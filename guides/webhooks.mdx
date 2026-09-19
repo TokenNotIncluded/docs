@@ -1,5 +1,5 @@
 ---
-title: "Tokenz Webhooks: Real-Time Event Notifications"
+title: "Tokenz Webhook Events: Types, Retries, and Delivery"
 sidebarTitle: "Webhooks"
 description: "Tokenz webhooks deliver real-time event notifications to your server. Use them to fulfill orders, track refunds, respond to disputes, and more."
 ---
@@ -38,7 +38,9 @@ Every webhook Tokenz delivers has the same top-level envelope. The `eventData` f
 |---|---|
 | `id` | Use as an idempotency key to detect duplicate deliveries |
 | `object` | Event type (e.g., `order.succeeded`) |
+| `createdAt` | ISO 8601 timestamp of when the event was generated |
 | `test` | `true` if this is a test event |
+| `eventData.type` | The category of the changed object (e.g., `order`) |
 | `eventData.version` | API version used when the event was generated |
 | `eventData.data` | The changed object at the time the event fired |
 
@@ -84,23 +86,25 @@ Because Tokenz may deliver the same event more than once — including during re
 
 ## Troubleshooting
 
-<Accordion title="My endpoint isn't receiving events">
-  - Check the HTTP status your endpoint returned in the Tokenz Dashboard delivery log: `2xx` means delivered, `4xx` means your server rejected the request, and `5xx` or a timeout means your server errored.
-  - Confirm your endpoint is publicly reachable over HTTPS. Tokenz cannot deliver to `localhost` or private network addresses.
-  - Check for firewalls, WAFs, or IP allowlists that may be blocking inbound requests from Tokenz.
-  - Use [webhook.site](https://webhook.site) as a temporary endpoint to inspect the exact payload and headers Tokenz sends.
-</Accordion>
+<AccordionGroup>
+  <Accordion title="My endpoint isn't receiving events">
+    - Check the HTTP status your endpoint returned in the Tokenz Dashboard delivery log: `2xx` means delivered, `4xx` means your server rejected the request, and `5xx` or a timeout means your server errored.
+    - Confirm your endpoint is publicly reachable over HTTPS. Tokenz cannot deliver to `localhost` or private network addresses.
+    - Check for firewalls, WAFs, or IP allowlists that may be blocking inbound requests from Tokenz.
+    - Use [webhook.site](https://webhook.site) as a temporary endpoint to inspect the exact payload and headers Tokenz sends.
+  </Accordion>
 
-<Accordion title="Signature verification is failing">
-  - Always verify the signature over the **raw request body** — not a re-serialized version of the parsed JSON. Even a single byte difference will cause a mismatch.
-  - Confirm you are using the signing secret for the specific endpoint you registered. Each endpoint has its own secret, shown once at creation.
-  - Make sure you are matching mode correctly — a test event verified with a live signing secret will never match.
-  - Check for clock skew between your server and Tokenz. Signatures are rejected if the timestamp in the header is more than **5 minutes** old.
-</Accordion>
+  <Accordion title="Signature verification is failing">
+    - Always verify the signature over the **raw request body** — not a re-serialized version of the parsed JSON. Even a single byte difference will cause a mismatch.
+    - Confirm you are using the signing secret for the specific endpoint you registered. Each endpoint has its own secret, shown once at creation.
+    - Make sure you are matching mode correctly — a test event verified with a live signing secret will never match.
+    - Check for clock skew between your server and Tokenz. Signatures are rejected if the timestamp in the header is more than **5 minutes** old.
+  </Accordion>
 
-<Accordion title="I'm getting duplicate events">
-  Duplicate delivery is expected behavior — Tokenz may send the same event more than once, especially during retries. To handle this safely:
+  <Accordion title="I'm getting duplicate events">
+    Duplicate delivery is expected behavior — Tokenz may send the same event more than once, especially during retries. To handle this safely:
 
-  - Use the top-level event `id` as your idempotency key.
-  - Store fulfilled event IDs in **durable storage** (a database), not a cache with a short expiry. A short-lived cache won't protect you if a duplicate arrives hours later during a retry sequence.
-</Accordion>
+    - Use the top-level event `id` as your idempotency key.
+    - Store fulfilled event IDs in **durable storage** (a database), not a cache with a short expiry. A short-lived cache won't protect you if a duplicate arrives hours later during a retry sequence.
+  </Accordion>
+</AccordionGroup>

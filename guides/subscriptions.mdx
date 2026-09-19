@@ -1,5 +1,5 @@
 ---
-title: "Sell Recurring Subscriptions with Tokenz"
+title: "Create and Manage Recurring Subscriptions with Tokenz"
 sidebarTitle: "Subscriptions"
 description: "Create card-based recurring subscriptions with trial periods and automatic renewal. Tokenz manages billing, dunning, plan changes, and lifecycle webhooks."
 ---
@@ -25,6 +25,10 @@ Before creating your first subscription, familiarize yourself with these key ter
 <Steps>
   <Step title="Create the session with a subscription block">
     Add a `subscription` object to your standard Checkout Session request. All other fields — `itemDetails`, `successUrl`, `customerInfo` — work the same as for one-time payments.
+
+    <Warning>
+      A subscription Checkout Session must contain exactly **one item** in `itemDetails`. Multiple items per subscription are not supported.
+    </Warning>
 
     ```bash create-subscription.sh
     curl --request POST \
@@ -102,8 +106,10 @@ Listen for these subscription events on your webhook endpoint and take the corre
 
 | Event | Action |
 |---|---|
+| `subscription.created` | Record the new subscription — the customer has initiated checkout but not yet authorized their card. |
 | `subscription.activated` | Grant access — the first charge succeeded and the subscription is now active. |
 | `subscription.trial_started` | Start the trial — no charge has occurred yet; grant access for the trial period. |
+| `subscription.trial_ended` | Note the trial conclusion — the trial period has elapsed and the first billing charge is about to be attempted. |
 | `subscription.renewed` | Extend access for the next billing period — a renewal charge succeeded. |
 | `subscription.unpaid` | Warn the user — a charge failed and dunning has started. Consider surfacing a recovery link. |
 | `subscription.payment_method_updated` | Update your cached card metadata — the subscriber has entered a new card. |

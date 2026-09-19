@@ -1,5 +1,5 @@
 ---
-title: "Supported Currencies and Amount Formatting"
+title: "Currencies and Amount Formatting in Tokenz Checkout"
 sidebarTitle: "Currencies"
 description: "Tokenz supports 45 currencies. All amounts use the smallest minor unit. Zero-decimal currencies like JPY use the value as-is; USD and EUR multiply by 100."
 ---
@@ -53,9 +53,12 @@ The table below shows the factor to apply and a worked example for the most comm
 | Australian Dollar | AUD | Cents | ×100 | 1000 |
 | Canadian Dollar | CAD | Cents | ×100 | 1000 |
 | Brazilian Real | BRL | Centavos | ×100 | 1000 |
+| Ugandan Shilling | UGX | — | ×1 | 10 |
+| Vietnamese Dong | VND | — | ×1 | 10 |
+| Chilean Peso | CLP | — | ×1 | 10 |
 | Bahraini Dinar | BHD | Fils | ×1000 | 10000 |
 | Kuwaiti Dinar | KWD | Fils | ×1000 | 10000 |
-| Vietnamese Dong | VND | — | ×1 | 10 |
+| Omani Rial | OMR | Fils | ×1000 | 10000 |
 
 <Warning>
   API **responses** also return amounts in minor units. When displaying amounts to customers — in confirmations, receipts, or dashboards — divide the API value by the factor (e.g., divide USD by 100). For zero-decimal currencies, display the value as-is.

@@ -1,5 +1,5 @@
 ---
-title: "Retrieve, Cancel, and Register Delivery for Orders"
+title: "Retrieve, Cancel, and Deliver Orders with Tokenz API"
 sidebarTitle: "Orders"
 description: "The Tokenz Orders API lets you retrieve order details, cancel orders, and register delivery records for fulfillment tracking and dispute protection."
 ---
@@ -77,6 +77,7 @@ curl --request POST \
 
 Delivery records are your evidence in disputes. When a customer challenges a charge, Tokenz and the card network look for delivery records to confirm fulfillment. They are also required for auditing purposes. You can make multiple delivery calls per order to support partial fulfillment.
 
+<CodeGroup>
 ```bash register-delivery.sh
 curl --request POST \
   --url https://api.tokenz.one/v2/order/order_1D5xA9BnKfv_t/delivery \
@@ -106,6 +107,7 @@ curl --request POST \
   "message": "Delivery record has been registered successfully"
 }
 ```
+</CodeGroup>
 
 ### Delivery record field guide
 

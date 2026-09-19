@@ -1,5 +1,5 @@
 ---
-title: "Test Your Tokenz Integration Before Going Live"
+title: "Testing Your Tokenz Integration with Test Mode and Cards"
 sidebarTitle: "Testing"
 description: "Simulate payments, trigger declines, test async methods like Konbini, and verify webhook delivery using Tokenz test mode and test card numbers."
 ---
@@ -115,7 +115,7 @@ Konbini is a convenience store cash payment method common in Japan. In live mode
 
 </Steps>
 
-## Test wallet payments (PayPay, Alipay)
+## Test wallet payments (PayPay)
 
 To test wallet payment methods, include the `paymentMethodKinds` field in your session request:
 
@@ -134,7 +134,7 @@ curl --request POST \
   }'
 ```
 
-Open the checkout URL, enter your email address when prompted, and set the **Test Authorization Result** to your desired outcome. Click **Continue with PayPay** — a placeholder wallet screen appears (no real wallet app is required in test mode). Click **Pay** to complete the simulated flow. The `order.succeeded` webhook fires to your test endpoint on success.
+Open the checkout URL, enter your email address when prompted, and set the **Test Authorization Result** to your desired outcome. Click **Continue with PayPay** — a simulated wallet screen appears (no real wallet app is required in test mode). Click **Pay** to complete the simulated flow. The `order.succeeded` webhook fires to your test endpoint on success.
 
 ## Test disputes
 

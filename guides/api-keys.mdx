@@ -1,12 +1,16 @@
 ---
-title: "Authenticate Tokenz API Requests with API Keys"
+title: "Tokenz API Keys: Authentication, Scopes, and Rotation"
 sidebarTitle: "API Keys"
-description: "Learn how to create, use, and rotate Tokenz API keys. Pass your secret key as a Bearer token to authenticate every request."
+description: "Create, scope, and rotate Tokenz API keys. Use test keys during development and live keys in production, always passed as a Bearer token."
 ---
 
-Tokenz uses secret API keys to authenticate every request you make to the API. Include your key as a Bearer token in the `Authorization` header — no sessions, no cookies, no OAuth flows. Every call you make to the Tokenz API must carry this header or the request will be rejected.
+Tokenz uses secret API keys to authenticate every request you make to the API. Include your key as a Bearer token in the `Authorization` header — no sessions, no cookies, no OAuth flows. Every call you make to the Tokenz API must carry this header or the request will be rejected with a `401 Unauthorized` error.
 
-```bash
+## Authenticating a request
+
+Pass your secret key in the `Authorization` header on every API call:
+
+```bash authenticate.sh
 curl https://api.tokenz.one/v2/checkoutsession \
   --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
 ```
@@ -63,7 +67,7 @@ Tokenz immediately rejects any request that uses a deleted key, so complete your
 
 Webhook signing secrets are separate from API keys. Each webhook endpoint you register in the Dashboard gets its own signing secret, which Tokenz uses to sign the `Tokenz-Signature` header on every event delivery. You use this secret to verify that the payload came from Tokenz and has not been tampered with.
 
-See the [Webhook Integration guide](/guides/webhook-integration) for full verification instructions including the HMAC-SHA256 signature algorithm.
+The signature is computed as an HMAC-SHA256 digest of the timestamp and raw request body, encoded in base64. See the [Webhook Integration guide](/guides/webhook-integration) for full verification instructions and example code.
 
 ## Authentication errors
 

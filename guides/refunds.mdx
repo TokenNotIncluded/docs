@@ -1,7 +1,7 @@
 ---
-title: "Process Refunds for Completed Tokenz Orders"
+title: "Process Refunds for Tokenz Orders via the Refunds API"
 sidebarTitle: "Refunds"
-description: "Use the Tokenz Refunds API to initiate refunds, check refund status, and list refunds for completed orders. Track progress via refund webhooks."
+description: "Use the Tokenz Refunds API to issue refunds, check refund status, and list refunds for orders. Monitor progress with refund webhooks."
 ---
 
 The Tokenz Refunds API lets you return funds to customers for completed orders. Refunds are processed asynchronously — initiate them via the API and then monitor their progress via webhooks or by polling the refund object.
@@ -77,7 +77,7 @@ curl --request GET \
 
 ## List refunds
 
-Send a `GET` request to `/v2/refunds` with query parameters to retrieve a paginated list of refunds.
+Send a `GET` request to `/v2/refunds` with query parameters to retrieve a paginated list of refunds. All query parameters are optional.
 
 ```bash list-refunds.sh
 curl --request GET \
@@ -98,7 +98,19 @@ curl --request GET \
 ```json refunds-list.json
 {
   "refunds": {
-    "items": [ { "...refund object..." } ],
+    "items": [
+      {
+        "id": "refund_1p4LS47fB1h",
+        "object": "refund",
+        "orderId": "order_1p4LPTRKB5Z",
+        "amount": { "amount": 10000, "currency": "JPY" },
+        "status": "pending",
+        "reason": "customer_cancellation",
+        "initiatedBy": "apikey",
+        "test": false,
+        "createdAt": "2024-10-07T10:30:00Z"
+      }
+    ],
     "hasMore": false
   }
 }

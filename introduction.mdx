@@ -1,7 +1,7 @@
 ---
 title: "Tokenz: Merchant of Record Payments for Digital Goods"
 sidebarTitle: "Introduction"
-description: "Tokenz is a Merchant of Record checkout platform for gaming and digital goods companies. Accept 50+ payment methods globally, automate tax, and manage orders via API."
+description: "Tokenz is a Merchant of Record platform for gaming and digital goods. Accept 50+ payment methods globally, automate tax, and manage orders via API."
 ---
 
 Tokenz is a Merchant of Record (MoR) checkout platform built for game developers and digital goods merchants who need to sell globally without the complexity of tax compliance, payment infrastructure, or fraud management. When you use Tokenz, you integrate once and immediately gain access to 50+ payment methods across APAC, Europe, and the Americas — while Tokenz assumes legal responsibility for VAT, GST, and sales tax calculation, collection, and remittance on your behalf.
@@ -44,15 +44,15 @@ Tokenz sits between your store and the global payments ecosystem, handling the h
 
 <Steps>
   <Step title="Create a Checkout Session via API">
-    Send a `POST` request to `https://api.tokenz.one/v1/checkout/sessions` with your product details, pricing, and customer information to create a new checkout session. Tokenz returns a unique `sessionId` you use to build the redirect URL.
+    Send a `POST` request to `https://api.tokenz.one/v2/checkoutsession` with your product details, pricing, and customer information to create a new checkout session. Tokenz returns a session object containing a hosted checkout `url` you redirect the customer to.
   </Step>
-  <Step title="Redirect customer to hosted payment page">
-    Send your customer to `https://checkout.tokenz.one/{sessionId}`. The hosted page automatically presents the payment methods available in the customer's region and handles the entire payment flow for you.
+  <Step title="Redirect the customer to the hosted payment page">
+    Redirect your customer to the `url` returned in the session response. The hosted page automatically presents the payment methods available in the customer's region and handles the entire payment flow for you.
   </Step>
   <Step title="Customer pays using their preferred method">
     The customer selects a payment method — card, e-wallet, bank transfer, or cash — and completes the transaction. Tokenz manages currency conversion, tax display, and payment processing end to end.
   </Step>
-  <Step title="Receive `order.succeeded` webhook and fulfill the order">
+  <Step title="Receive the order.succeeded webhook and fulfill the order">
     Once payment is confirmed, Tokenz sends an `order.succeeded` event to your webhook endpoint. Verify the event signature and fulfill the order — grant entitlements, deliver goods, or activate the subscription.
   </Step>
 </Steps>
