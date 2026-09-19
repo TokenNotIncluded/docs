@@ -1,0 +1,137 @@
+---
+title: "Handle Payment Disputes and Chargebacks"
+sidebarTitle: "Disputes"
+description: "When customers dispute a charge, Tokenz notifies you via webhooks. Respond quickly with delivery records before the evidence deadline to protect your revenue."
+---
+
+When a customer challenges a payment with their card issuer, Tokenz creates a dispute and notifies you via webhooks. Responding promptly with delivery evidence gives you the best chance of winning — acting before the `evidenceDueBy` deadline is critical.
+
+## Dispute lifecycle
+
+<Steps>
+  <Step title="Customer opens a dispute">
+    A customer or their bank opens a dispute against a payment. The order is flagged and funds may be held.
+  </Step>
+  <Step title="Tokenz sends dispute.created">
+    Tokenz fires a `dispute.created` webhook containing the dispute details and an `evidenceDueBy` deadline. Act immediately.
+  </Step>
+  <Step title="You submit delivery evidence">
+    Submit your delivery records via `POST /v2/order/{orderId}/delivery` before the deadline. Include user identifiers, item SKUs, quantities, and delivery timestamps.
+  </Step>
+  <Step title="Bank makes a decision">
+    The issuing bank reviews the evidence and delivers a verdict. Tokenz fires a `dispute.closed` webhook with `outcome: won` or `outcome: lost`.
+  </Step>
+</Steps>
+
+## Dispute statuses
+
+| Status | Meaning |
+|---|---|
+| `created` | Dispute opened; awaiting resolution |
+| `underReview` | Evidence submitted; currently under review by the bank |
+| `lost` | Dispute decided in the customer's favor |
+| `won` | Dispute decided in the merchant's favor |
+
+## Dispute reason codes
+
+| Reason | Description |
+|---|---|
+| `fraudulent` | Customer claims the charge was unauthorized |
+| `duplicate` | Customer claims they were charged more than once |
+| `product_not_received` | Customer claims the item was never delivered |
+| `product_unacceptable` | Customer claims the item was not as described |
+| `unrecognized` | Customer does not recognize the charge |
+| `general` | General or unclassified dispute |
+
+## The `dispute.created` event
+
+When a dispute opens, Tokenz sends a `dispute.created` event to your webhook endpoint. Parse the `evidenceDueBy` field immediately and add it to your internal tracking system.
+
+```json dispute-created.json
+{
+  "id": "d4584e9a-2734-4e32-8d3d-3db675ed329a",
+  "object": "dispute.created",
+  "createdAt": "2026-02-13T14:01:50.158Z",
+  "test": true,
+  "eventData": {
+    "type": "dispute",
+    "version": "v2",
+    "data": {
+      "dispute": {
+        "id": "dispute_2CjCzaPskfh",
+        "orderId": "order_2CjCq5NEAXR",
+        "amount": { "amount": 1000, "currency": "USD" },
+        "reason": "fraudulent",
+        "status": "created",
+        "evidenceDueBy": "2026-02-20T14:02:50.158Z",
+        "createdAt": "2026-02-13T14:01:50.158Z"
+      }
+    }
+  }
+}
+```
+
+## The `dispute.closed` event
+
+When the bank reaches a verdict, Tokenz fires a `dispute.closed` event. Check the `outcome` field to determine the result and update your internal records accordingly.
+
+```json dispute-closed.json
+{
+  "id": "f9c12b3a-4411-4b21-9aef-7dc902fa841c",
+  "object": "dispute.closed",
+  "createdAt": "2026-02-21T09:15:00.000Z",
+  "test": true,
+  "eventData": {
+    "type": "dispute",
+    "version": "v2",
+    "data": {
+      "dispute": {
+        "id": "dispute_2CjCzaPskfh",
+        "orderId": "order_2CjCq5NEAXR",
+        "amount": { "amount": 1000, "currency": "USD" },
+        "reason": "fraudulent",
+        "status": "won",
+        "outcome": "won",
+        "closedAt": "2026-02-21T09:15:00.000Z"
+      }
+    }
+  }
+}
+```
+
+## Submitting evidence
+
+<Warning>
+  Submit delivery records **before** the `evidenceDueBy` deadline. Records submitted after the dispute moves to `underReview` will not be forwarded to the bank and will not count as evidence. Use `POST /v2/order/{orderId}/delivery` as described in [Orders](/guides/orders).
+</Warning>
+
+Send a delivery record that includes the user identifier, email address, item SKUs, delivered quantities, and the ISO 8601 timestamp of fulfillment. The more detail you provide, the stronger your evidence.
+
+<Tip>
+  Follow these practices to maximize your chances of winning disputes:
+
+  - Register delivery records immediately after every fulfillment — don't batch them
+  - Always include `user.userId`, `user.emailAddress`, item `sku`, `name`, and `deliveredQuantity`
+  - Use precise ISO 8601 timestamps that match your game server or delivery system logs
+  - Store delivery records in durable, queryable storage so you can retrieve them within minutes of a `dispute.created` webhook
+</Tip>
+
+## Testing disputes
+
+Use your test API keys and a test card to simulate the full dispute flow in a sandbox environment.
+
+<Steps>
+  <Step title="Complete a test payment">
+    Create a Checkout Session with a test API key and complete a payment using a test card. Set the **Test Dispute Result** on the card to **Won** or **Lost** depending on which outcome you want to simulate.
+  </Step>
+  <Step title="Receive dispute.created">
+    Within seconds of payment, a `dispute.created` webhook fires to your test webhook endpoint. The payload includes a real-looking `evidenceDueBy` deadline and `"test": true`.
+  </Step>
+  <Step title="Receive dispute.closed">
+    Shortly after, a `dispute.closed` webhook fires with `outcome: won` or `outcome: lost` matching your test card configuration.
+  </Step>
+</Steps>
+
+<Note>
+  Test dispute webhooks are delivered only to endpoints registered with a test API key. They are never sent to live endpoints and do not affect real funds.
+</Note>

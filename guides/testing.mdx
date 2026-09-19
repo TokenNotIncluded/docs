@@ -1,0 +1,157 @@
+---
+title: "Test Your Tokenz Integration Before Going Live"
+sidebarTitle: "Testing"
+description: "Simulate payments, trigger declines, test async methods like Konbini, and verify webhook delivery using Tokenz test mode and test card numbers."
+---
+
+Use test API keys and test payment methods to fully exercise your integration without moving any real money. Tokenz test mode mirrors the live environment exactly — the same API, the same webhooks, and the same checkout UI — so the behavior you see in testing is the behavior your customers will experience in production.
+
+<Note>
+  **Test mode basics**
+
+  - Any Checkout Session created with a `secret_test_…` key automatically runs in test mode.
+  - Test entity IDs are suffixed with `_t` (for example, `order_abc123_t`) so you can distinguish them from live objects at a glance.
+  - Webhooks fired in test mode are delivered only to webhook endpoints you have registered as **test** endpoints in the Dashboard. They are never sent to live endpoints.
+</Note>
+
+## Complete a test card payment
+
+<Steps>
+
+  <Step title="Create a Checkout Session with your test key">
+    Send a `POST` request to `/v2/checkoutsession` using your `secret_test_…` key:
+
+    ```bash create-test-session.sh
+    curl --request POST \
+      --url https://api.tokenz.one/v2/checkoutsession \
+      --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "itemDetails": [
+          {
+            "product": {
+              "label": "Test Item",
+              "quantity": 1,
+              "price": { "currency": "JPY", "amount": 500 },
+              "taxCategory": "VIRTUAL_CURRENCY"
+            }
+          }
+        ],
+        "successUrl": "https://yourdomain.com/success",
+        "pendingUrl": "https://yourdomain.com/pending",
+        "cancelUrl": "https://yourdomain.com/cancel",
+        "customerInfo": {}
+      }'
+    ```
+
+    Copy the `url` from the response.
+  </Step>
+
+  <Step title="Open the checkout URL and select Card payment">
+    Open the returned URL in your browser. The Tokenz-hosted checkout page loads in test mode. Select **Card** as the payment method.
+  </Step>
+
+  <Step title="Enter a test card number">
+    Use one of the test card numbers from the table in the next section. Enter any future expiry date and any CVC value that matches the required digit count for the brand.
+  </Step>
+
+  <Step title="Set the result to Success and click Pay">
+    Leave the **Test Authorization Result** toggle set to **Success** and click **Pay**. The checkout completes and redirects you to your `successUrl`.
+  </Step>
+
+  <Step title="Verify your webhook received order.succeeded">
+    Check your webhook endpoint (or [webhook.site](https://webhook.site) if you are using it for testing) and confirm it received an `order.succeeded` event. The event payload contains the fulfilled order object including the order ID, amount, and line items.
+  </Step>
+
+</Steps>
+
+## Test card numbers
+
+Use these card numbers exclusively in test mode. They simulate real brand behavior without processing any charge.
+
+| Brand | Number | CVC | Expiry |
+|---|---|---|---|
+| Visa | `4242 4242 4242 4242` | Any 3 digits | Any future date |
+| Visa | `4111 1111 1111 1111` | Any 3 digits | Any future date |
+| Mastercard | `5555 5555 5555 4444` | Any 3 digits | Any future date |
+| Mastercard | `2222 2222 2222 2224` | Any 3 digits | Any future date |
+| JCB | `3530 1113 3330 0000` | Any 3 digits | Any future date |
+| Amex | `3714 4963 539 8431` | Any 4 digits | Any future date |
+| Diners | `3611 111111 1111` | Any 3 digits | Any future date |
+
+<Warning>
+  Never enter real card numbers on a test mode checkout page. Test mode is not PCI-scoped in the same way as production — use only the synthetic numbers listed above.
+</Warning>
+
+## Trigger a payment decline
+
+Follow the same steps as a successful card payment, but toggle the **Test Authorization Result** to **Decline** before clicking **Pay**. The checkout returns the customer to the card input screen with a decline message. No order is created and no webhook fires. Use this to verify that your UI handles failed payment states gracefully.
+
+## Test async payments (Konbini)
+
+Konbini is a convenience store cash payment method common in Japan. In live mode, the customer has hours or days to pay at a store. In test mode, the confirmation fires after roughly ten seconds.
+
+<Steps>
+
+  <Step title="Create a Checkout Session and open the URL">
+    Use your test key to create a session as shown above and open the returned URL.
+  </Step>
+
+  <Step title="Select Japan as the region and choose Konbini">
+    On the checkout page, set your region to **Japan**, then select **Konbini** from the available payment methods.
+  </Step>
+
+  <Step title="Fill in the payment details">
+    Enter the required details (name, email, and preferred convenience store chain) as prompted by the checkout form.
+  </Step>
+
+  <Step title="Set the result to Success and click Pay">
+    Leave **Test Authorization Result** set to **Success** and click **Pay**. The checkout displays a pending confirmation screen — this mirrors the real experience where the customer has yet to visit the store.
+  </Step>
+
+  <Step title="Wait for the webhook">
+    After approximately ten seconds in test mode, Tokenz simulates the store confirmation and fires the `order.succeeded` webhook to your test endpoint. Verify that your fulfillment logic handles the async delay correctly.
+  </Step>
+
+</Steps>
+
+## Test wallet payments (PayPay, Alipay)
+
+To test wallet payment methods, include the `paymentMethodKinds` field in your session request:
+
+```bash create-wallet-session.sh
+curl --request POST \
+  --url https://api.tokenz.one/v2/checkoutsession \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "itemDetails": [ /* your items */ ],
+    "paymentMethodKinds": ["PAYPAY"],
+    "successUrl": "https://yourdomain.com/success",
+    "pendingUrl": "https://yourdomain.com/pending",
+    "cancelUrl": "https://yourdomain.com/cancel",
+    "customerInfo": {}
+  }'
+```
+
+Open the checkout URL, enter your email address when prompted, and set the **Test Authorization Result** to your desired outcome. Click **Continue with PayPay** — a placeholder wallet screen appears (no real wallet app is required in test mode). Click **Pay** to complete the simulated flow. The `order.succeeded` webhook fires to your test endpoint on success.
+
+## Test disputes
+
+To simulate a dispute, complete a successful test card payment and set the **Test Dispute Result** to either **Won** or **Lost** before clicking Pay. Within seconds, Tokenz fires two events in sequence:
+
+1. `dispute.created` — the dispute is opened
+2. `dispute.closed` — the dispute is resolved with the result you selected
+
+Use this flow to verify your dispute-handling logic, reporting, and any inventory or access adjustments that should happen on a lost dispute. For full dispute event schemas, see the [Disputes guide](/guides/disputes).
+
+## Go live checklist
+
+<Tip>
+  When you are ready to accept real payments, run through this checklist:
+
+  1. **Swap your API key** — replace `secret_test_…` with your `secret_live_…` key in all server environments.
+  2. **Register a live webhook endpoint** — create a new endpoint in **Dashboard → Developers → Webhooks** under your live account. This generates a new signing secret; update `TOKENZ_WEBHOOK_SECRET` in your environment.
+  3. **Deploy to a stable HTTPS URL** — your live webhook endpoint must be publicly reachable over HTTPS with a valid TLS certificate.
+  4. **Run a live smoke test** — make one real low-value purchase end to end to confirm the full production flow works before announcing to customers.
+</Tip>

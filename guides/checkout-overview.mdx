@@ -1,0 +1,88 @@
+---
+title: "Tokenz Checkout: Hosted Payment Page Overview"
+sidebarTitle: "Overview"
+description: "Tokenz Checkout is a hosted, prebuilt payment form. Create a Checkout Session via API, redirect customers, and receive order webhooks for fulfillment."
+---
+
+Tokenz Checkout is a fully hosted payment form that handles everything between your "Buy Now" button and your fulfillment logic — including payment method rendering, 3DS authentication, real-time tax calculation, and post-payment redirect flows. You create a session on your server, redirect the customer, and Tokenz takes care of the rest.
+
+## How it works
+
+The Checkout flow follows a straightforward lifecycle from your storefront to fulfilled order:
+
+1. Customer selects items and clicks checkout on your site.
+2. Your server creates a Checkout Session via the Tokenz API.
+3. Tokenz returns a session object containing a `url`.
+4. You redirect the customer to that `url`.
+5. Customer completes payment on the Tokenz-hosted page.
+6. Tokenz redirects the customer back to your `successUrl`, `pendingUrl`, or `cancelUrl`.
+7. Tokenz sends a webhook event to your server.
+8. Your server fulfills the order upon receiving the `order.succeeded` event.
+
+## Checkout Session object
+
+When you create a Checkout Session, the API returns the following key fields:
+
+<ParamField body="id" type="string">
+  Unique identifier for the Checkout Session. Use this to look up or reference the session later.
+</ParamField>
+
+<ParamField body="url" type="string">
+  The fully formed URL of the Tokenz-hosted payment page. Redirect your customer here immediately after creating the session.
+</ParamField>
+
+<ParamField body="order" type="object">
+  The associated order object. On creation, its status is `requiresPayment`. It transitions to `succeeded` or `failed` after the customer attempts payment.
+</ParamField>
+
+<ParamField body="test" type="boolean">
+  Indicates whether this session was created using a test API key. Test sessions do not process real payments.
+</ParamField>
+
+## Tax categories
+
+As a Merchant of Record, Tokenz automatically calculates and collects the correct tax for every transaction based on the product's `taxCategory` and the customer's location. Set the appropriate category for each line item:
+
+| Value | Use for |
+|---|---|
+| `VIRTUAL_CURRENCY` | In-game currency, tokens, virtual coins |
+| `DIGITAL_GOODS_AND_SERVICES` | Game items, downloadable content, digital services |
+| `EBOOK` | Electronic books and publications |
+| `SAAS` | Software as a Service subscriptions |
+
+<Note>
+  You do not need to calculate, collect, or remit tax yourself. Tokenz handles tax compliance globally as your Merchant of Record.
+</Note>
+
+## Payment methods
+
+Tokenz supports 50+ payment methods out of the box. By default, all methods available for the customer's detected region are shown on the checkout page. You can restrict which methods appear by passing the `paymentMethodKinds` array when creating a session:
+
+```json payment-method-filter.json
+{ "paymentMethodKinds": ["CARD", "PAYPAY", "KONBINI"] }
+```
+
+See [Payment Methods](/guides/payment-methods) for the full list of supported method API values.
+
+## Amount format
+
+<Note>
+  All monetary amounts in the Tokenz API use the **smallest currency unit**. For example, `1200` in JPY equals ¥1,200 (zero-decimal), while `1299` in USD equals $12.99 (two-decimal). See [Currencies](/guides/currencies) for a full list of zero-decimal and three-decimal currencies.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Checkout Integration" icon="code" href="/guides/checkout-integration">
+    Follow the step-by-step guide to add Tokenz Checkout to your application.
+  </Card>
+  <Card title="Payment Methods" icon="credit-card" href="/guides/payment-methods">
+    Browse all 50+ supported payment methods and their API values.
+  </Card>
+  <Card title="Testing" icon="flask" href="/guides/testing">
+    Use test cards and wallets to validate your integration before going live.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/guides/webhook-integration">
+    Set up webhook listeners to reliably fulfill orders after payment.
+  </Card>
+</CardGroup>

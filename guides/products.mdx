@@ -1,0 +1,189 @@
+---
+title: "Manage Virtual Items and Bundles with the Product API"
+sidebarTitle: "Products"
+description: "The Tokenz Product API lets you retrieve virtual items and bundles from your catalog to display in your storefront and reference in Checkout Sessions."
+---
+
+The Tokenz Product API is a content management system for virtual items and bundles. Use it to retrieve your catalog programmatically and reference items directly when creating Checkout Sessions — keeping your storefront in sync with what you've configured in the Dashboard.
+
+<Note>
+  The Product API is currently in beta. Some functionality may change.
+</Note>
+
+## Product system overview
+
+The Product API is built around two components:
+
+- **Virtual Items** — individual digital products with names, descriptions, images, and pricing. Each item has a unique ID, an optional SKU, localized labels, and a unit price in your configured default currency.
+- **Bundles** — collections of virtual items sold together at a single bundle price. Bundles let you group related items and offer them at a combined price distinct from the sum of individual item prices.
+
+## Product lifecycle
+
+<Steps>
+  <Step title="Create and configure products in the Dashboard">
+    Define your virtual items and bundles in the [Tokenz Dashboard](https://dashboard.tokenz.one), including names, descriptions, images, SKUs, and pricing. All product configuration happens here — the API is read-only.
+  </Step>
+  <Step title="Retrieve product data via API">
+    Fetch your catalog programmatically to display items in your storefront, game client, or any other surface. Use pagination and filtering to retrieve exactly the items you need.
+  </Step>
+  <Step title="Reference product IDs in Checkout Sessions">
+    When a customer is ready to buy, pass the product or bundle ID directly in your Checkout Session request. Tokenz resolves the current name, image, and price from your catalog automatically.
+  </Step>
+  <Step title="Tokenz handles pricing and checkout">
+    Tokenz applies the configured unit price, handles tax calculation, and presents the checkout page. No additional price data is needed from your server at checkout time.
+  </Step>
+</Steps>
+
+## List virtual items
+
+Send a `GET` request to `/v2/product/virtual-items` to retrieve all virtual items in your catalog. The response is paginated and supports several query parameters for filtering and sorting.
+
+```bash list-items.sh
+curl --request GET \
+  --url 'https://api.tokenz.one/v2/product/virtual-items' \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
+```
+
+**Query parameters**
+
+<ParamField query="limit" type="integer">
+  Number of items to return per page. Maximum `100`, default `20`.
+</ParamField>
+
+<ParamField query="offset" type="integer">
+  Number of items to skip before starting to return results. Use with `limit` to paginate through your catalog.
+</ParamField>
+
+<ParamField query="sku" type="string">
+  Filter results to a single item by exact SKU match.
+</ParamField>
+
+<ParamField query="category" type="string">
+  Filter results by category. Returns only items assigned to the specified category.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Sort order for results. Accepted values: `name_asc`, `name_desc`, `sku_asc`, `sku_desc`, `created_asc`, `created_desc`.
+</ParamField>
+
+**Sample response**
+
+```json response.json
+{
+  "data": [
+    {
+      "id": "virtualitem_YJoSoHrd9R1",
+      "sku": "gold-ring-350",
+      "label": { "en_US": "Gold Ring" },
+      "description": { "en_US": "" },
+      "images": [
+        {
+          "id": "3ZUJBfy7M99jRh0YglPUQv",
+          "url": "https://images.ctfassets.net/.../gold-ring.png",
+          "width": 240,
+          "height": 240
+        }
+      ],
+      "defaultFiatCurrency": "JPY",
+      "unitPrices": [{ "amount": 350, "currency": "JPY" }],
+      "taxCategory": "DIGITAL_GOODS_AND_SERVICES",
+      "createdAt": "2025-07-28T04:28:21.112Z"
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "limit": 20,
+    "offset": 0,
+    "hasNext": false,
+    "hasPrevious": false
+  }
+}
+```
+
+<Note>
+  Amount values are in the smallest minor unit for the currency. `350` with `"currency": "JPY"` equals ¥350 — JPY is a zero-decimal currency, so the value is used as-is. For USD, `1200` would equal $12.00.
+</Note>
+
+## Get a virtual item by ID
+
+Fetch a single virtual item by its ID. Use this to display item details or verify a product exists before referencing it in a Checkout Session.
+
+```bash get-item.sh
+curl --request GET \
+  --url https://api.tokenz.one/v2/product/virtual-items/{VirtualItemID} \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
+```
+
+Replace `{VirtualItemID}` with a value like `virtualitem_YJoSoHrd9R1`.
+
+## List bundles
+
+Retrieve all bundles in your catalog. Use the `include_items` parameter to embed the full virtual item details within each bundle response — useful when building a bundle display page.
+
+<ParamField query="include_items" type="boolean">
+  When `true`, each bundle in the response includes its constituent virtual items with their full metadata. Defaults to `false`.
+</ParamField>
+
+```bash list-bundles.sh
+curl --request GET \
+  --url 'https://api.tokenz.one/v2/product/bundles?include_items=true' \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
+```
+
+The response follows the same paginated structure as virtual items, with `data` and `pagination` fields. Each bundle includes its own `unitPrices` array — this is the price charged for the bundle, not the sum of item prices.
+
+## Get a bundle by ID
+
+Fetch a single bundle by its ID.
+
+```bash get-bundle.sh
+curl --request GET \
+  --url https://api.tokenz.one/v2/product/bundles/{BundleID} \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
+```
+
+## Using products in Checkout Sessions
+
+Rather than supplying inline product details at checkout time, you can reference a virtual item or bundle directly by its ID. When you do, Tokenz automatically pulls the current name, image, and configured unit price from your catalog — no need to keep product data in sync on your server.
+
+**Reference a virtual item:**
+
+```json using-virtual-item.json
+{
+  "itemDetails": [
+    {
+      "virtualItem": {
+        "id": "virtualitem_YJoSoHrd9R1",
+        "quantity": 2
+      }
+    }
+  ]
+}
+```
+
+**Reference a bundle:**
+
+```json using-bundle.json
+{
+  "itemDetails": [
+    {
+      "bundle": {
+        "id": "bundle_GavBmyQmH43",
+        "quantity": 1
+      }
+    }
+  ]
+}
+```
+
+<Tip>
+  When using product IDs in a Checkout Session, pricing is pulled from the product configuration automatically. You do not need to supply `price` or `label` fields — they are resolved from the catalog.
+</Tip>
+
+## Error codes
+
+| HTTP Status | Code | Meaning |
+|---|---|---|
+| `401` | — | Invalid or missing API key. Check that your `Authorization` header includes a valid `secret_test_` or `secret_live_` key. |
+| `404` | — | Product not found. Verify the virtual item or bundle ID is correct and belongs to your account. |
+| `429` | — | Rate limit exceeded. Back off and retry after the interval indicated in the `Retry-After` response header. |

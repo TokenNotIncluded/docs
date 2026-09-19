@@ -1,0 +1,164 @@
+---
+title: "Get Started with Tokenz Checkout"
+sidebarTitle: "Quickstart"
+description: "Create your first Tokenz Checkout Session, redirect customers to the hosted payment page, and handle the order.succeeded webhook in five steps."
+---
+
+This quickstart walks you through the complete payment flow: creating a server-side Checkout Session, redirecting your customer to the Tokenz-hosted payment page, and fulfilling the order by handling the `order.succeeded` webhook. By the end, you will have a working end-to-end integration you can build on.
+
+<Note>
+  **Prerequisites**
+
+  Before you begin, make sure you have the following:
+
+  - A Tokenz merchant account — sign up at [dashboard.tokenz.one](https://dashboard.tokenz.one)
+  - A test API key — go to **Dashboard → Developers → API keys** and copy your `secret_test_…` key
+  - A publicly accessible HTTPS endpoint for receiving webhooks — use [webhook.site](https://webhook.site) if you need a quick test URL
+</Note>
+
+<Steps>
+
+  <Step title="Create a Checkout Session">
+    All Checkout Sessions are created server-side using your secret key. Send a `POST` request to `/v2/checkoutsession` with your item details and redirect URLs. Never make this call from browser or mobile code — your secret key must stay on the server.
+
+    ```bash create-session.sh
+    curl --request POST \
+      --url https://api.tokenz.one/v2/checkoutsession \
+      --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "itemDetails": [
+          {
+            "product": {
+              "label": "Star Shard Pack",
+              "description": "1,200 in-game Star Shards",
+              "images": [],
+              "quantity": 1,
+              "price": { "currency": "JPY", "amount": 1200 },
+              "taxCategory": "VIRTUAL_CURRENCY"
+            }
+          }
+        ],
+        "successUrl": "https://yourdomain.com/success",
+        "pendingUrl": "https://yourdomain.com/pending",
+        "cancelUrl": "https://yourdomain.com/cancel",
+        "customerInfo": {}
+      }'
+    ```
+
+    A successful response returns a session object containing a hosted checkout `url` and a linked `order`:
+
+    ```json response.json
+    {
+      "id": "checkoutsession_abc123",
+      "object": "checkoutsession",
+      "url": "https://checkout.tokenz.one/abc123",
+      "order": {
+        "id": "order_xyz789",
+        "status": "requiresPayment",
+        "amount": { "amount": 1200, "currency": "JPY" }
+      },
+      "test": true
+    }
+    ```
+
+    <Info>
+      All monetary amounts use the smallest currency unit. `1200` JPY equals ¥1,200 because JPY is a zero-decimal currency. For USD, `1200` would equal $12.00.
+    </Info>
+  </Step>
+
+  <Step title="Redirect to checkout">
+    Once you have the session, redirect your customer to the `url` from the response. Perform this redirect server-side — a `303 See Other` response is the cleanest approach.
+
+    ```javascript server.js
+    // Express example — server-side only, never expose your secret key to the browser
+    app.post('/create-checkout', async (req, res) => {
+      const response = await fetch('https://api.tokenz.one/v2/checkoutsession', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.TOKENZ_SECRET_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ /* itemDetails, successUrl, etc. */ })
+      });
+      const session = await response.json();
+      res.redirect(303, session.url);
+    });
+    ```
+
+    The customer lands on the Tokenz-hosted checkout page, selects a payment method, and completes the purchase. Tokenz handles all payment UI, tax calculation, and compliance.
+  </Step>
+
+  <Step title="Add redirect pages">
+    Your Checkout Session requires three redirect URLs. Tokenz sends the customer to one of these after the payment flow ends:
+
+    - **`successUrl`** — the customer completed payment successfully
+    - **`pendingUrl`** — an asynchronous payment is in progress (e.g., konbini convenience store payment or bank transfer); the order is not yet confirmed
+    - **`cancelUrl`** — the customer pressed the back or cancel button without paying
+
+    These pages can display a confirmation message or spinner, but they should not trigger order fulfillment on their own.
+
+    <Warning>
+      **Do not use redirects to confirm payment.** Redirect URLs fire client-side and can be tampered with or skipped entirely. Always use webhooks (Step 4) as your authoritative fulfillment signal.
+    </Warning>
+  </Step>
+
+  <Step title="Set up a webhook endpoint">
+    Register your webhook endpoint in **Dashboard → Developers → Webhooks** and select the `order.succeeded` event. Tokenz will POST a signed payload to your URL whenever an order is confirmed.
+
+    Your handler must verify the `Tokenz-Signature` header before processing any event. The signature is an HMAC-SHA256 digest of the timestamp and raw request body, encoded in base64.
+
+    ```javascript webhook.js
+    const crypto = require('crypto');
+
+    app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+      const sig = req.headers['tokenz-signature'];
+      const secret = process.env.TOKENZ_WEBHOOK_SECRET;
+
+      // Verify signature
+      let timestamp, signature;
+      for (const part of sig.split(',')) {
+        const [key, value] = part.split(':');
+        if (key === 't') timestamp = value;
+        else if (key === 'v1') signature = value;
+      }
+
+      const expected = crypto.createHmac('sha256', Buffer.from(secret, 'base64'))
+        .update(`${timestamp}${req.body.toString('utf8')}`)
+        .digest('base64');
+
+      if (signature !== expected) return res.status(400).end();
+
+      const event = JSON.parse(req.body);
+      if (event.object === 'order.succeeded') {
+        const order = event.eventData.data.order;
+        // Fulfill the order here
+        console.log('Order succeeded:', order.id);
+      }
+
+      res.status(200).end();
+    });
+    ```
+
+    Always return a `200` response quickly and process fulfillment asynchronously if needed. Tokenz retries delivery if your endpoint returns a non-2xx status or times out.
+  </Step>
+
+  <Step title="Test your integration">
+    With your test key active, open the Tokenz-hosted checkout URL and complete a payment using the test card below. No real money moves.
+
+    | Field | Value |
+    |---|---|
+    | Card number | `4242 4242 4242 4242` |
+    | Expiry date | Any future date |
+    | CVC | Any 3 digits |
+
+    After clicking **Pay**, your webhook endpoint should receive an `order.succeeded` event within seconds. Confirm the event arrives and your fulfillment logic runs correctly.
+
+    For a full list of test cards, decline triggers, and async payment testing, see the [Testing guide](/guides/testing).
+  </Step>
+
+</Steps>
+
+<Tip>
+  Prefer a guided setup? Try the [AI-assisted integration](/guides/checkout-integration) to have Tokenz walk you through configuration automatically based on your platform and product type.
+</Tip>

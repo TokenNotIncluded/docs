@@ -1,0 +1,106 @@
+---
+title: "Tokenz Webhooks: Real-Time Event Notifications"
+sidebarTitle: "Webhooks"
+description: "Tokenz webhooks deliver real-time event notifications to your server. Use them to fulfill orders, track refunds, respond to disputes, and more."
+---
+
+Tokenz webhooks send HTTP POST requests to your server whenever important events occur — payment succeeded, refund created, dispute opened. Use webhooks to drive your fulfillment logic reliably, rather than depending on client-side redirects or polling the API.
+
+<Warning>
+  Redirects from the checkout page are **not** a reliable payment confirmation. Always fulfill orders from the `order.succeeded` webhook, not from a customer reaching your success page. A customer can close their browser, lose connectivity, or be redirected by a third-party payment method before the redirect fires — the webhook will still arrive.
+</Warning>
+
+## Event object structure
+
+Every webhook Tokenz delivers has the same top-level envelope. The `eventData` field carries the object that changed.
+
+```json event-example.json
+{
+  "id": "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6",
+  "object": "order.succeeded",
+  "createdAt": "2025-09-24T03:22:20.297Z",
+  "test": true,
+  "eventData": {
+    "type": "order",
+    "version": "v2",
+    "data": {
+      "order": {
+        "id": "order_1D5xA9BnKfv_t",
+        "status": "succeeded",
+        "amount": { "amount": 3700, "currency": "JPY" }
+      }
+    }
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `id` | Use as an idempotency key to detect duplicate deliveries |
+| `object` | Event type (e.g., `order.succeeded`) |
+| `test` | `true` if this is a test event |
+| `eventData.version` | API version used when the event was generated |
+| `eventData.data` | The changed object at the time the event fired |
+
+## All event types
+
+| Event | Description |
+|---|---|
+| `order.created` | Order created via Checkout Session |
+| `order.succeeded` | Payment completed — fulfill here |
+| `order.expired` | Order expired without payment |
+| `order.canceled` | Order canceled |
+| `order.failed` | Payment failed |
+| `refund.created` | Refund initiated |
+| `refund.failed` | Refund failed |
+| `dispute.created` | Dispute opened by customer |
+| `dispute.closed` | Dispute resolved (won or lost) |
+| `redemption.completed` | Gift code redeemed or free item claimed |
+| `subscription.activated` | Subscription first charge succeeded |
+| `subscription.trial_started` | Subscription trial period began |
+| `subscription.renewed` | Recurring renewal succeeded |
+| `subscription.unpaid` | Renewal charge failed |
+| `subscription.payment_method_updated` | Card updated on subscription |
+| `subscription.plan_change_scheduled` | Deferred plan change approved |
+| `subscription.plan_change_canceled` | Scheduled plan change canceled |
+| `subscription.plan_changed` | Plan change applied |
+| `subscription.canceled` | Subscription canceled by merchant |
+| `subscription.expired` | Subscription ended due to payment failure |
+
+## Retries and idempotency
+
+If your endpoint does not return a `2xx` status code, Tokenz retries delivery for up to **3 days**. The retry schedule starts fast and backs off over time:
+
+- **Early retries**: ~5 seconds, 15 seconds, 30 seconds after the first failure
+- **Subsequent retries**: increasing delays over hours and days
+
+Because Tokenz may deliver the same event more than once — including during retries — you must handle duplicates. Use the top-level `id` field as your idempotency key: store each processed event ID in durable storage and skip any event whose ID you have already seen.
+
+**Respond with `2xx` immediately** and do heavy processing asynchronously. If your handler performs slow database writes or external API calls before responding, it risks timing out and triggering unnecessary retries.
+
+<Note>
+  Test events (those with `"test": true`) are only delivered to **test** webhook endpoints. Live events go to live endpoints only. Register separate endpoints for each environment and keep their signing secrets separate.
+</Note>
+
+## Troubleshooting
+
+<Accordion title="My endpoint isn't receiving events">
+  - Check the HTTP status your endpoint returned in the Tokenz Dashboard delivery log: `2xx` means delivered, `4xx` means your server rejected the request, and `5xx` or a timeout means your server errored.
+  - Confirm your endpoint is publicly reachable over HTTPS. Tokenz cannot deliver to `localhost` or private network addresses.
+  - Check for firewalls, WAFs, or IP allowlists that may be blocking inbound requests from Tokenz.
+  - Use [webhook.site](https://webhook.site) as a temporary endpoint to inspect the exact payload and headers Tokenz sends.
+</Accordion>
+
+<Accordion title="Signature verification is failing">
+  - Always verify the signature over the **raw request body** — not a re-serialized version of the parsed JSON. Even a single byte difference will cause a mismatch.
+  - Confirm you are using the signing secret for the specific endpoint you registered. Each endpoint has its own secret, shown once at creation.
+  - Make sure you are matching mode correctly — a test event verified with a live signing secret will never match.
+  - Check for clock skew between your server and Tokenz. Signatures are rejected if the timestamp in the header is more than **5 minutes** old.
+</Accordion>
+
+<Accordion title="I'm getting duplicate events">
+  Duplicate delivery is expected behavior — Tokenz may send the same event more than once, especially during retries. To handle this safely:
+
+  - Use the top-level event `id` as your idempotency key.
+  - Store fulfilled event IDs in **durable storage** (a database), not a cache with a short expiry. A short-lived cache won't protect you if a duplicate arrives hours later during a retry sequence.
+</Accordion>

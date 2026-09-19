@@ -1,0 +1,135 @@
+---
+title: "Integrate Free Item Campaigns for Player Giveaways"
+sidebarTitle: "Free Items"
+description: "Let players claim free rewards without a code using the Tokenz Free Items API. Supports daily, weekly, and monthly refresh schedules with per-player limits."
+---
+
+Free Item campaigns let players claim a reward directly — no code, no payment. Your server checks campaign status and calls the claim endpoint on behalf of the player. Tokenz sends a `redemption.completed` webhook for fulfillment.
+
+## How it works
+
+<Steps>
+  <Step title="Get campaign status">
+    Your server calls `GET /v2/free-items/{campaignId}` with the player's ID to retrieve remaining claims and a reward preview.
+  </Step>
+  <Step title="Display the reward">
+    Show the reward name, image, quantity, and remaining claims to the player, along with a **Claim** button.
+  </Step>
+  <Step title="Player clicks Claim">
+    Your server calls `POST /v2/free-items/claim` with the `campaignId` and `playerId`.
+  </Step>
+  <Step title="Tokenz sends the webhook">
+    Tokenz delivers a `redemption.completed` event to your registered webhook endpoint.
+  </Step>
+  <Step title="Verify and fulfill">
+    Verify the `Tokenz-Signature` header and grant the reward. Use `redemptionId` to prevent duplicate grants if the event is delivered more than once.
+  </Step>
+</Steps>
+
+<Note>
+  `playerId` is case-sensitive and matched exactly. `Player_123` and `player_123` are treated as different players. Use your game's stable account ID. Leading and trailing whitespace is stripped automatically; the value cannot exceed 100 characters.
+</Note>
+
+## Get Free Item status
+
+Call this endpoint to retrieve the current campaign state and how many claims remain for a specific player before showing the Claim button.
+
+```bash free-item-status.sh
+curl --request GET \
+  --url 'https://api.tokenz.one/v2/free-items/campaign_1p4LPTRKB5Z?playerId=player_98765' \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE'
+```
+
+```json status-response.json
+{
+  "campaign": { "id": "campaign_1p4LPTRKB5Z", "name": "Weekly Free Pack" },
+  "rewardPreview": {
+    "name": "Marathon Energy Gift",
+    "imageUrl": "https://images.example.com/rewards/energy.png",
+    "quantity": 1
+  },
+  "campaignRemaining": 842,
+  "remainingForPlayer": 1,
+  "nextResetAt": "2026-09-14T00:00:00Z"
+}
+```
+
+| Field | Notes |
+|---|---|
+| `campaignRemaining` | Omitted if the campaign has no total limit |
+| `remainingForPlayer` | Omitted if `playerId` was not provided or there is no per-player limit |
+| `nextResetAt` | Omitted for one-time (non-recurring) campaigns |
+
+## Claim a Free Item
+
+Call this endpoint when the player confirms they want to claim. A successful response means the claim was recorded and the fulfillment webhook is on its way.
+
+```bash claim-item.sh
+curl --request POST \
+  --url https://api.tokenz.one/v2/free-items/claim \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "campaignId": "campaign_1p4LPTRKB5Z",
+    "playerId": "player_98765"
+  }'
+```
+
+```json claim-response.json
+{
+  "redemption": {
+    "redemptionId": "redemption_1p4LPTRKB5Z",
+    "playerId": "player_98765",
+    "campaign": { "id": "campaign_1p4LPTRKB5Z", "name": "Weekly Free Pack" },
+    "reward": {
+      "skuRedemptionReward": {
+        "type": "EXTERNAL_SKU",
+        "sku": "ITEM_ENERGY_GIFT",
+        "name": "Marathon Energy Gift",
+        "quantity": 1
+      }
+    },
+    "kind": "FREE_ITEM_CLAIM",
+    "redeemedAt": "2026-09-10T08:10:00Z",
+    "nextPeriodStart": "2026-09-14T00:00:00Z"
+  },
+  "remainingForPlayer": 0,
+  "nextResetAt": "2026-09-14T00:00:00Z"
+}
+```
+
+## Recurring campaigns
+
+Free Item campaigns support a refresh cadence that automatically resets per-player limits at the start of each new period.
+
+| Cadence | Period resets |
+|---|---|
+| None (one-time) | Never — limits apply for the campaign lifetime |
+| Daily | Local midnight |
+| Weekly | Monday at local midnight |
+| Monthly | First day of the month at local midnight |
+
+Use `nextResetAt` from API responses to display countdown timers in your UI. Do not calculate period boundaries yourself — Tokenz handles daylight saving time and calendar edge cases.
+
+<Warning>
+  The claim endpoint has no idempotency key. Retrying a successful call can create a second claim if limits allow. If a response is lost and no webhook arrives, contact Tokenz support rather than retrying automatically. Always deduplicate fulfillment in your webhook handler using `redemptionId`.
+</Warning>
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `entity.not-found` | Campaign not found or accessed with the wrong API key mode |
+| `campaign.status-invalid` | Campaign is draft, paused, ended, or not yet started |
+| `campaign.limit-reached` | Campaign total claim limit hit |
+| `campaign.player-limit-reached` | Player hit per-campaign limit |
+| `campaign.player-period-limit-reached` | Player hit the limit for the current period; retry after `nextResetAt` |
+
+<Accordion title="How do Free Item claims differ from Gift Code redemptions in the webhook?">
+  Both campaign types deliver the same `redemption.completed` event, but there are a few differences to be aware of:
+
+  - **`kind`** is `FREE_ITEM_CLAIM` for Free Items and `CODE_REDEMPTION` for Gift Codes.
+  - **`code`** field is absent for Free Item claims — there is no code to report.
+  - **`nextPeriodStart`** is included in Free Item claim events for recurring campaigns only; it is absent for Gift Code redemptions.
+  - For most fulfillment logic, `redemptionId`, `playerId`, and `reward` are sufficient and behave identically for both types.
+</Accordion>

@@ -1,0 +1,122 @@
+---
+title: "Sell Recurring Subscriptions with Tokenz"
+sidebarTitle: "Subscriptions"
+description: "Create card-based recurring subscriptions with trial periods and automatic renewal. Tokenz manages billing, dunning, plan changes, and lifecycle webhooks."
+---
+
+Tokenz Subscriptions let you sell recurring access to your product using the same Checkout Session flow as one-time payments. Once a subscriber authorizes their card at checkout, Tokenz handles scheduling, retrying failed charges, and notifying your backend — so you can focus on delivering value, not managing billing infrastructure.
+
+<Note>
+  Subscriptions are currently in beta and available for Merchant of Record (MoR) accounts only. Only card payment methods are supported at this time.
+</Note>
+
+## Core concepts
+
+Before creating your first subscription, familiarize yourself with these key terms:
+
+- **Subscription** — the recurring billing record tied to a customer's saved card. It holds the billing interval, status, and links to each renewal order.
+- **Billing interval** — defined as a `unit` (`WEEK`, `MONTH`, or `YEAR`) multiplied by a `count`. For example, `{"unit": "MONTH", "count": 1}` means monthly billing. `{"unit": "MONTH", "count": 3}` means every three months.
+- **Trial period** — an optional number of days before the first charge. The subscription sits in `trialing` status during this time. No payment is collected at checkout — only card details and MIT (merchant-initiated transaction) consent.
+- **Dunning** — the automatic retry strategy Tokenz uses when a renewal charge fails. Configure the number of retries, spacing, and what happens if all retries are exhausted.
+- **Plan change** — swapping a subscription's item or billing interval, either immediately or at the end of the current period.
+
+## Create a subscription Checkout Session
+
+<Steps>
+  <Step title="Create the session with a subscription block">
+    Add a `subscription` object to your standard Checkout Session request. All other fields — `itemDetails`, `successUrl`, `customerInfo` — work the same as for one-time payments.
+
+    ```bash create-subscription.sh
+    curl --request POST \
+      --url https://api.tokenz.one/v2/checkoutsession \
+      --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+      --header 'Content-Type: application/json' \
+      --data '{
+        "itemDetails": [{
+          "product": {
+            "price": { "amount": 1000, "currency": "USD" },
+            "quantity": 1,
+            "label": "Pro Plan (Monthly)",
+            "images": [],
+            "taxCategory": "SAAS"
+          }
+        }],
+        "subscription": {
+          "interval": { "unit": "MONTH", "count": 1 },
+          "trialPeriodDays": 7,
+          "dunningMode": "RETRY"
+        },
+        "successUrl": "https://yourdomain.com/success",
+        "pendingUrl": "https://yourdomain.com/pending",
+        "cancelUrl": "https://yourdomain.com/cancel",
+        "customerInfo": { "emailAddress": "player@example.com" }
+      }'
+    ```
+
+    <Note>
+      `amount: 1000` with `currency: "USD"` equals $10.00 USD. USD uses two decimal places, so the amount is in cents.
+    </Note>
+
+    **Subscription parameters**
+
+    | Parameter | Required | Description |
+    |---|---|---|
+    | `interval.unit` | Yes | Billing frequency unit: `WEEK`, `MONTH`, or `YEAR`. |
+    | `interval.count` | Yes | Number of units between renewals. Must be `1` or greater. |
+    | `trialPeriodDays` | No | Days before the first charge. Accepted range: `1`–`365`. |
+    | `dunningMode` | No | `RETRY` (default) retries failed charges. `CANCEL_IMMEDIATELY` expires the subscription on first failure. |
+    | `dunningMaxAttempts` | No | Maximum retry attempts when `dunningMode` is `RETRY`. Range: `1`–`10`, default `3`. |
+    | `dunningExpireAfterHours` | No | Hours before an unpaid renewal order expires. Range: `1`–`168`, default `24`. |
+  </Step>
+  <Step title="Redirect the customer to checkout">
+    Use the `url` from the session response to send the customer to the Tokenz hosted checkout page at `https://checkout.tokenz.one/{sessionId}`. Tokenz collects their card details, completes 3DS authentication, and captures MIT (merchant-initiated transaction) consent for future renewals — all in a single checkout flow.
+  </Step>
+  <Step title="Renewals run automatically">
+    No further API calls are needed. Tokenz charges the customer's saved card at the end of each billing period and fires a `subscription.renewed` webhook on success. Monitor lifecycle webhooks to keep your entitlement system up to date.
+  </Step>
+</Steps>
+
+## Subscription response
+
+A successful session creation returns a `subscription` object alongside the standard checkout session fields:
+
+```json subscription-response.json
+{
+  "id": "checkoutsession_abc",
+  "url": "https://checkout.tokenz.one/abc",
+  "subscription": {
+    "id": "subscription_1p4LS47fB1h",
+    "status": "created",
+    "interval": { "unit": "MONTH", "count": 1 }
+  }
+}
+```
+
+<Info>
+  When no trial period is configured, an `order` object is also included in the response representing the first charge. If `trialPeriodDays` is set, no initial order is created — the first order is generated when the trial converts.
+</Info>
+
+## Webhook events to handle
+
+Listen for these subscription events on your webhook endpoint and take the corresponding action in your system:
+
+| Event | Action |
+|---|---|
+| `subscription.activated` | Grant access — the first charge succeeded and the subscription is now active. |
+| `subscription.trial_started` | Start the trial — no charge has occurred yet; grant access for the trial period. |
+| `subscription.renewed` | Extend access for the next billing period — a renewal charge succeeded. |
+| `subscription.unpaid` | Warn the user — a charge failed and dunning has started. Consider surfacing a recovery link. |
+| `subscription.payment_method_updated` | Update your cached card metadata — the subscriber has entered a new card. |
+| `subscription.plan_changed` | Update entitlements — the subscription's item or interval has changed. |
+| `subscription.canceled` | Revoke access at period end — the subscription has been deliberately canceled. |
+| `subscription.expired` | Revoke access immediately — dunning was exhausted and the subscription could not be renewed. |
+
+## Testing subscriptions
+
+<Tip>
+  Always use test API keys (prefixed `secret_test_`) when building subscription flows. Test entity IDs end with `_t`. In the [Tokenz Dashboard](https://dashboard.tokenz.one), you can trigger a manual renewal charge on any test subscription without waiting for the next billing date — useful for exercising your webhook handlers end-to-end.
+</Tip>
+
+## Further reading
+
+For detailed information on billing period anchoring, trial conversion, dunning retry logic, and cancellation behavior, see [Subscription Lifecycle, Billing, and Dunning](/guides/subscription-lifecycle).

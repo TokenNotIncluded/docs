@@ -1,0 +1,92 @@
+---
+title: "Subscription Lifecycle, Billing, and Dunning"
+sidebarTitle: "Lifecycle & Billing"
+description: "Understand subscription statuses, billing period logic, trial periods, failed payment recovery (dunning), cancellation, and renewal reminders."
+---
+
+This page explains how subscriptions move through their lifecycle — from creation through billing periods, failed payment recovery, and eventual cancellation or expiry. Understanding this flow helps you design an entitlement system that stays accurately in sync with each subscriber's billing state.
+
+## Subscription statuses
+
+A subscription transitions through the following statuses over its lifetime:
+
+| Status | Meaning |
+|---|---|
+| `created` | The subscription has been created and is awaiting consumer authorization at checkout. No charge has been attempted. |
+| `trialing` | The consumer has authorized their card and is in the trial period. No charge has occurred yet. |
+| `active` | The subscription is billing normally. The consumer is charged at the end of each billing period. |
+| `unpaid` | The most recent renewal charge failed. Dunning (automatic retry) is in progress. |
+| `canceled` | The subscription was deliberately canceled by the merchant on the consumer's behalf. This is a terminal state. |
+| `expired` | The subscription ended because payment could not be collected after exhausting all dunning attempts. This is a terminal state. |
+
+<Note>
+  Distinguish `canceled` from `expired` in your churn reporting. `canceled` reflects a deliberate decision (e.g., consumer requested cancellation), while `expired` reflects involuntary churn due to payment failure. Mixing them understates recoverable churn.
+</Note>
+
+## Billing periods
+
+Each subscription has a **billing interval** composed of a `unit` (`WEEK`, `MONTH`, or `YEAR`) and a `count` (e.g., `count: 3` with `unit: MONTH` = every three months). The **anchor date** is set at the moment the subscription first activates — either when the initial charge succeeds, or when a trial converts.
+
+Tokenz uses the anchor date to calculate the end of each subsequent period. For monthly and yearly subscriptions with anchor dates on the 29th, 30th, or 31st, periods roll to the last day of shorter months. For example, an anchor on January 31st produces a next period end of February 28th (or 29th in a leap year).
+
+The `currentBillingPeriodEnd` field on the subscription object tells you exactly when the next renewal charge is scheduled. Use it to display "your subscription renews on…" messaging to your customers.
+
+## Trial periods
+
+When `trialPeriodDays` is set on a subscription, the initial checkout session works differently from a standard purchase:
+
+1. **Checkout collects card details and MIT consent only.** No initial order is created and no charge is captured. The consumer is authorizing Tokenz to charge their card in the future.
+2. **The subscription moves to `trialing`.** The `subscription.trial_started` webhook fires. Grant access to your product for the duration of the trial.
+3. **At `trialEnd`, Tokenz creates the first renewal order and attempts to charge it.** If the charge succeeds, the subscription moves to `active` and `subscription.activated` fires. If the charge fails, normal dunning behavior applies.
+
+The anchor date for billing is set at `trialEnd`, not at the original checkout date.
+
+## Dunning (failed payment recovery)
+
+When a renewal charge fails, Tokenz moves the subscription to `unpaid` and begins the dunning process according to the configuration set at subscription creation:
+
+| Field | Description |
+|---|---|
+| `dunningMode` | `RETRY` (default) — retries the charge up to `dunningMaxAttempts` times. `CANCEL_IMMEDIATELY` — the subscription expires on the very first failed charge, skipping retries entirely. |
+| `dunningMaxAttempts` | The maximum number of charge attempts before giving up. Range: `1`–`10`, default `3`. |
+| `dunningExpireAfterHours` | How long an unpaid renewal order stays open before it expires. Range: `1`–`168` hours, default `24`. |
+
+**RETRY flow:** Tokenz retries the charge up to `dunningMaxAttempts` times, spaced by `dunningExpireAfterHours`. On each failure, Tokenz emails the consumer a payment recovery link where they can update their card. A `subscription.unpaid` webhook fires on the first failure. If a retry succeeds, the subscription returns to `active` and `subscription.renewed` fires. If all retries are exhausted, the subscription moves to `expired` and `subscription.expired` fires.
+
+**CANCEL_IMMEDIATELY flow:** The first failed charge immediately moves the subscription to `expired`. No retries are attempted.
+
+<Note>
+  Recovering from `unpaid` does **not** shift the billing period. The next renewal after a successful retry is still anchored to the original billing period end date — not to the recovery date.
+</Note>
+
+## Cancellation
+
+You can cancel a subscription while it is in any of the following statuses: `trialing`, `active`, or `unpaid`. When you cancel a subscription, Tokenz:
+
+1. Sets `canceledAt` to the current timestamp and stops scheduling renewal orders.
+2. Cancels any in-flight unpaid order that is currently awaiting payment.
+3. Fires the `subscription.canceled` webhook.
+
+Cancellation is **final** — a canceled subscription cannot be reactivated. If the consumer wants to resubscribe, they must complete a new Checkout Session, which creates a new subscription record.
+
+<Warning>
+  Revoke or schedule revocation of access based on the `subscription.canceled` event — not immediately on cancellation API response. Consumers typically retain access through the end of the billing period they've already paid for.
+</Warning>
+
+## Renewal reminders
+
+Where regulations require advance notice before a charge (for example, before a free trial converts to a paid subscription, or before an annual renewal), Tokenz automatically sends reminder emails to the consumer on your behalf. No configuration is required — Tokenz detects the applicable jurisdiction and sends reminders at the appropriate intervals.
+
+## Updating a payment method
+
+<Accordion title="How can a subscriber update their card?">
+  When a subscriber's card expires or is declined, you can direct them to the Tokenz hosted payment method update flow for their subscription. The flow works as follows:
+
+  1. Direct the consumer to the Tokenz hosted update page for their subscription. The URL is provided in the subscription management portal or via the subscription API.
+  2. The consumer enters their new card details. If 3DS authentication is required for the card, Tokenz initiates and completes it inline.
+  3. Tokenz captures new MIT (merchant-initiated transaction) consent for future renewals using the new card.
+  4. The `subscription.payment_method_updated` webhook fires once the new card is saved.
+  5. If the card is declined or the consumer abandons the flow, the existing card remains in place — nothing changes on the subscription.
+
+  After a successful update, any pending dunning retries will use the new card on their next attempt.
+</Accordion>

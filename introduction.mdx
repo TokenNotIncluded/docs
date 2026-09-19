@@ -1,0 +1,62 @@
+---
+title: "Tokenz: Merchant of Record Payments for Digital Goods"
+sidebarTitle: "Introduction"
+description: "Tokenz is a Merchant of Record checkout platform for gaming and digital goods companies. Accept 50+ payment methods globally, automate tax, and manage orders via API."
+---
+
+Tokenz is a Merchant of Record (MoR) checkout platform built for game developers and digital goods merchants who need to sell globally without the complexity of tax compliance, payment infrastructure, or fraud management. When you use Tokenz, you integrate once and immediately gain access to 50+ payment methods across APAC, Europe, and the Americas — while Tokenz assumes legal responsibility for VAT, GST, and sales tax calculation, collection, and remittance on your behalf.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+    Accept your first payment in minutes
+  </Card>
+  <Card title="Checkout" icon="credit-card" href="/guides/checkout-overview">
+    Hosted payment page with 50+ methods
+  </Card>
+  <Card title="API Keys" icon="key" href="/guides/api-keys">
+    Authenticate and secure your integration
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/guides/webhooks">
+    Real-time payment event notifications
+  </Card>
+</CardGroup>
+
+## What Tokenz does
+
+Tokenz sits between your store and the global payments ecosystem, handling the hard parts of selling digital goods internationally — so you can focus on building your product rather than managing tax jurisdictions, payment method contracts, or compliance obligations.
+
+<CardGroup cols={2}>
+  <Card title="Global Payment Methods" icon="globe">
+    Cards, e-wallets, bank transfers, and cash payments across APAC, Europe, and the Americas
+  </Card>
+  <Card title="Merchant of Record" icon="shield-check">
+    Tokenz handles tax calculation, compliance, and remittance so you don't have to
+  </Card>
+  <Card title="Subscriptions" icon="repeat">
+    Recurring billing with trial periods, dunning, and automatic renewal
+  </Card>
+  <Card title="Campaigns" icon="gift">
+    Gift codes and free item giveaways to reward your players
+  </Card>
+</CardGroup>
+
+## How Tokenz works
+
+<Steps>
+  <Step title="Create a Checkout Session via API">
+    Send a `POST` request to `https://api.tokenz.one/v1/checkout/sessions` with your product details, pricing, and customer information to create a new checkout session. Tokenz returns a unique `sessionId` you use to build the redirect URL.
+  </Step>
+  <Step title="Redirect customer to hosted payment page">
+    Send your customer to `https://checkout.tokenz.one/{sessionId}`. The hosted page automatically presents the payment methods available in the customer's region and handles the entire payment flow for you.
+  </Step>
+  <Step title="Customer pays using their preferred method">
+    The customer selects a payment method — card, e-wallet, bank transfer, or cash — and completes the transaction. Tokenz manages currency conversion, tax display, and payment processing end to end.
+  </Step>
+  <Step title="Receive `order.succeeded` webhook and fulfill the order">
+    Once payment is confirmed, Tokenz sends an `order.succeeded` event to your webhook endpoint. Verify the event signature and fulfill the order — grant entitlements, deliver goods, or activate the subscription.
+  </Step>
+</Steps>
+
+<Note>
+  Ready to go live? Switch from test API keys (`secret_test_…`) to live keys (`secret_live_…`) in your environment configuration.
+</Note>

@@ -1,0 +1,147 @@
+---
+title: "Register and Secure a Tokenz Webhook Endpoint"
+sidebarTitle: "Integration"
+description: "Create a webhook handler, register it in the Tokenz Dashboard, verify the Tokenz-Signature header, and test delivery with test payments."
+---
+
+Setting up a Tokenz webhook endpoint involves four steps: creating a handler on your server, registering the endpoint in the Dashboard, verifying the signature on every incoming request, and testing with simulated payments. Follow the steps below to get your integration production-ready.
+
+## Setup
+
+<Steps>
+
+### Create a handler
+
+Set up an HTTPS endpoint that accepts `POST` requests. Return a `2xx` response immediately — before doing any fulfillment work — so Tokenz does not time out and retry unnecessarily. Queue or trigger your actual processing asynchronously.
+
+```javascript webhook-handler.js
+const crypto = require('crypto');
+const express = require('express');
+const app = express();
+
+// Mount BEFORE global express.json() middleware
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['tokenz-signature'];
+  const secret = process.env.TOKENZ_WEBHOOK_SECRET; // Base64-encoded
+
+  // Extract timestamp and signature
+  let timestamp, signature;
+  for (const part of sig.split(',')) {
+    const [key, value] = part.split(':');
+    if (key === 't') timestamp = value;
+    else if (key === 'v1') signature = value;
+  }
+
+  // Verify signature
+  const expected = crypto
+    .createHmac('sha256', Buffer.from(secret, 'base64'))
+    .update(`${timestamp}${req.body.toString('utf8')}`)
+    .digest('base64');
+
+  // Reject if signature doesn't match or timestamp is stale (5-minute window)
+  const tolerance = 5 * 60 * 1000;
+  if (signature !== expected || Math.abs(Date.now() - Number(timestamp)) > tolerance) {
+    return res.status(400).end();
+  }
+
+  // Parse event after verification
+  const event = JSON.parse(req.body);
+
+  // Respond immediately, process asynchronously
+  res.status(200).end();
+
+  // Handle event types
+  switch (event.object) {
+    case 'order.succeeded':
+      fulfillOrder(event.eventData.data.order);
+      break;
+    case 'refund.created':
+      handleRefund(event.eventData.data.refund);
+      break;
+    case 'dispute.created':
+      handleDispute(event.eventData.data.dispute);
+      break;
+  }
+});
+```
+
+### Register in the Dashboard
+
+Tell Tokenz where to send events by registering your endpoint URL.
+
+1. Open your [Tokenz Dashboard](https://dashboard.tokenz.one) home page.
+2. Click **Create new webhook**.
+3. Enter your endpoint URL and an optional description.
+4. Select the events you want to receive. At minimum, subscribe to `order.succeeded`.
+5. Click **Create webhook**.
+
+<Warning>
+  Copy the **signing secret** immediately after creation. It is shown only once and cannot be retrieved later. If you lose it, you will need to rotate to a new secret.
+</Warning>
+
+### Verify the signature
+
+Every Tokenz webhook request includes a `Tokenz-Signature` header in this format:
+
+```
+t:1725864981111,v1:zjdrra3...Mh+e6s=
+```
+
+To verify it:
+
+1. Split the header value by `,`. Extract the value after `t:` (the timestamp) and after `v1:` (the signature).
+2. Concatenate: the timestamp string, then the verbatim raw request body — no separator.
+3. Compute an HMAC-SHA256 digest over that string using your **Base64-decoded** signing secret.
+4. Base64-encode the digest and compare it with the `v1` value from the header.
+5. Reject the request if the values do not match, or if the timestamp is more than **300 seconds** in the past (replay attack protection).
+
+<Warning>
+  Always verify over the **raw request body** — not parsed or re-serialized JSON. Parsing JSON before verification changes the byte sequence and will break signature verification. In Express, use `express.raw()` on your webhook route, mounted before any global `express.json()` middleware.
+</Warning>
+
+### Test your endpoint
+
+Use test API keys (prefix `secret_test_`) to create test payments and trigger test events. Confirm that your handler receives and correctly processes each event type you subscribed to. If you need to inspect raw payloads during development, register a temporary [webhook.site](https://webhook.site) URL in the Dashboard to see exactly what Tokenz sends.
+
+See [Testing](/guides/testing) for details on creating test payments and simulating specific event scenarios.
+
+</Steps>
+
+## Signing secret security
+
+<Note>
+  Store your signing secret in an environment variable — never commit it to source code or check it into version control. The signing secret is separate from your API key; each registered endpoint has its own unique secret.
+</Note>
+
+## Local development
+
+<Tip>
+  To receive webhooks on your local machine during development, use a tunnel tool to expose your local server over a public HTTPS URL, then register that URL in the Dashboard.
+
+  ```bash ngrok-tunnel.sh
+  ngrok http 3000
+  # Then register https://your-ngrok-url.ngrok.io/webhook in the Dashboard
+  ```
+
+  [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/) is a free alternative if you prefer not to create an ngrok account.
+</Tip>
+
+## Idempotency pattern
+
+Tokenz may deliver the same event more than once. Use the event `id` to deduplicate before processing:
+
+```javascript idempotency.js
+const processedEvents = new Set(); // Use a database in production
+
+async function handleEvent(event) {
+  if (processedEvents.has(event.id)) {
+    return; // Already processed
+  }
+
+  // ... process event ...
+
+  processedEvents.add(event.id);
+}
+```
+
+In production, replace the in-memory `Set` with a persistent store (such as a database table) so that deduplication survives process restarts and scales across multiple instances.

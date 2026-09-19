@@ -1,0 +1,190 @@
+---
+title: "Integrate Tokenz Checkout into Your Application"
+sidebarTitle: "Integration"
+description: "Step-by-step guide to integrating Tokenz Checkout: create sessions server-side, add redirect pages, and configure webhook fulfillment."
+---
+
+This guide walks through a complete Tokenz Checkout integration — from creating sessions on your server to handling post-payment redirect pages and fulfilling orders via webhooks. By the end you'll have a working end-to-end checkout flow ready for testing.
+
+## AI-assisted integration
+
+<Tip>
+  If you use Claude Code, Cursor, Codex, or another AI coding assistant, connect the Tokenz MCP server to get guided, self-verifying integration support:
+
+  ```bash add-mcp-server.sh
+  claude mcp add --transport http tokenz https://mcp.tokenz.one/mcp \
+    --header "Authorization: Bearer secret_test_YOUR_KEY_HERE"
+  ```
+
+  Alternatively, point your AI tool at [https://docs.tokenz.one/llms-full.txt](https://docs.tokenz.one/llms-full.txt) for the full machine-readable documentation.
+</Tip>
+
+## Prerequisites
+
+<Note>
+  You need a Tokenz API secret key before starting. Find it in your dashboard under **Developers → API Keys**. Keep this key server-side only — never expose it in client-side code, browser bundles, or mobile apps.
+</Note>
+
+## Step-by-step setup
+
+<Steps>
+
+### Create a Checkout Session endpoint
+
+Always create Checkout Sessions on your server. Your endpoint receives a request from your frontend, calls the Tokenz API with your secret key, and redirects the customer to the returned session URL.
+
+<CodeGroup>
+
+```python server.py
+import os
+import requests
+from flask import Flask, request, redirect, jsonify
+
+app = Flask(__name__)
+SECRET_KEY = os.environ.get('TOKENZ_SECRET_KEY')
+
+@app.route('/create-checkout', methods=['POST'])
+def create_checkout():
+    payload = {
+        'itemDetails': [
+            {
+                'product': {
+                    'label': 'Gold Coin Pack',
+                    'description': '1,000 Gold Coins',
+                    'images': [],
+                    'quantity': 1,
+                    'price': {'currency': 'JPY', 'amount': 980},
+                    'taxCategory': 'VIRTUAL_CURRENCY'
+                }
+            }
+        ],
+        'successUrl': 'https://yourdomain.com/success',
+        'pendingUrl': 'https://yourdomain.com/pending',
+        'cancelUrl': 'https://yourdomain.com/cancel',
+        'customerInfo': {}
+    }
+    resp = requests.post(
+        'https://api.tokenz.one/v2/checkoutsession',
+        json=payload,
+        headers={'Authorization': f'Bearer {SECRET_KEY}'}
+    )
+    session = resp.json()
+    return redirect(session['url'], 303)
+```
+
+```javascript server.js
+import express from 'express';
+const app = express();
+app.use(express.json());
+
+app.post('/create-checkout', async (req, res) => {
+  const response = await fetch('https://api.tokenz.one/v2/checkoutsession', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.TOKENZ_SECRET_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      itemDetails: [{
+        product: {
+          label: 'Gold Coin Pack',
+          description: '1,000 Gold Coins',
+          images: [],
+          quantity: 1,
+          price: { currency: 'JPY', amount: 980 },
+          taxCategory: 'VIRTUAL_CURRENCY'
+        }
+      }],
+      successUrl: 'https://yourdomain.com/success',
+      pendingUrl: 'https://yourdomain.com/pending',
+      cancelUrl: 'https://yourdomain.com/cancel',
+      customerInfo: {}
+    })
+  });
+  const session = await response.json();
+  res.redirect(303, session.url);
+});
+```
+
+</CodeGroup>
+
+### Add a checkout button
+
+On your storefront or game client, add a form or button that posts to your `/create-checkout` endpoint. Keep the frontend minimal — all session logic lives on your server.
+
+```html checkout.html
+<form action="/create-checkout" method="POST">
+  <button type="submit">Buy Now — ¥980</button>
+</form>
+```
+
+### Create redirect pages
+
+Tokenz redirects the customer to one of three URLs after the payment attempt. Create a page for each:
+
+**`successUrl`** — The customer's payment completed successfully. Show a confirmation message.
+
+<Warning>
+  Do **not** trigger order fulfillment from the `successUrl` page. Customers may close the browser before reaching this page, and it can be reached without a genuine completed payment in edge cases. Always fulfill orders based on the `order.succeeded` webhook event.
+</Warning>
+
+**`pendingUrl`** — The payment was submitted but is not yet confirmed (common for bank transfers, konbini, and other delayed-confirmation methods). Tell the customer that their payment is being processed and they will receive a confirmation notification.
+
+**`cancelUrl`** — The customer pressed back or cancelled. Return them to your cart or product page so they can try again.
+
+### Handle the webhook
+
+The `order.succeeded` event is the only reliable signal that a payment has cleared. Configure a webhook endpoint on your server to receive this event and trigger fulfillment — grant access, deliver digital goods, or activate a subscription.
+
+See [Webhook Integration](/guides/webhook-integration) for complete setup instructions, including how to verify webhook signatures to protect against spoofed requests.
+
+### Test with test cards
+
+Before going live, run your full checkout flow using Tokenz test credentials and test card numbers to confirm sessions are created correctly, redirects work, and your webhook handler fires as expected.
+
+See [Testing](/guides/testing) for test card numbers and wallets.
+
+</Steps>
+
+## Select payment methods
+
+By default, Tokenz shows all payment methods available for the customer's detected region. To restrict which methods appear, pass the `paymentMethodKinds` array in your session request:
+
+```json payment-methods.json
+{
+  "paymentMethodKinds": ["CARD", "PAYPAY", "KONBINI"]
+}
+```
+
+If you omit `paymentMethodKinds` or pass an empty array, all eligible methods for the customer's region are displayed. See [Payment Methods](/guides/payment-methods) for all available API values.
+
+## Multiple line items
+
+You can include multiple products in a single Checkout Session by adding entries to `itemDetails`. Tokenz computes the total from the line items automatically:
+
+```json multi-line-items.json
+{
+  "itemDetails": [
+    {
+      "product": {
+        "label": "Emerald Pack",
+        "quantity": 3,
+        "price": { "currency": "JPY", "amount": 1200 },
+        "taxCategory": "DIGITAL_GOODS_AND_SERVICES"
+      }
+    },
+    {
+      "product": {
+        "label": "Diamond Pouch",
+        "quantity": 1,
+        "price": { "currency": "JPY", "amount": 1600 },
+        "taxCategory": "VIRTUAL_CURRENCY"
+      }
+    }
+  ]
+}
+```
+
+<Note>
+  The session total is computed automatically from your line items. If you also pass a top-level `amount` field, it must exactly match the computed sum — a mismatch causes the request to be rejected.
+</Note>

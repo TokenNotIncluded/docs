@@ -1,0 +1,94 @@
+{
+  "projectType": "saas",
+  "projectName": "Tokenz",
+  "projectDescription": "Tokenz is a Merchant of Record checkout platform for digital goods and gaming companies, enabling merchants to accept payments across APAC and globally with built-in tax handling, subscriptions, campaigns, and order management.",
+  "theme": "luma",
+  "primaryColor": "#6366F1",
+  "lightColor": "#818CF8",
+  "darkColor": "#4F46E5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "guides/quickstart",
+              "guides/api-keys",
+              "guides/testing"
+            ]
+          },
+          {
+            "group": "Checkout",
+            "pages": [
+              "guides/checkout-overview",
+              "guides/checkout-integration",
+              "guides/payment-methods",
+              "guides/currencies"
+            ]
+          },
+          {
+            "group": "Products & Subscriptions",
+            "pages": [
+              "guides/products",
+              "guides/subscriptions",
+              "guides/subscription-lifecycle"
+            ]
+          },
+          {
+            "group": "Orders & Fulfillment",
+            "pages": [
+              "guides/orders",
+              "guides/refunds",
+              "guides/disputes"
+            ]
+          },
+          {
+            "group": "Campaigns",
+            "pages": [
+              "guides/campaigns",
+              "guides/gift-codes",
+              "guides/free-items"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "guides/webhooks",
+              "guides/webhook-integration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Hosted checkout with 50+ APAC and global payment methods",
+    "Merchant of Record model with automatic tax calculation",
+    "Virtual item and bundle product catalog management",
+    "Recurring subscriptions with trial periods and dunning",
+    "Order management with delivery registration and dispute protection",
+    "Gift code and free item campaign system for player rewards",
+    "Webhook-driven fulfillment with signature verification",
+    "Test mode with simulated payments and disputes"
+  ],
+  "publicApiSurface": [
+    "POST /v2/checkoutsession",
+    "GET /v2/order/{orderId}",
+    "POST /v2/order/{orderId}/cancel",
+    "POST /v2/order/{orderId}/delivery",
+    "POST /v2/refunds",
+    "GET /v2/refunds/{refundId}",
+    "GET /v2/refunds",
+    "GET /v2/product/virtual-items",
+    "GET /v2/product/virtual-items/{id}",
+    "GET /v2/product/bundles",
+    "GET /v2/product/bundles/{id}",
+    "POST /v2/redemption-codes/validate",
+    "POST /v2/redemption-codes/redeem",
+    "GET /v2/free-items/{campaignId}",
+    "POST /v2/free-items/claim"
+  ]
+}

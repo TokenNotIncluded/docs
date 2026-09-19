@@ -1,0 +1,153 @@
+---
+title: "Supported Payment Methods for Global Checkout"
+sidebarTitle: "Payment Methods"
+description: "Tokenz supports 50+ payment methods across APAC, Europe, and the Americas. Control which methods appear using the paymentMethodKinds parameter."
+---
+
+Tokenz supports over 50 payment methods globally, with especially deep coverage across APAC markets including Japan, Korea, Southeast Asia, and Greater China. By default, all methods available for the customer's detected region appear automatically on the Tokenz-hosted checkout page. To restrict which methods are offered, pass the `paymentMethodKinds` array when creating a Checkout Session.
+
+```json payment-method-filter.json
+{
+  "paymentMethodKinds": ["CARD", "PAYPAY", "KONBINI"]
+}
+```
+
+Browse the full list of supported methods by region below. Each entry shows the method name, its type, covered markets, and the API value to use in `paymentMethodKinds`.
+
+---
+
+<Accordion title="Global">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Card (Visa, Mastercard, Amex, JCB, UnionPay, Diners) | Card | Worldwide | `CARD` |
+| Apple Pay | Digital wallet | Auto-enabled with `CARD` | — |
+| Google Pay | Digital wallet | Auto-enabled with `CARD` | — |
+| PayPal | Digital wallet | Worldwide | `PAYPAL` |
+| Amazon Pay | Digital wallet | Worldwide | `AMAZON_PAY` |
+| Crypto (Binance) | Cryptocurrency | Worldwide | `BINANCE` |
+| Skrill | Digital wallet | Worldwide | `SKRILL` |
+
+<Note>
+  Apple Pay and Google Pay activate automatically when `CARD` is included. No separate API value is required.
+</Note>
+
+</Accordion>
+
+<Accordion title="Japan (JP)">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Konbini | Convenience store | JP | `KONBINI` |
+| PayEasy | Bank payment | JP | `PAYEASY` |
+| PayPay | QR / digital wallet | JP | `PAYPAY` |
+| AU Pay | QR / digital wallet | JP | `AUPAY` |
+| d Payment | Carrier billing | JP | `DBARAI` |
+| Rakuten Pay | Digital wallet | JP | `RAKUTEN_PAY` |
+| Paidy | Buy now, pay later | JP | `PAIDY` |
+| merpay | Digital wallet | JP | `MERPAY` |
+
+</Accordion>
+
+<Accordion title="Korea (KR)">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Korean local cards | Card | KR | `CARD_KR` |
+| Kakao Pay | Digital wallet | KR | `KAKAOPAY` |
+| Naver Pay | Digital wallet | KR | `NAVERPAY` |
+| Payco | Digital wallet | KR | `PAYCO` |
+| Samsung Pay | Digital wallet | KR | `SAMSUNGPAY_KR` |
+| Toss Pay | Digital wallet | KR | `TOSSPAY` |
+
+</Accordion>
+
+<Accordion title="Southeast Asia">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| GrabPay | Digital wallet | SG, MY | `GRAB_PAY` |
+| PayNow | Bank transfer | SG | `PAY_NOW` |
+| DANA | Digital wallet | ID | `DANA` |
+| GoPay | Digital wallet | ID | `GO_PAY` |
+| OVO | Digital wallet | ID | `OVO` |
+| Boost | Digital wallet | MY | `BOOST` |
+| DuitNow | Bank transfer | MY | `DUIT_NOW` |
+| ShopeePay | Digital wallet | MY | `SHOPEE_PAY` |
+| Touch 'n Go | Digital wallet | MY | `TOUCH_N_GO` |
+| FPX / Internet Banking | Bank transfer | MY | `FPX` |
+| GCash | Digital wallet | PH | `GCASH` |
+| Maya | Digital wallet | PH | `PAYMAYA` |
+| PromptPay | QR / bank transfer | TH | `PROMPT_PAY` |
+| TrueMoney | Digital wallet | TH | `TRUE_MONEY` |
+| Rabbit LINE Pay | Digital wallet | TH | `RABBIT_LINE_PAY` |
+
+</Accordion>
+
+<Accordion title="China & Hong Kong">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Alipay | Digital wallet | CN, global | `ALIPAY` |
+| WeChat Pay | Digital wallet | CN, global | `WECHAT_PAY` |
+| FPS | Bank transfer | HK | `FPS` |
+
+</Accordion>
+
+<Accordion title="Taiwan">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| ATM Payment | Bank transfer | TW | `ATM_TW` |
+| Samsung Pay | Digital wallet | TW | `SAMSUNGPAY_KR` |
+
+</Accordion>
+
+<Accordion title="Europe">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Klarna | Buy now, pay later | EU, GB, US | `KLARNA` |
+| iDEAL | Bank transfer | NL | `IDEAL` |
+| Giropay | Bank transfer | DE | `GIROPAY` |
+| Bancontact | Card / bank | BE | `BANCONTACT` |
+| Trustly | Bank transfer | EU | `TRUSTLY` |
+| SEPA Instant | Bank transfer | EU | `SEPA` |
+| EPS | Bank transfer | AT | `EPS` |
+| Pay by Bank App | Bank transfer | GB | `PAY_BY_BANK_APP` |
+| Paysafecard | Prepaid voucher | EU | `PAYSAFECARD` |
+| Paysafecash | Cash payment | EU | `PAYSAFECASH` |
+| MyBank | Bank transfer | IT | `MYBANK` |
+| Blik | Bank transfer | PL | `BLIK` |
+| Przelewy24 (P24) | Bank transfer | PL | `PRZELEWY24` |
+| PayU | Digital wallet | PL | `PAYU` |
+| Multibanco | Bank transfer | PT | `MULTIBANCO` |
+
+</Accordion>
+
+<Accordion title="Americas">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| Venmo | Digital wallet | US | `VENMO` |
+| Cash App | Digital wallet | US | `CASH_APP` |
+| PIX | Instant bank transfer | BR | `PIX` |
+| SPEI | Bank transfer | MX | `SPEI` |
+| PSE | Bank transfer | CO | `PSE` |
+
+</Accordion>
+
+<Accordion title="Africa & Middle East">
+
+| Method | Type | Regions | API Value |
+|---|---|---|---|
+| M-Pesa / Airtel Money | Mobile money | KE | `MOBILE_MONEY_KE` |
+| Bank Transfer Kenya | Bank transfer | KE | `BANK_TRANSFER_KE` |
+
+</Accordion>
+
+---
+
+<Note>
+  If you need a payment method not listed here, contact Tokenz support. We regularly add new methods based on merchant demand.
+</Note>

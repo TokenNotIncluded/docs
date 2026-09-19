@@ -1,0 +1,157 @@
+---
+title: "Integrate Gift Codes to Reward Players with Campaigns"
+sidebarTitle: "Gift Codes"
+description: "Validate and redeem campaign Gift Codes using the Tokenz Redemption Codes API. Fulfill rewards securely via the redemption.completed webhook."
+---
+
+Gift Codes (formerly Redemption Codes) let players enter a campaign code to receive a reward. Your server validates the code, redeems it, and fulfills the reward via the `redemption.completed` webhook.
+
+<Note>
+  This feature was formerly called Redemption Codes. API endpoints and event names remain unchanged.
+</Note>
+
+## Integration flow
+
+<Steps>
+  <Step title="Player enters a code">
+    The player types or pastes a campaign code into your UI.
+  </Step>
+  <Step title="Validate the code">
+    Your server calls `POST /v2/redemption-codes/validate` to check eligibility and retrieve a reward preview. Include `playerId` to also enforce per-player limits at this stage.
+  </Step>
+  <Step title="Show the reward preview">
+    Display the reward name, image, and quantity to the player so they know what they will receive before confirming.
+  </Step>
+  <Step title="Player confirms">
+    The player confirms the redemption. Your server calls `POST /v2/redemption-codes/redeem` with the code and `playerId`.
+  </Step>
+  <Step title="Tokenz sends the webhook">
+    Tokenz delivers a `redemption.completed` event to your registered webhook endpoint.
+  </Step>
+  <Step title="Verify and fulfill">
+    Your backend verifies the `Tokenz-Signature` header, then grants the reward. Use `redemptionId` to prevent duplicate grants if the event is delivered more than once.
+  </Step>
+</Steps>
+
+## Validate a code
+
+Call this endpoint before redeeming to confirm the code is valid and the player is eligible. A successful validation does **not** consume the code.
+
+```bash validate-code.sh
+curl --request POST \
+  --url https://api.tokenz.one/v2/redemption-codes/validate \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "redemptionCode": "SPRING2026FREE",
+    "playerId": "player_98765"
+  }'
+```
+
+`playerId` is optional for validation, but if provided, per-player limits are also checked against the campaign and the specific code.
+
+```json validate-response.json
+{
+  "campaign": {
+    "id": "campaign_1AbCdEfGh12",
+    "name": "Spring Campaign 2026"
+  },
+  "rewardPreview": {
+    "name": "SSR Reimu Card",
+    "imageUrl": "https://images.example.com/rewards/reimu.png",
+    "quantity": 1
+  }
+}
+```
+
+## Redeem a code
+
+Once the player confirms, call the redeem endpoint to consume the code and trigger fulfillment.
+
+```bash redeem-code.sh
+curl --request POST \
+  --url https://api.tokenz.one/v2/redemption-codes/redeem \
+  --header 'Authorization: Bearer secret_test_YOUR_KEY_HERE' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "redemptionCode": "SPRING2026FREE",
+    "playerId": "player_98765"
+  }'
+```
+
+`playerId` is required when redeeming a code.
+
+```json redeem-response.json
+{
+  "redemptionId": "redemption_1XyZaBcDe34",
+  "kind": "CODE_REDEMPTION",
+  "code": "SPRING2026FREE",
+  "playerId": "player_98765",
+  "campaign": {
+    "id": "campaign_1AbCdEfGh12",
+    "name": "Spring Campaign 2026"
+  },
+  "reward": {
+    "skuRedemptionReward": {
+      "type": "EXTERNAL_SKU",
+      "sku": "ITEM_SSR_REIMU",
+      "name": "SSR Reimu Card",
+      "quantity": 1
+    }
+  },
+  "redeemedAt": "2026-03-25T08:10:00Z"
+}
+```
+
+## Handle the webhook
+
+<Warning>
+  Always verify the `Tokenz-Signature` header before granting any reward. A handler without signature verification will grant rewards to anyone who finds the URL.
+</Warning>
+
+```javascript webhook-handler.js
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  // Verify signature first (see /guides/webhook-integration)
+  const event = JSON.parse(req.body);
+
+  if (event.object === 'redemption.completed') {
+    const { redemptionId, playerId, reward, kind } = event.eventData.data.redemption;
+
+    // Guard against duplicate delivery
+    if (alreadyFulfilled(redemptionId)) return res.status(200).end();
+
+    if (kind === 'CODE_REDEMPTION') {
+      const { sku, quantity } = reward.skuRedemptionReward;
+      grantItemToPlayer(playerId, sku, quantity);
+      markFulfilled(redemptionId);
+    }
+  }
+
+  res.status(200).end();
+});
+```
+
+## Code status reference
+
+A code's visible status reflects the state of its parent campaign.
+
+| Campaign Status | Code Status |
+|---|---|
+| `active` | `active` |
+| `draft`, `scheduled`, `paused` | `pending` |
+| `ended` | `deactivated` |
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `entity.not-found` | Code not found |
+| `campaign.limit-reached` | Campaign total redemption limit hit |
+| `campaign.player-limit-reached` | Player reached per-campaign limit |
+| `redemptionCode.campaign-invalid` | Campaign not active or outside valid window |
+| `redemptionCode.limit-reached` | Code's own usage limit hit |
+| `redemptionCode.player-limit-reached` | Player reached per-code limit |
+
+<Tip>
+  Create test campaigns in the Dashboard using test mode. Test API keys (`secret_test_…`) can only redeem test codes. Test redemption IDs end with `_t`. Test webhooks are delivered only to test endpoints.
+</Tip>
