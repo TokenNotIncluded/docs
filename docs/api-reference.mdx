@@ -1,0 +1,31 @@
+---
+title: "API reference"
+sidebarTitle: "Overview"
+description: "Choose the OpenAPI contract that matches the LMM API surface you are integrating."
+---
+
+The repository publishes two machine-readable OpenAPI contracts. Use the relay contract for model and media requests. Use the admin contract for panel, account, model, billing, and operational endpoints.
+
+<CardGroup cols={2}>
+  <Card title="Relay API" icon="bot" href="/docs/responses-tool-compatibility">
+    OpenAI-compatible chat, Responses, Messages, Gemini, media, embeddings, audio, reranking, and moderation endpoints.
+  </Card>
+  <Card title="Admin API" icon="settings" href="/docs/read-only-query-api">
+    System, user, authentication, channel, token, billing, model, task, and administration endpoints.
+  </Card>
+</CardGroup>
+
+## Authentication
+
+Most relay endpoints use a bearer token:
+
+```bash
+curl https://api.lmm.best/v1/models \
+  -H "Authorization: Bearer $LMM_API_KEY"
+```
+
+See [User authentication and login sessions](/docs/authentication) for access tokens, refresh cookies, personal access tokens, session limits, trusted proxies, and security proofs.
+
+<Info>
+  The OpenAPI files are copied from the upstream repository and remain available at `docs/openapi/api.json` and `docs/openapi/relay.json` for client generation and contract review.
+</Info>

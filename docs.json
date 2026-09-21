@@ -1,89 +1,36 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "Tokenz",
-  "theme": "luma",
-  "colors": {
-    "primary": "#6366F1",
-    "light": "#818CF8",
-    "dark": "#4F46E5"
-  },
+  "name": "LMM API",
+  "theme": "mint",
+  "colors": { "primary": "#0E7490", "light": "#22D3EE", "dark": "#155E75" },
   "favicon": "/favicon.svg",
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+  "logo": { "light": "/logo/light.svg", "dark": "/logo/dark.svg" },
+  "api": {
+    "openapi": ["docs/openapi/api.json", "docs/openapi/relay.json"]
   },
   "navbar": {
     "links": [
-      {
-        "label": "Dashboard",
-        "href": "https://dashboard.tokenz.one"
-      }
+      { "label": "API status", "href": "https://api.lmm.best" },
+      { "label": "GitHub", "href": "https://github.com/TokenNotIncluded/api.lmm.best" }
     ],
-    "primary": {
-      "type": "button",
-      "label": "Get Started",
-      "href": "https://dashboard.tokenz.one"
-    }
+    "primary": { "type": "button", "label": "API reference", "href": "/docs/api-reference" }
   },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
-          {
-            "group": "Get Started",
-            "pages": [
-              "introduction",
-              "guides/quickstart",
-              "guides/api-keys",
-              "guides/testing"
-            ]
-          },
-          {
-            "group": "Checkout",
-            "pages": [
-              "guides/checkout-overview",
-              "guides/checkout-integration",
-              "guides/payment-methods",
-              "guides/currencies"
-            ]
-          },
-          {
-            "group": "Products & Subscriptions",
-            "pages": [
-              "guides/products",
-              "guides/subscriptions",
-              "guides/subscription-lifecycle"
-            ]
-          },
-          {
-            "group": "Orders & Fulfillment",
-            "pages": [
-              "guides/orders",
-              "guides/refunds",
-              "guides/disputes"
-            ]
-          },
-          {
-            "group": "Campaigns",
-            "pages": [
-              "guides/campaigns",
-              "guides/gift-codes",
-              "guides/free-items"
-            ]
-          },
-          {
-            "group": "Webhooks",
-            "pages": [
-              "guides/webhooks",
-              "guides/webhook-integration"
-            ]
-          }
+          { "group": "Get started", "pages": ["introduction", "docs/README", "docs/authentication", "docs/setup-startup", "docs/server-ops", "docs/product-terminology"] },
+          { "group": "API reference", "pages": ["docs/api-reference", "docs/read-only-query-api", "docs/responses-tool-compatibility", "docs/ali-image-polling", "docs/pi-remote-control-api"] },
+          { "group": "Deploy and release", "pages": ["docs/backend-cli-deployment-contract", "docs/manual-systemd-deployment", "docs/seamless-upgrades", "docs/release-architecture", "docs/production-release-transaction", "docs/production-upgrade-plan", "docs/production-ab-preparation", "docs/ci-workflow-layout", "docs/go052-authorization-bridge", "docs/rust-blue-green", "docs/rust-go-parity", "docs/rust-relay-timeouts", "docs/test-single-instance", "docs/three-node-deployment"] },
+          { "group": "Data and infrastructure", "pages": ["docs/postgresql-migration", "docs/postgresql-cutover", "docs/postgresql-scanner-leadership", "docs/valkey-lmm-api", "docs/controller-only-backup-format", "docs/go-memory-management", "docs/pprof-diagnostics", "docs/ionet-client"] },
+          { "group": "Product and payments", "pages": ["docs/model-price-locks", "docs/price-lock-snapshot-consistency", "docs/payment-money-contract", "docs/cc-switch-account-balance", "docs/referral-rewards", "docs/referral-retry-preparation", "docs/open-source-bounties", "docs/tool-market-gap-audit", "docs/tool-market-implementation", "docs/product-experience-rollout", "docs/waiting-experience", "docs/waffo-pancake"] },
+          { "group": "Assistant and channels", "pages": ["docs/assistant-admin-control", "docs/assistant-human-support", "docs/assistant-ux-permission-audit", "docs/channel/other_setting", "docs/games/signal-path", "docs/frontend-design", "docs/oidc-settings-save"] },
+          { "group": "Security and incidents", "pages": ["docs/incident-343-forward-recovery", "docs/incident-343-owner-ops", "docs/incidents/2026-09-20-recovery-retirement", "docs/new-api-upstream-review-2026-09-09", "docs/translation-glossary", "docs/translation-glossary.fr", "docs/translation-glossary.ru", "docs/security/assistant-registration-guard"] },
+          { "group": "Legal", "pages": ["docs/legal/user-agreement", "docs/legal/privacy-policy", "docs/legal/terms-of-service"] }
         ]
       }
     ]
   },
-  "footer": {
-    "socials": {}
-  }
+  "footer": { "socials": { "github": "https://github.com/TokenNotIncluded/api.lmm.best" } }
 }

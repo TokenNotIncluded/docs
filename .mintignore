@@ -5,3 +5,7 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Legacy Tokenz starter content and local upstream checkout are not part of the LMM API site.
+guides/
+.upstream-api-lmm/

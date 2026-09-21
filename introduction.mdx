@@ -1,62 +1,58 @@
 ---
-title: "Tokenz: Merchant of Record Payments for Digital Goods"
-sidebarTitle: "Introduction"
-description: "Tokenz is a Merchant of Record platform for gaming and digital goods. Accept 50+ payment methods globally, automate tax, and manage orders via API."
+title: "LMM API documentation"
+sidebarTitle: "Overview"
+description: "Build with the LMM API, operate the platform safely, and integrate OpenAI-compatible model endpoints."
 ---
 
-Tokenz is a Merchant of Record (MoR) checkout platform built for game developers and digital goods merchants who need to sell globally without the complexity of tax compliance, payment infrastructure, or fraud management. When you use Tokenz, you integrate once and immediately gain access to 50+ payment methods across APAC, Europe, and the Americas — while Tokenz assumes legal responsibility for VAT, GST, and sales tax calculation, collection, and remittance on your behalf.
+LMM API gives you OpenAI-compatible access to language, image, video, audio, embedding, and moderation models. This documentation also covers authentication, deployment, operations, billing, and product behavior for the platform.
+
+<Note>
+  The pages in this site are organized from the upstream `api.lmm.best` documentation set. Operational and legal pages are intentionally preserved so the site remains a complete reference.
+</Note>
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
-    Accept your first payment in minutes
+  <Card title="Start with the API" icon="rocket" href="/docs/authentication">
+    Learn the authentication model, request contracts, and compatibility boundaries.
   </Card>
-  <Card title="Checkout" icon="credit-card" href="/guides/checkout-overview">
-    Hosted payment page with 50+ methods
+  <Card title="Browse API contracts" icon="brackets-curly" href="/docs/api-reference">
+    Explore the generated admin and relay OpenAPI specifications.
   </Card>
-  <Card title="API Keys" icon="key" href="/guides/api-keys">
-    Authenticate and secure your integration
+  <Card title="Deploy and operate" icon="server" href="/docs/setup-startup">
+    Follow the supported setup, release, migration, backup, and recovery workflows.
   </Card>
-  <Card title="Webhooks" icon="webhook" href="/guides/webhooks">
-    Real-time payment event notifications
+  <Card title="Understand the product" icon="sparkles" href="/docs/product-terminology">
+    Find product behavior, pricing, payments, assistant capabilities, and design guidance.
   </Card>
 </CardGroup>
 
-## What Tokenz does
-
-Tokenz sits between your store and the global payments ecosystem, handling the hard parts of selling digital goods internationally — so you can focus on building your product rather than managing tax jurisdictions, payment method contracts, or compliance obligations.
-
-<CardGroup cols={2}>
-  <Card title="Global Payment Methods" icon="globe">
-    Cards, e-wallets, bank transfers, and cash payments across APAC, Europe, and the Americas
-  </Card>
-  <Card title="Merchant of Record" icon="shield-check">
-    Tokenz handles tax calculation, compliance, and remittance so you don't have to
-  </Card>
-  <Card title="Subscriptions" icon="repeat">
-    Recurring billing with trial periods, dunning, and automatic renewal
-  </Card>
-  <Card title="Campaigns" icon="gift">
-    Gift codes and free item giveaways to reward your players
-  </Card>
-</CardGroup>
-
-## How Tokenz works
+## Common workflows
 
 <Steps>
-  <Step title="Create a Checkout Session via API">
-    Send a `POST` request to `https://api.tokenz.one/v2/checkoutsession` with your product details, pricing, and customer information to create a new checkout session. Tokenz returns a session object containing a hosted checkout `url` you redirect the customer to.
+  <Step title="Authenticate requests">
+    Use a panel access token or the relay API bearer contract described in [Authentication](/docs/authentication). Keep tokens server-side and rotate them when a session or deployment changes.
   </Step>
-  <Step title="Redirect the customer to the hosted payment page">
-    Redirect your customer to the `url` returned in the session response. The hosted page automatically presents the payment methods available in the customer's region and handles the entire payment flow for you.
+  <Step title="Choose a compatible endpoint">
+    Start with the [relay API reference](/docs/api-reference), then select the protocol that matches your client: Chat Completions, Responses, Messages, Gemini, embeddings, media, or another supported format.
   </Step>
-  <Step title="Customer pays using their preferred method">
-    The customer selects a payment method — card, e-wallet, bank transfer, or cash — and completes the transaction. Tokenz manages currency conversion, tax display, and payment processing end to end.
+  <Step title="Validate in a safe environment">
+    Run the checks in [Setup and startup](/docs/setup-startup) and the relevant deployment contract before changing production state.
   </Step>
-  <Step title="Receive the order.succeeded webhook and fulfill the order">
-    Once payment is confirmed, Tokenz sends an `order.succeeded` event to your webhook endpoint. Verify the event signature and fulfill the order — grant entitlements, deliver goods, or activate the subscription.
+  <Step title="Operate with evidence">
+    Use the release, backup, PostgreSQL, Valkey, diagnostics, and incident pages to make changes reversible and auditable.
   </Step>
 </Steps>
 
-<Note>
-  Ready to go live? Switch from test API keys (`secret_test_…`) to live keys (`secret_live_…`) in your environment configuration.
-</Note>
+## Reference areas
+
+<CardGroup cols={3}>
+  <Card title="API" icon="code" href="/docs/api-reference">OpenAPI contracts and request compatibility.</Card>
+  <Card title="Deployment" icon="cloud-upload" href="/docs/backend-cli-deployment-contract">Release, rollback, and systemd procedures.</Card>
+  <Card title="Operations" icon="activity" href="/docs/server-ops">Runbooks for production services and incidents.</Card>
+  <Card title="Security" icon="shield-check" href="/docs/assistant-ux-permission-audit">Authentication, permissions, and privacy boundaries.</Card>
+  <Card title="Product" icon="layers" href="/docs/product-experience-rollout">Features, terminology, payments, and referrals.</Card>
+  <Card title="Legal" icon="scale" href="./docs/legal/terms-of-service.mdx">Terms, privacy, and user agreements.</Card>
+</CardGroup>
+
+<Warning>
+  Production changes require the documented validation and approval steps. Do not treat an incident note, audit, or migration rehearsal as a substitute for the current release contract.
+</Warning>

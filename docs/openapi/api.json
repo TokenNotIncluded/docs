@@ -1,0 +1,7032 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "后台管理接口",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "系统"
+    },
+    {
+      "name": "用户登陆注册"
+    },
+    {
+      "name": "OAuth"
+    },
+    {
+      "name": "用户管理"
+    },
+    {
+      "name": "充值"
+    },
+    {
+      "name": "两步验证"
+    },
+    {
+      "name": "安全验证"
+    },
+    {
+      "name": "渠道管理"
+    },
+    {
+      "name": "令牌管理"
+    },
+    {
+      "name": "兑换码"
+    },
+    {
+      "name": "日志"
+    },
+    {
+      "name": "数据统计"
+    },
+    {
+      "name": "分组"
+    },
+    {
+      "name": "任务"
+    },
+    {
+      "name": "供应商"
+    },
+    {
+      "name": "模型管理"
+    },
+    {
+      "name": "系统设置"
+    }
+  ],
+  "paths": {
+    "/api/setup": {
+      "get": {
+        "summary": "获取初始化状态",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "初始化系统",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/status": {
+      "get": {
+        "summary": "获取系统状态",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/status/test": {
+      "get": {
+        "summary": "测试系统状态",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/uptime/status": {
+      "get": {
+        "summary": "获取Uptime Kuma状态",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/notice": {
+      "get": {
+        "summary": "获取公告",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user-agreement": {
+      "get": {
+        "summary": "获取用户协议",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/privacy-policy": {
+      "get": {
+        "summary": "获取隐私政策",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/about": {
+      "get": {
+        "summary": "获取关于信息",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/home_page_content": {
+      "get": {
+        "summary": "获取首页内容",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/pricing": {
+      "get": {
+        "summary": "获取定价信息",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（可选登录）",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models": {
+      "get": {
+        "summary": "获取模型列表",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/ratio_config": {
+      "get": {
+        "summary": "获取倍率配置",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "系统"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/verification": {
+      "get": {
+        "summary": "发送邮箱验证码",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/reset_password": {
+      "get": {
+        "summary": "发送密码重置邮件",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/reset": {
+      "post": {
+        "summary": "重置密码",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/register": {
+      "post": {
+        "summary": "用户注册",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "verification_code": {
+                    "type": "string"
+                  },
+                  "aff_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/login": {
+      "post": {
+        "summary": "用户登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权。签发新登录 Session 时可能返回 409 AUTH_SESSION_LIMIT 或 429 AUTH_SESSION_ISSUANCE_LIMIT。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "description": "该用户的活跃登录 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "该用户在统计窗口内创建的 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/login/2fa": {
+      "post": {
+        "summary": "两步验证登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（登录流程）。签发新登录 Session 时可能返回 409 AUTH_SESSION_LIMIT 或 429 AUTH_SESSION_ISSUANCE_LIMIT。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "flow_token": {
+                    "type": "string",
+                    "description": "密码校验成功后返回的一次性 2FA 登录流程令牌"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "description": "该用户的活跃登录 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "该用户在统计窗口内创建的 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/auth/refresh": {
+      "post": {
+        "summary": "刷新面板登录",
+        "deprecated": false,
+        "description": "使用 HttpOnly Refresh Cookie 轮换刷新令牌并返回新的 AuthBundle；SESSION_COOKIE_SECURE=true 时要求同源或可信 Origin，false/未配置时保持本地 HTTP 兼容模式。已有内存会话时通过 X-Auth-Session 绑定预期 SID，Cookie 不匹配返回 409 AUTH_SESSION_MISMATCH 且不修改 Cookie。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [
+          {
+            "name": "X-Auth-Session",
+            "in": "header",
+            "description": "可选的预期登录会话 SID；冷启动时可省略",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "description": "X-Auth-Session 与 Refresh Cookie 的 SID 不一致；不修改 Cookie 或会话",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/auth/logout": {
+      "post": {
+        "summary": "撤销当前登录会话",
+        "deprecated": false,
+        "description": "撤销明确的 Bearer/X-Auth-Session 会话；仅当 HttpOnly Refresh Cookie 属于同一 SID 时才撤销并清除 Cookie，避免跨标签页误踢其他账号。SESSION_COOKIE_SECURE=true 时要求同源或可信 Origin，false/未配置时保持本地 HTTP 兼容模式。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [
+          {
+            "name": "X-Auth-Session",
+            "in": "header",
+            "description": "可选的预期登录会话 SID",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/sessions": {
+      "get": {
+        "summary": "查看登录会话",
+        "deprecated": false,
+        "description": "🔐 需要面板 Access Token；PAT 不能管理浏览器登录会话。只返回当前 user_auth_version 的有效会话，当前会话优先，最多 100 条。顶层 session_auto_logout 返回用户的自动登出开关，所有账号默认开启。开启时撤销 created_at 严格早于当前时间减去 7 天的会话，刷新令牌不重置登录时间。此功能由默认 Go 后端提供。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "返回当前鉴权版本的有效登录会话及自动登出开关",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "data",
+                    "session_auto_logout"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "session_auto_logout": {
+                      "type": "boolean",
+                      "default": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/user/sessions/settings": {
+      "put": {
+        "summary": "设置自动登出超过一周的登录会话",
+        "deprecated": false,
+        "description": "🔐 需要当前用户的浏览器登录会话 Access Token；PAT 不可使用。保存用户级 session_auto_logout 开关，缺省设置代表开启，已有账号同样适用。开启后立即撤销登录时间 created_at 严格早于当前时间减去 7 天的会话，包括符合条件的当前会话；刚好 7 天仍保留。关闭开关不恢复已撤销会话，原有 30 天有效期继续生效。默认 Go 后端提供此接口，Rust 预览后端暂未实现。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "session_auto_logout"
+                ],
+                "properties": {
+                  "session_auto_logout": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "设置已保存并完成适用的会话撤销；当前会话被撤销时，后续请求返回 401",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "message"
+                  ],
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "message": ""
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "缺少 session_auto_logout 或值不是布尔值"
+          },
+          "401": {
+            "description": "登录会话无效或已撤销"
+          },
+          "403": {
+            "description": "需要浏览器登录会话，PAT 不可使用"
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/user/sessions/{sid}": {
+      "delete": {
+        "summary": "撤销指定登录会话",
+        "deprecated": false,
+        "description": "🔐 需要面板 Access Token，可撤销当前会话",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/user/sessions/revoke-others": {
+      "post": {
+        "summary": "撤销其他登录会话",
+        "deprecated": false,
+        "description": "🔐 保留当前登录会话并撤销该用户的其他会话，包含列表不可见的旧 user_auth_version active 残留行",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/user/groups": {
+      "get": {
+        "summary": "获取用户分组列表",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/login/begin": {
+      "post": {
+        "summary": "开始Passkey登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/login/finish": {
+      "post": {
+        "summary": "完成Passkey登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权。签发新登录 Session 时可能返回 409 AUTH_SESSION_LIMIT 或 429 AUTH_SESSION_ISSUANCE_LIMIT。",
+        "tags": [
+          "用户登陆注册"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "description": "该用户的活跃登录 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "该用户在统计窗口内创建的 Session 已达上限",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthSessionIssuanceError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/github": {
+      "get": {
+        "summary": "GitHub OAuth登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/discord": {
+      "get": {
+        "summary": "Discord OAuth登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/oidc": {
+      "get": {
+        "summary": "OIDC登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/linuxdo": {
+      "get": {
+        "summary": "LinuxDO OAuth登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/state": {
+      "post": {
+        "summary": "生成OAuth State",
+        "deprecated": false,
+        "description": "创建一次性 OAuth AuthFlow。login 无需鉴权；bind 需要面板 Access Token 并绑定当前登录会话",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "provider",
+                  "intent"
+                ],
+                "properties": {
+                  "provider": {
+                    "type": "string"
+                  },
+                  "intent": {
+                    "type": "string",
+                    "enum": [
+                      "login",
+                      "bind"
+                    ]
+                  },
+                  "aff": {
+                    "type": "string",
+                    "description": "仅 login intent 可用的 affiliate code"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/wechat": {
+      "get": {
+        "summary": "微信OAuth登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/wechat/bind": {
+      "post": {
+        "summary": "绑定微信",
+        "deprecated": false,
+        "description": "🔐 需要面板 Access Token",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/email/bind": {
+      "post": {
+        "summary": "绑定邮箱",
+        "deprecated": false,
+        "description": "🔐 需要面板 Access Token",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "code"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/telegram/login": {
+      "get": {
+        "summary": "Telegram登录",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（OAuth 回调）。创建本地登录 Session 时同样受 AUTH_SESSION_LIMIT 和 AUTH_SESSION_ISSUANCE_LIMIT 约束。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          },
+          "409": {
+            "$ref": "#/components/responses/AuthSessionLimit"
+          },
+          "429": {
+            "$ref": "#/components/responses/AuthSessionIssuanceLimit"
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/telegram/bind/start": {
+      "post": {
+        "summary": "创建 Telegram 绑定流程",
+        "deprecated": false,
+        "description": "🔐 需要面板 Access Token；返回绑定 widget 使用的一次性 flow_token 与 callback_url",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "AccessToken1": []
+          }
+        ]
+      }
+    },
+    "/api/oauth/telegram/bind/{flow_token}": {
+      "get": {
+        "summary": "完成 Telegram 绑定",
+        "deprecated": false,
+        "description": "Telegram widget 回调；通过一次性 flow_token 关联并重新校验创建该流程的登录会话。始终以 302 回到 /oauth/telegram：成功携带 telegram_bind=success，失败携带 telegram_bind=error、flow_token 和稳定 error_code（TELEGRAM_BIND_DISABLED、TELEGRAM_BIND_INVALID_REQUEST、TELEGRAM_BIND_FLOW_INVALID、TELEGRAM_BIND_SESSION_INVALID、TELEGRAM_BIND_ALREADY_BOUND、TELEGRAM_BIND_USER_DELETED、TELEGRAM_BIND_USER_DISABLED 或 TELEGRAM_BIND_INTERNAL_ERROR），不会透传底层错误文案。",
+        "tags": [
+          "OAuth"
+        ],
+        "parameters": [
+          {
+            "name": "flow_token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "重定向到 /oauth/telegram 的绑定结果回调",
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/user/self/groups": {
+      "get": {
+        "summary": "获取当前用户分组",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/self": {
+      "get": {
+        "summary": "获取当前用户信息",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新当前用户信息",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "display_name": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "original_password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "注销当前用户",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/models": {
+      "get": {
+        "summary": "获取用户可用模型",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/token": {
+      "get": {
+        "summary": "生成访问令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey": {
+      "get": {
+        "summary": "获取Passkey状态",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除Passkey",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/register/begin": {
+      "post": {
+        "summary": "开始注册Passkey",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/register/finish": {
+      "post": {
+        "summary": "完成注册Passkey",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/verify/begin": {
+      "post": {
+        "summary": "开始验证Passkey",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/passkey/verify/finish": {
+      "post": {
+        "summary": "完成验证Passkey",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/aff": {
+      "get": {
+        "summary": "获取邀请码",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/aff_transfer": {
+      "post": {
+        "summary": "转换邀请额度",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quota": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/setting": {
+      "put": {
+        "summary": "更新用户设置",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notify_type": {
+                    "type": "string"
+                  },
+                  "quota_warning_threshold": {
+                    "type": "number"
+                  },
+                  "webhook_url": {
+                    "type": "string"
+                  },
+                  "notification_email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/topup": {
+      "get": {
+        "summary": "获取所有充值记录",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/": {
+      "get": {
+        "summary": "获取所有用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "p",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/topup/complete": {
+      "post": {
+        "summary": "管理员完成充值",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/search": {
+      "get": {
+        "summary": "搜索用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/{id}": {
+      "get": {
+        "summary": "获取指定用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除用户",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/{id}/reset_passkey": {
+      "delete": {
+        "summary": "管理员重置用户Passkey",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/{id}/2fa": {
+      "delete": {
+        "summary": "管理员禁用用户2FA",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/manage": {
+      "post": {
+        "summary": "管理用户状态",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "用户管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "disable",
+                      "enable",
+                      "delete",
+                      "promote",
+                      "demote"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/topup/info": {
+      "get": {
+        "summary": "获取充值信息",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/topup/self": {
+      "get": {
+        "summary": "获取用户充值记录",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/pay": {
+      "post": {
+        "summary": "发起易支付",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/amount": {
+      "post": {
+        "summary": "获取支付金额",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/stripe/pay": {
+      "post": {
+        "summary": "发起Stripe支付",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/stripe/amount": {
+      "post": {
+        "summary": "获取Stripe支付金额",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/creem/pay": {
+      "post": {
+        "summary": "发起Creem支付",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/epay/notify": {
+      "get": {
+        "summary": "易支付回调",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（支付回调）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/stripe/webhook": {
+      "post": {
+        "summary": "Stripe Webhook",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（Webhook回调）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/creem/webhook": {
+      "post": {
+        "summary": "Creem Webhook",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（Webhook回调）",
+        "tags": [
+          "充值"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/status": {
+      "get": {
+        "summary": "获取2FA状态",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/setup": {
+      "post": {
+        "summary": "设置2FA",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/enable": {
+      "post": {
+        "summary": "启用2FA",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/disable": {
+      "post": {
+        "summary": "禁用2FA",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/backup_codes": {
+      "post": {
+        "summary": "重新生成备用码",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/user/2fa/stats": {
+      "get": {
+        "summary": "获取2FA统计",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "两步验证"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/verify": {
+      "post": {
+        "summary": "通用安全验证",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "安全验证"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/": {
+      "get": {
+        "summary": "获取所有渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "p",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_sort",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "tag_mode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "添加渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "single",
+                      "batch",
+                      "multi_to_single"
+                    ]
+                  },
+                  "channel": {
+                    "$ref": "#/components/schemas/Channel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Channel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/search": {
+      "get": {
+        "summary": "搜索渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/models": {
+      "get": {
+        "summary": "获取渠道模型列表",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/models_enabled": {
+      "get": {
+        "summary": "获取已启用模型列表",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/{id}": {
+      "get": {
+        "summary": "获取指定渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/{id}/key": {
+      "post": {
+        "summary": "获取渠道密钥",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）+ 安全验证",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/test": {
+      "get": {
+        "summary": "测试所有渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/test/{id}": {
+      "get": {
+        "summary": "测试指定渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/update_balance": {
+      "get": {
+        "summary": "更新所有渠道余额",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/update_balance/{id}": {
+      "get": {
+        "summary": "更新指定渠道余额",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/disabled": {
+      "delete": {
+        "summary": "删除已禁用渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/batch": {
+      "post": {
+        "summary": "批量删除渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/fix": {
+      "post": {
+        "summary": "修复渠道能力",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/fetch_models/{id}": {
+      "get": {
+        "summary": "获取上游模型列表",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/fetch_models": {
+      "post": {
+        "summary": "获取模型列表",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "base_url": {
+                    "type": "string",
+                    "description": "上游基础地址。编辑预览时显式空字符串表示清除已保存值，省略则沿用已保存值；相对上游路径要求非空的完整基础地址。"
+                  },
+                  "type": {
+                    "type": "integer",
+                    "description": "渠道类型。高级自定义渠道为 58。"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "新建渠道预览使用的 API 密钥。提供 channel_id 时忽略此字段，并在服务端使用渠道已保存的单密钥或多密钥配置。"
+                  },
+                  "channel_id": {
+                    "type": "integer",
+                    "description": "可选的已保存渠道 ID。用于在不向前端返回密钥的情况下预览尚未保存的高级自定义配置。"
+                  },
+                  "advanced_custom": {
+                    "type": "string",
+                    "description": "可选的高级自定义配置 JSON 字符串。新建高级自定义渠道时必填；编辑预览时覆盖已保存配置，省略则沿用已保存配置。模型发现仅支持显式的 /v1/models 路由和 OpenAI data[].id 响应。"
+                  },
+                  "header_override": {
+                    "type": "string",
+                    "description": "可选的全局请求头覆盖 JSON 字符串。编辑预览时覆盖已保存值，显式空字符串表示清除，省略则沿用。"
+                  },
+                  "proxy": {
+                    "type": "string",
+                    "description": "可选的网络代理。编辑预览时覆盖已保存值，显式空字符串表示清除，省略则沿用。"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/batch/tag": {
+      "post": {
+        "summary": "批量设置渠道标签",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  },
+                  "tag": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/tag/models": {
+      "get": {
+        "summary": "获取标签模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/tag/disabled": {
+      "post": {
+        "summary": "禁用标签渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/tag/enabled": {
+      "post": {
+        "summary": "启用标签渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/tag": {
+      "put": {
+        "summary": "编辑标签渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string"
+                  },
+                  "new_tag": {
+                    "type": "string"
+                  },
+                  "priority": {
+                    "type": "integer"
+                  },
+                  "weight": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/copy/{id}": {
+      "post": {
+        "summary": "复制渠道",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "suffix",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reset_balance",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/channel/multi_key/manage": {
+      "post": {
+        "summary": "管理多密钥",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "渠道管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "channel_id": {
+                    "type": "integer"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "get_key_status",
+                      "disable_key",
+                      "enable_key",
+                      "delete_key",
+                      "delete_disabled_keys",
+                      "enable_all_keys",
+                      "disable_all_keys"
+                    ]
+                  },
+                  "key_index": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/token/": {
+      "get": {
+        "summary": "获取所有令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [
+          {
+            "name": "p",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Token"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Token"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/token/search": {
+      "get": {
+        "summary": "搜索令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/token/{id}": {
+      "get": {
+        "summary": "获取指定令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/token/batch": {
+      "post": {
+        "summary": "批量删除令牌",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/usage/token/": {
+      "get": {
+        "summary": "获取令牌使用情况",
+        "deprecated": false,
+        "description": "🔑 需要令牌认证（TokenAuth）",
+        "tags": [
+          "令牌管理"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/redemption/": {
+      "get": {
+        "summary": "获取所有兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [
+          {
+            "name": "p",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Redemption"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Redemption"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/redemption/search": {
+      "get": {
+        "summary": "搜索兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/redemption/{id}": {
+      "get": {
+        "summary": "获取指定兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/redemption/invalid": {
+      "delete": {
+        "summary": "删除无效兑换码",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "兑换码"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/": {
+      "get": {
+        "summary": "获取所有日志",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [
+          {
+            "name": "p",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/system-task/log-cleanup": {
+      "post": {
+        "summary": "创建日志清理任务",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）。使用 target_timestamp 指定需清理的历史日志边界，并返回异步系统任务。",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [
+          {
+            "name": "target_timestamp",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功创建任务或返回参数错误",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/stat": {
+      "get": {
+        "summary": "获取日志统计",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/self/stat": {
+      "get": {
+        "summary": "获取个人日志统计",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/search": {
+      "get": {
+        "summary": "搜索日志",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/self": {
+      "get": {
+        "summary": "获取个人日志",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/self/search": {
+      "get": {
+        "summary": "搜索个人日志",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/log/token": {
+      "get": {
+        "summary": "通过令牌获取日志",
+        "deprecated": false,
+        "description": "🔓 无需鉴权（通过令牌查询）",
+        "tags": [
+          "日志"
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/data/": {
+      "get": {
+        "summary": "获取所有额度数据",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "数据统计"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/data/self": {
+      "get": {
+        "summary": "获取个人额度数据",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "数据统计"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/group/": {
+      "get": {
+        "summary": "获取所有分组",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "分组"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/prefill_group/": {
+      "get": {
+        "summary": "获取预填分组",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "分组"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建预填分组",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "分组"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新预填分组",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "分组"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/prefill_group/{id}": {
+      "delete": {
+        "summary": "删除预填分组",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "分组"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/mj/": {
+      "get": {
+        "summary": "获取所有Midjourney任务",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "任务"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/mj/self": {
+      "get": {
+        "summary": "获取个人Midjourney任务",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "任务"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/task/": {
+      "get": {
+        "summary": "获取所有任务",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "任务"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/task/self": {
+      "get": {
+        "summary": "获取个人任务",
+        "deprecated": false,
+        "description": "🔐 需要登录（User权限）",
+        "tags": [
+          "任务"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/vendors/": {
+      "get": {
+        "summary": "获取所有供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/vendors/search": {
+      "get": {
+        "summary": "搜索供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/vendors/{id}": {
+      "get": {
+        "summary": "获取指定供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除供应商",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "供应商"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/": {
+      "get": {
+        "summary": "获取所有模型元数据",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "创建模型元数据",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新模型元数据",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/search": {
+      "get": {
+        "summary": "搜索模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/{id}": {
+      "get": {
+        "summary": "获取指定模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "删除模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/sync_upstream/preview": {
+      "get": {
+        "summary": "预览上游模型同步",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/sync_upstream": {
+      "post": {
+        "summary": "同步上游模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/models/missing": {
+      "get": {
+        "summary": "获取缺失模型",
+        "deprecated": false,
+        "description": "👨‍💼 需要管理员权限（Admin）",
+        "tags": [
+          "模型管理"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/option/": {
+      "get": {
+        "summary": "获取系统选项",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）。已退役的 theme.frontend 不在列表中返回。",
+        "tags": [
+          "系统设置"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "更新系统选项",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）。兼容期内 theme.frontend=default 可幂等写入，其他主题值会被拒绝。",
+        "tags": [
+          "系统设置"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/option/rest_model_ratio": {
+      "post": {
+        "summary": "重置模型倍率",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）",
+        "tags": [
+          "系统设置"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/ratio_sync/channels": {
+      "get": {
+        "summary": "获取可同步渠道",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）",
+        "tags": [
+          "系统设置"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    },
+    "/api/ratio_sync/fetch": {
+      "post": {
+        "summary": "获取上游倍率",
+        "deprecated": false,
+        "description": "👑 需要超级管理员权限（Root）",
+        "tags": [
+          "系统设置"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "Combination343": []
+          },
+          {
+            "Combination1243": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {}
+        }
+      },
+      "AuthSessionIssuanceError": {
+        "type": "object",
+        "required": [
+          "success",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "AUTH_SESSION_LIMIT",
+              "AUTH_SESSION_ISSUANCE_LIMIT"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "PageInfo": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          },
+          "page_size": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "Log": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "integer"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "username": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "quota": {
+            "type": "integer"
+          },
+          "used_quota": {
+            "type": "integer"
+          },
+          "request_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Channel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "models": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "weight": {
+            "type": "integer"
+          },
+          "base_url": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "expired_time": {
+            "type": "integer"
+          },
+          "remain_quota": {
+            "type": "integer"
+          },
+          "unlimited_quota": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Redemption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "quota": {
+            "type": "integer"
+          },
+          "created_time": {
+            "type": "integer"
+          },
+          "redeemed_time": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "responses": {
+      "AuthSessionLimit": {
+        "description": "该用户的活跃登录 Session 已达上限",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AuthSessionIssuanceError"
+            }
+          }
+        }
+      },
+      "AuthSessionIssuanceLimit": {
+        "description": "该用户在统计窗口内创建的 Session 已达上限",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/AuthSessionIssuanceError"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "SessionAuth1": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session",
+        "description": "已废弃：Gin session 不再用于面板鉴权"
+      },
+      "AccessToken1": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "面板短期 JWT 或 User.AccessToken PAT；不再要求 New-Api-User"
+      },
+      "NewApiUser1": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "New-Api-User",
+        "description": "已废弃且不再参与鉴权；PAT 客户端可以移除此请求头"
+      },
+      "RefreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "new_api_refresh",
+        "description": "仅 refresh/logout 使用的 HttpOnly、SameSite=Strict Cookie"
+      },
+      "SecurityProof": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Security-Proof",
+        "description": "绑定用户、登录会话和 scope 的短期二次验证 Proof"
+      },
+      "Combination222": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1122": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination223": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1123": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination224": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1124": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination225": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1125": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination226": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1126": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination227": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1127": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination228": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1128": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination229": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1129": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination230": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1130": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination231": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1131": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination232": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1132": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination233": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1133": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination234": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1134": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination235": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1135": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination236": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1136": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination237": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1137": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination238": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1138": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination239": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1139": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination240": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1140": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination241": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1141": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination242": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1142": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination243": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1143": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination244": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1144": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination245": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1145": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination246": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1146": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination247": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1147": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination248": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1148": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination249": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1149": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination250": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1150": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination251": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1151": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination252": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1152": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination253": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1153": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination254": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1154": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination255": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1155": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination256": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1156": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination257": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1157": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination258": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1158": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination259": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1159": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination260": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1160": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination261": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1161": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination262": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1162": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination263": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1163": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination264": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1164": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination265": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1165": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination266": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1166": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination267": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1167": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination268": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1168": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination269": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1169": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination270": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1170": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination271": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1171": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination272": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1172": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination273": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1173": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination274": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1174": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination275": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1175": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination276": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1176": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination277": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1177": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination278": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1178": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination279": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1179": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination280": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1180": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination281": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1181": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination282": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1182": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination283": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1183": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination284": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1184": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination285": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1185": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination286": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1186": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination287": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1187": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination288": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1188": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination289": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1189": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination290": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1190": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination291": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1191": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination292": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1192": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination293": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1193": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination294": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1194": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination295": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1195": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination296": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1196": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination297": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1197": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination298": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1198": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination299": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1199": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination300": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1200": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination301": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1201": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination302": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1202": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination303": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1203": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination304": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1204": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination305": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1205": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination306": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1206": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination307": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1207": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination308": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1208": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination309": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1209": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination310": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1210": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination311": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1211": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination312": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1212": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination313": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1213": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination314": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1214": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination315": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1215": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination316": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1216": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination317": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1217": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination318": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1218": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination319": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1219": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination320": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1220": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination321": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1221": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination322": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1222": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination323": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1223": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination324": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1224": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination325": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1225": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination326": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1226": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination327": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1227": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination328": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1228": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination329": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1229": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination330": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1230": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination331": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1231": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination332": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1232": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination333": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1233": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination334": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1234": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination335": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1235": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination336": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1236": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination337": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1237": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination338": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1238": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination339": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1239": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination340": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1240": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination341": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1241": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination342": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      },
+      "Combination1242": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT or PAT",
+        "description": "Normalized bearer security requirement from the upstream contract."
+      }
+    }
+  },
+  "servers": [],
+  "security": [
+    {
+      "Combination343": []
+    },
+    {
+      "Combination1243": []
+    }
+  ]
+}
