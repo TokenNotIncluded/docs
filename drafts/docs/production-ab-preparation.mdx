@@ -1,6 +1,8 @@
 ---
-title: "Paired A/B deployment preparation"
-description: "LMM API documentation: Paired A/B deployment preparation"
+title: "成对 A/B 部署准备"
+sidebarTitle: "A/B 部署准备"
+description: "成对 A/B 部署的准备步骤与回退条件。"
+icon: "split"
 ---
 
 Status: draft, not wired into production. No release, package update, database migration, or service operation is performed by this change.
@@ -41,4 +43,3 @@ GO111MODULE=off go test -race -count=10 -timeout=40s .
 ```
 
 All nine new test functions and their subtests passed; the ten-repeat race run also passed. No full Go 1.25 application build or server deployment was run locally. Existing `go test ./...` jobs include this package and its original tests; remote results must be reviewed separately. No workflow, version file, package pin or production request is changed.
-

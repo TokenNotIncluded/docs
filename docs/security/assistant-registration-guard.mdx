@@ -1,76 +1,30 @@
 ---
-title: "Built-in assistant registration guard"
-description: "LMM API documentation: Built-in assistant registration guard"
+title: "内置助手注册保护"
+sidebarTitle: "助手注册保护"
+description: "内置助手注册保护的限制与校验流程。"
 ---
 
-L0 admission is performed through the built-in assistant, not a second reviewer
-model or a user-submitted recommendation letter. The public legacy submission
-route returns 410; historical requests and administrator audit/override helpers
-remain readable. The existing three completed server-recorded turns minimum for
-an L1 grant remains. It is an anti-replay prerequisite, not proof of personhood.
+L0 准入通过内置助手完成,不使用第二个评审模型,也不依赖用户提交推荐信。旧的公开提交入口返回 410;历史请求和管理员审计与覆盖辅助功能仍可读取。L1 授权仍要求服务端已记录三次完整的往返对话,这是防重放的前置条件,不是对“真人”的证明。
 
-## Boundaries
+## 边界
 
-- `get_registration_risk` reads owner-scoped redacted history and aggregate
-  cross-account observations. `notify_registration_risk`,
-  `end_registration_conversation`, and `ban_l0_user` accept **no arguments**.
-  The server resolves the browser actor and owned conversation, not the relay
-  billing account. Tool calls never choose another target, run SQL, or set an IP
-  allowlist.
-- Casual replies, topic changes, spelling, speed, nickname choices, QQ email and
-  AI-assisted writing do not authorize sanctions. No puzzle or nickname story
-  proves that a person has never registered before.
-- HMAC-indexed long-message shingles are combined across multiple messages and
-  accounts. A template campaign alone creates an alert; a campaign plus linked
-  network peers pauses access/rewards. Suspension additionally requires an
-  already-consumed canonical reward identity. Shared networks alone never ban.
-- L1, paid/developer access, administrator roles and explicit trust overrides are
-  excluded from the new L0 sanction tool. Every write rechecks durable evidence
-  under the target user row lock. No model confidence score can override it.
-- Sanctions persist a terminal notice, restrict the current conversation, advance
-  the existing authentication-version fence, and create an audit event in one
-  database transaction. Remaining tools in that batch do not execute. Automatic
-  sanctions share a database-locked UTC daily cap across instances (default 5,
-  maximum 5). A disabled/exhausted cap returns an actual `notify` receipt.
-- Administrators can restore guard-suspended accounts after confirmation. A
-  seven-day automatic-resuspension grace period follows. Restoring does not reset
-  the welcome-credit identity ledger or silently reopen a restricted conversation.
+- `get_registration_risk` 读取按所有者作用域脱敏的历史记录以及跨账户的聚合观察。`notify_registration_risk`、`end_registration_conversation` 和 `ban_l0_user` **不接受任何参数**。服务端解析的是浏览器行为主体与其拥有的会话,而不是中继计费账户。工具调用无法指定其他目标、执行 SQL 或设置 IP 允许列表。
+- 随意回复、切换话题、拼写、速度、昵称选择、QQ 邮箱和 AI 辅助写作都不构成制裁依据。任何谜题或昵称故事都不能证明一个人此前从未注册。
+- 基于 HMAC 索引的长消息 shingle 会跨多条消息与多个账户组合。仅存在模板化话术会产生告警;模板化话术加关联网络对端会暂停访问与奖励。要执行封禁,还必须存在已被消耗的规范奖励身份。仅凭共享网络永远不会封禁。
+- L1、付费或开发者权限、管理员角色以及显式信任覆盖都不受新的 L0 制裁工具影响。每次写入都会在目标用户行锁下重新检查持久证据,任何模型置信度都不能覆盖它。
+- 制裁会在同一数据库事务中写入终态通知、限制当前会话、推进既有的认证版本栅栏并创建审计事件。同一批次中剩余的工具不会执行。自动制裁在多个实例间共享一个数据库锁定的 UTC 每日上限(默认 5,最大 5)。上限被禁用或耗尽时返回真实的 `notify` 回执。
+- 管理员可以在确认后恢复被保护机制暂停的账户,随后有七天的自动重新暂停宽限期。恢复不会重置欢迎额度身份账本,也不会静默重新打开受限会话。
 
-## Operation and privacy
+## 运行与隐私
 
-Four new tables are included in both migration entry points. Risk fingerprints
-are limited to 256 per observed account and seven days; raw foreign conversation
-text, email, IP and peer IDs are not returned by the tools. The stable secret is
-reused from the existing gift-risk key table. Preserve that table and secret on
-migration; changing it invalidates correlation.
+两个迁移入口都包含四张新表。风险指纹按被观察账户限制为 256 条、保留七天;工具不会返回外部会话原文、邮箱、IP 和对端 ID。稳定密钥复用已有的礼包风控密钥表,迁移时必须保留该表与密钥,更改它会使关联失效。
 
-The index starts from observed assistant traffic, not a retroactive scan of every
-historical conversation. A tool may read the current user's last six redacted
-messages. There is no claim of full historical coverage, AI detection accuracy,
-or unique-human identity verification. An email or server-bound OAuth subject is
-required for a fresh registration observation. Admission/reward checks fail
-closed on missing, stale or changed identity evidence while normal support can
-continue. Gift claiming refreshes server request metadata before checking.
+索引从观察到的助手流量开始,不是对全部历史会话的追溯扫描。工具可以读取当前用户最近六条脱敏消息。平台不声称具备完整历史覆盖、AI 检测准确率或唯一真人身份验证能力。新的注册观察需要邮箱或服务端绑定的 OAuth 主体。身份证据缺失、过期或发生变化时,准入与奖励检查以失败告终,但正常客服流程可以继续。礼包领取会在检查前刷新服务端请求元数据。
 
-Alerts are durable **in-site inbox events**, not email/push deliveries. The new
-settings inbox supports pagination and restoration. It does not mass-ban a whole
-cohort and does not run a new autonomous reviewer. Existing deterministic
-aggregate reporting and historical audit structures are retained.
+告警是持久化的**站内收件箱事件**,不是邮件或推送。新的设置收件箱支持分页与恢复,不会对整批人群执行批量封禁,也不会运行新的自主评审器。既有的确定性聚合报表与历史审计结构保留。
 
-Options `AssistantRegistrationAutoSuspendEnabled` and
-`AssistantRegistrationDailySuspendCap` are the only writable registration-guard
-settings. Internal budget state is not writable through the options API. Ordinary
-L0 conversations cannot create global blocking rules; administrator configuration
-uses the existing restricted configuration capability.
+可选配置 `AssistantRegistrationAutoSuspendEnabled` 和 `AssistantRegistrationDailySuspendCap` 是唯一可写的注册保护设置。内部预算状态不能通过配置 API 写入。普通 L0 会话无法创建全局拦截规则;管理员配置使用既有的受限配置能力。
 
-## Validation
+## 校验
 
-Regression suites cover weak signals, cross-user ownership, protected roles,
-missing/stale/changed identity, OAuth without email, repeated sanctions, auth
-version changes, restoration and the global cap. Frontend tests cover unknown and
-failed states, recommendation-form removal and the human-support explanation.
-Run Go model/controller tests and web typechecking in a dependency-equipped
-runner. Production traffic, PostgreSQL/MySQL concurrency, Redis outage behavior,
-and browser visual review must be verified before deployment; SQLite unit tests
-alone do not certify these behaviors.
-
+回归套件覆盖弱信号、跨用户归属、受保护角色、身份缺失或过期或变更、无邮箱的 OAuth、重复制裁、认证版本变更、恢复以及全局上限。前端测试覆盖未知与失败状态、推荐表单移除以及人工支持说明。请在具备依赖的运行器中执行 Go 模型与控制器测试以及 Web 类型检查。部署前必须验证生产流量、PostgreSQL / MySQL 并发、Redis 故障行为以及浏览器视觉评审;仅靠 SQLite 单元测试不能证明这些行为。

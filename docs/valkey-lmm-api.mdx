@@ -1,47 +1,37 @@
 ---
-title: "Dedicated Valkey for lmm-api"
-description: "LMM API documentation: Dedicated Valkey for lmm-api"
+title: "LMM API 专用 Valkey"
+sidebarTitle: "Valkey"
+description: "lmm-api 专用 Valkey 实例的用途与配置。"
 ---
 
-Production uses a dedicated native Valkey instance, separate from any existing
-`valkey.service` on `127.0.0.1:6379`.
+生产环境使用专用的原生 Valkey 实例,与 `127.0.0.1:6379` 上已有的 `valkey.service` 相互独立。
 
-## Layout
+## 布局
 
-| Resource | Value |
+| 资源 | 取值 |
 | --- | --- |
-| Unit | `valkey-lmm-api.service` |
-| Listener | `127.0.0.1:6380` only |
-| Configuration | `/etc/valkey/lmm-api.conf` (`0640 root:valkey`) |
-| ACL | `/etc/valkey/lmm-api.acl` (`0640 root:valkey`) |
-| Application environment | `/etc/lmm-api/valkey.env` (`0600 root:root`) |
-| Persistent state | `/var/lib/valkey-lmm-api` |
-| Cache memory | 64 MiB, `noeviction` |
-| Unit limits | `MemoryHigh=80M`, `MemoryMax=112M`, `MemorySwapMax=32M` |
-| Persistence | AOF, `appendfsync everysec` |
-| Kernel policy | `vm.overcommit_memory=1`; THP `madvise` |
+| unit | `valkey-lmm-api.service` |
+| 监听 | 仅 `127.0.0.1:6380` |
+| 配置 | `/etc/valkey/lmm-api.conf`(`0640 root:valkey`) |
+| ACL | `/etc/valkey/lmm-api.acl`(`0640 root:valkey`) |
+| 应用环境文件 | `/etc/lmm-api/valkey.env`(`0600 root:root`) |
+| 持久状态 | `/var/lib/valkey-lmm-api` |
+| 缓存内存 | 64 MiB,`noeviction` |
+| unit 限制 | `MemoryHigh=80M`、`MemoryMax=112M`、`MemorySwapMax=32M` |
+| 持久化 | AOF,`appendfsync everysec` |
+| 内核策略 | `vm.overcommit_memory=1`;THP `madvise` |
 
-Immutable service, configuration, sysctl, and tmpfiles inputs live under
-`packaging/common/valkey`. The retired root deployment scripts are not operator
-entry points.
+不可变的服务、配置、sysctl 与 tmpfiles 输入位于 `packaging/common/valkey`。已废弃的 root 部署脚本不是运维入口。
 
-## Security and data role
+## 安全与数据角色
 
-PostgreSQL is the persistent authority. Valkey carries rebuildable cache plus
-security-sensitive session, revocation, and rate-limit state. `noeviction`
-causes writes to fail rather than silently discarding security state. The
-default user is disabled; the `lmm-api` ACL user is denied `@dangerous`.
-Protected mode and loopback binding provide independent containment.
+PostgreSQL 是持久权威。Valkey 承载可重建缓存,以及与安全相关的会话、吊销和限流状态。`noeviction` 会让写入失败,而不是静默丢弃安全状态。默认用户被禁用,`lmm-api` ACL 用户被拒绝 `@dangerous`。保护模式与回环绑定提供相互独立的隔离。
 
-The connection URL is read only from protected configuration. Never print,
-commit, package, or pass its credential on a command line. Go and Rust must use
-the same endpoint, key contract, and `CRYPTO_SECRET` before any shared route
-ownership.
+连接 URL 只从受保护配置读取。绝不要打印、提交、打包或在命令行传入其凭据。在任何共享路由归属之前,Go 与 Rust 必须使用同一端点、同一键契约和同一个 `CRYPTO_SECRET`。
 
-## Package and CLI verification
+## 软件包与 CLI 校验
 
-Provider/runtime packaging installs immutable inputs. Production inspection and
-health operations enter only through the verified public symlink:
+供应方与运行时打包安装不可变输入。生产检查与健康操作只能通过经过校验的公开符号链接进入:
 
 ```text
 /usr/bin/lmm-api doctor
@@ -49,35 +39,21 @@ health operations enter only through the verified public symlink:
 /usr/bin/lmm-api-deploy production status ...
 ```
 
-Before application mutation, verify:
+在改动应用之前,校验:
 
-- `valkey-lmm-api.service` is active with the expected PID and cgroup limits;
-- only the expected loopback listener owns port 6380;
-- the pre-existing 6379 service/PID/listener is unchanged;
-- authenticated `PING` succeeds without exposing credentials;
-- the application ACL cannot run dangerous administration commands;
-- both backend providers resolve the same sanitized endpoint identity.
+- `valkey-lmm-api.service` 处于活跃状态,PID 与 cgroup 限制符合预期;
+- 只有预期的回环监听占用 6380 端口;
+- 既有的 6379 服务、PID 和监听保持不变;
+- 带认证的 `PING` 成功且不暴露凭据;
+- 应用 ACL 无法执行危险的管理命令;
+- 两个后端供应方解析到同一个经过清洗的端点身份。
 
-Package installation or a CLI preflight must fail closed on unsafe modes,
-symlinks, ownership mismatches, invalid directives, listener collisions, or
-ambiguous runtime state.
+软件包安装或 CLI 预检在遇到不安全权限、符号链接、属主不匹配、非法指令、监听冲突或状态不明确时,必须以失败告终。
 
-## Changes and rollback
+## 变更与回滚
 
-Valkey configuration changes are part of the marker-owned production
-transaction. Before the first live mutation, record exact prior presence,
-bytes, type, ownership, mode, service enablement/activity, kernel values, and
-checksums. Publish files atomically and verify the isolated instance without
-restarting the unrelated 6379 service.
+Valkey 配置变更属于由标记文件拥有的生产事务。在首次修改线上状态之前,记录原有的存在性、字节内容、类型、属主、权限、服务启用与活跃状态、内核取值以及校验和。文件原子发布,并在不重启无关 6379 服务的前提下校验隔离实例。
 
-There is no rollback timer and no automatic rollback. A post-mutation failure
-becomes `ROLLBACK_REQUIRED` and retains the transaction lock/evidence. An
-explicit operator rollback restores only the selected verified configuration
-snapshot and prior service/kernel state, then re-runs authenticated health and
-listener-isolation checks. It never restores PostgreSQL or treats Valkey AOF as
-a database backup.
+不存在回滚定时器,也没有自动回滚。变更后的失败进入 `ROLLBACK_REQUIRED`,并保留事务锁与证据。运维人员显式回滚时只恢复选定的已校验配置快照以及之前的服务与内核状态,随后重新执行带认证的健康检查和监听隔离检查。它绝不恢复 PostgreSQL,也不会把 Valkey AOF 当作数据库备份。
 
-A provider deployment must remain N/N-1 compatible with the current Valkey key
-contract. Valkey presence alone never grants Rust production route ownership;
-`apps/api-rust/tests/fixtures/routes/route-gate.tsv` remains authoritative.
-
+供应方部署必须与当前的 Valkey 键契约保持 N / N-1 兼容。仅存在 Valkey 永远不会把 Rust 的生产路由归属授予 Rust;`apps/api-rust/tests/fixtures/routes/route-gate.tsv` 仍是权威依据。

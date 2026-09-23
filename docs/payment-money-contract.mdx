@@ -1,91 +1,68 @@
 ---
-title: "Payment money contract"
-description: "LMM API documentation: Payment money contract"
+title: "支付金额契约"
+sidebarTitle: "支付金额"
+description: "支付金额的单位、精度与对账契约。"
 ---
 
-This document defines the units used by wallet top-ups and subscription payments. A bare number or `$` symbol is not a sufficient money type.
+本文定义钱包充值与订阅支付使用的单位。只有数字或 `$` 符号不足以表达货币类型。
 
-## Dimensions
+## 量纲
 
-| Name | Meaning | Unit |
+| 名称 | 含义 | 单位 |
 | --- | --- | --- |
-| `platform_units` (`P`) | Internal platform balance credited to a user | platform units |
-| `cny_per_usd` (`R`) | Live operator-configured real-fiat FX rate | CNY / USD |
-| `platform_units_per_cny` (`B`) | Operator-configured wallet purchase ratio | platform units / CNY |
-| `settlement_amount` | Amount sent to and verified from a provider | real ISO fiat |
-| `price_multiplier` | Group, channel, tier, or coupon adjustment | dimensionless |
+| `platform_units`(`P`) | 计入用户的内部平台余额 | 平台单位 |
+| `cny_per_usd`(`R`) | 运维人员实时配置的法币汇率 | CNY / USD |
+| `platform_units_per_cny`(`B`) | 运维人员配置的钱包购买比率 | 平台单位 / CNY |
+| `settlement_amount` | 发送给供应方并从中校验的金额 | 真实 ISO 法币 |
+| `price_multiplier` | 分组、渠道、阶梯或优惠券调整 | 无量纲 |
 
-`R` and `B` are independent. Neither display-currency settings nor deprecated provider `unit_price` values may replace them. Example rates in tests are fixtures, never production constants.
+`R` 与 `B` 相互独立,显示货币设置与已废弃的供应方 `unit_price` 都不能替代它们。测试中的示例汇率属于测试数据,绝不是生产常量。
 
-## Wallet top-up
+## 钱包充值
 
-For a top-up that grants `P` platform units before a dimensionless multiplier `M`:
+对于在无量纲倍数 `M` 之前授予 `P` 个平台单位的充值:
 
 ```text
 base_cny = P / B
 net_cny  = base_cny * M
 ```
 
-Provider settlement is then a real-fiat conversion:
+供应方结算随后是真实法币换算:
 
 ```text
 Epay (CNY)           = net_cny CNY
 USD provider         = net_cny / R USD
 ```
 
-A quote must persist all of the following before redirecting to a provider:
+跳转到供应方之前,报价必须持久化以下全部信息:
 
-- credited platform units/quota;
-- expected settlement amount in integer micros (or provider minor units);
-- uppercase ISO settlement currency;
-- provider, product/store binding, and stable trade number;
-- applied dimensionless multipliers.
+- 计入的平台单位或额度;
+- 以整数微单位(或供应方最小单位)表示的预期结算金额;
+- 大写的 ISO 结算货币;
+- 供应方、产品与店铺绑定,以及稳定的交易号;
+- 已应用的无量纲倍数。
 
-Callbacks grant value only after matching the persisted amount, currency, provider, and product binding.
+回调只有在金额、货币、供应方和产品绑定都与持久化记录匹配后才授予价值。
 
-### Frontend quote display
+### 前端报价展示
 
-The wallet preserves the display fields returned by `/api/user/topup/info`,
-including `settlement_currency`, `platform_units_per_usd`,
-`settlement_units_per_usd`, `settlement_units_per_platform_unit`, `max_topup`,
-and `max_topup_amount`.
-Keep decimal strings intact during parsing. These fields describe the quote's
-currency and conversion; the existing amount endpoint remains authoritative for
-the payable amount. Platform credit and real-fiat payment appear separately.
+钱包保留 `/api/user/topup/info` 返回的展示字段,包括 `settlement_currency`、`platform_units_per_usd`、`settlement_units_per_usd`、`settlement_units_per_platform_unit`、`max_topup` 和 `max_topup_amount`。解析时保持十进制字符串完整。这些字段描述报价的货币与换算关系;应付金额仍以既有的金额端点为准。平台入账与真实法币支付分开显示。
 
-`max_topup` is a credited-USD limit, not an amount of platform credit. The Go
-backend derives `max_topup_amount` in the units accepted by the top-up request,
-using the global wallet rates and, in token display mode, `QuotaPerUnit`.
-Duplicate payment types share their strictest configured limit. Custom gateway
-pricing, discounts, and display currencies do not change this ceiling.
-The frontend compares its input only with `max_topup_amount`. If an older
-backend omits it, quote and checkout endpoints continue enforcing the USD limit;
-the client must not guess a conversion and block an otherwise valid purchase.
+`max_topup` 是计入的美元上限,不是平台额度金额。Go 后端使用全局钱包汇率推导以充值请求所接受单位表示的 `max_topup_amount`,在令牌显示模式下还使用 `QuotaPerUnit`。重复的支付类型共享其中最严格的配置上限。自定义网关定价、折扣和显示货币不会改变该上限。前端只把自己的输入与 `max_topup_amount` 比较。如果旧后端省略该字段,报价与结算端点仍会执行美元上限;客户端不得自行猜测换算关系并拦下本来有效的购买。
 
-An amount, payment-method, or discount-code change invalidates pending discount
-validation and payment confirmation. A successful response for an older input
-must not authorize confirmation for the current input. Checkout still recalculates
-and enforces the payment rules on the server.
+金额、支付方式或优惠码发生变化时,未决的折扣校验与支付确认都会失效。针对较早输入的成功响应不得为当前输入授权确认。结算在服务端仍会重新计算并执行支付规则。
 
-Checkout-link discounts are validated against the amount, payment method, code,
-and current input revision. Changing payment methods revalidates the discount;
-confirmation waits for the matching discounted quote. A failed validation or
-quote unlocks the code for editing and manual retry without an automatic retry
-loop. Normalizing a valid code must not start a duplicate validation.
+结算链接折扣按金额、支付方式、优惠码和当前输入修订版本校验。更换支付方式会重新校验折扣,确认会等待匹配的折扣报价。校验或报价失败会解锁优惠码以便编辑和手动重试,不进入自动重试循环。规范化有效优惠码不得触发重复校验。
 
-Homepage purchase actions follow the server's developer-access decision. Pending
-accounts continue to access review; approved accounts can enter the wallet.
-Registration links wait for live registration capabilities. Payment does not
-grant developer access, and the pricing overview does not expose the protected
-model catalog before approval.
+首页购买入口遵循服务端的开发者准入判断。待审核账户继续进入审核流程,已批准账户可以进入钱包。注册链接会等待实时的注册能力。支付不会授予开发者权限,定价概览在批准之前不会暴露受保护的模型目录。
 
-## Subscription plans
+## 订阅计划
 
-`SubscriptionPlan.PriceAmount` plus `SubscriptionPlan.Currency` is a real ISO-fiat list price. It is not a wallet top-up amount and must not pass through `P / B`.
+`SubscriptionPlan.PriceAmount` 与 `SubscriptionPlan.Currency` 共同构成真实 ISO 法币标价,它不是钱包充值金额,绝不能经过 `P / B` 换算。
 
-Legacy version-0 plans were forcibly tagged `USD` while behaving like platform/CNY amounts. Startup migrates them once to `CNY` and sets `PriceCurrencyVersion=1`; explicitly created version-1 USD plans remain USD.
+旧版 0 计划虽然实际按平台额度或人民币金额运作,却被强制标记为 `USD`。启动时会将它们一次性迁移为 `CNY` 并设置 `PriceCurrencyVersion=1`;显式创建的版本 1 美元计划仍保留 USD。
 
-For a plan priced `F USD`:
+对于标价 `F USD` 的计划:
 
 ```text
 Epay                 = F * R CNY
@@ -94,20 +71,19 @@ Stripe/Creem (USD)   = F USD
 wallet balance       = F * R * B platform units
 ```
 
-If another supported ISO source currency is introduced, convert real fiat to real fiat first, then convert to platform units only for wallet-balance payment.
+如果引入其他受支持的 ISO 源货币,应先把真实法币换算为真实法币,仅在钱包余额支付时再换算为平台单位。
 
-A pending subscription order stores an immutable plan/entitlement snapshot, expected settlement micros, ISO currency, provider product/price ID, and provider subscription ID. Provider callbacks and renewals must never re-price from mutable settings or a mutable plan row.
+待支付订阅订单会保存不可变的计划与权益快照、预期结算微单位金额、ISO 货币、供应方产品与价格 ID,以及供应方订阅 ID。供应方回调与续费绝不能根据可变的设置或可变的计划行重新定价。
 
-## Recurring lifecycle
+## 续订生命周期
 
-- Initial successful settlement creates one local entitlement.
-- Every renewal payment has a provider event/transaction idempotency key and a recorded billing period.
-- Failed payments and `past_due` do not grant a new period.
-- Cancel-at-period-end retains already-paid access through the paid period.
-- Immediate cancellation/refund revokes only according to verified provider evidence and the product policy.
-- USD and CNY totals are grouped by ISO currency; they are never directly summed.
+- 首次成功结算只创建一条本地权益。
+- 每次续费支付都有供应方事件或交易的幂等键,并记录计费周期。
+- 支付失败与 `past_due` 不会授予新的周期。
+- 期末取消在已付费周期内保留已付费访问权。
+- 立即取消或退款只依据经过校验的供应方证据和产品策略执行撤销。
+- 美元与人民币合计按 ISO 货币分别汇总,绝不直接相加。
 
-## Rounding
+## 舍入
 
-Business calculations use decimal arithmetic. Round only at the provider boundary using that currency's supported minor-unit policy, and persist the exact rounded amount that the callback must match.
-
+业务计算使用十进制算术。只在供应方边界上按该货币支持的最小单位策略舍入,并持久化回调必须匹配的精确舍入金额。

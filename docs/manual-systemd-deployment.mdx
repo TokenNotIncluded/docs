@@ -1,16 +1,12 @@
 ---
-title: "Manual Systemd Deployment"
-description: "LMM API documentation: Manual Systemd Deployment"
+title: "手动 systemd 部署"
+sidebarTitle: "手动部署"
+description: "使用 systemd 手动部署与启动服务的步骤。"
 ---
 
-Standalone Linux builds can be deployed on Ubuntu, Debian, Arch, and other
-systemd distributions without a package manager. This path updates an existing
-`lmm-api.service`, `/usr/bin/lmm-api -> lmm-api-go`, and
-`/srv/lmm-api-frontend` installation. Package-owned binaries are rejected; those
-installations retain the package transaction path.
+独立 Linux 构建产物可以在 Ubuntu、Debian、Arch 等 systemd 发行版上不使用包管理器直接部署。这条路径用于更新已有的 `lmm-api.service`、`/usr/bin/lmm-api -> lmm-api-go` 和 `/srv/lmm-api-frontend` 安装。由软件包管理的二进制会被拒绝,这类安装继续走软件包事务路径。
 
-Build the Go binary and frontend from the same reviewed revision. Transfer both
-to a private target directory. On the target, run the repository script as root:
+从同一个已评审的修订版本构建 Go 二进制和前端,并把两者传送到私有的目标目录。在目标机上以 root 运行仓库脚本:
 
 ```sh
 scripts/lmm-api-deploy.sh systemd stage --release REVISION \
@@ -20,34 +16,14 @@ scripts/lmm-api-deploy.sh systemd status --release REVISION
 scripts/lmm-api-deploy.sh systemd confirm --release REVISION --confirm api.lmm.best
 ```
 
-The standalone equivalent is `python3 scripts/deploy-systemd.py`. The target
-requires Python 3.11+, systemd, nginx, and the existing environment file at
-`/etc/lmm-api-go/lmm-api-go.env`. The health endpoint is the local service on
-port 3000. Ubuntu is the first live-validated target; other distributions must
-meet these prerequisites and have not yet been exercised live.
+对应的独立实现是 `python3 scripts/deploy-systemd.py`。目标机需要 Python 3.11 及以上、systemd、nginx,以及已有的环境文件 `/etc/lmm-api-go/lmm-api-go.env`。健康检查指向本地 3000 端口上的服务。Ubuntu 是首个通过实机验证的目标,其他发行版需要满足这些前置条件,目前尚未实机验证。
 
-The normal path requires an already-compatible PostgreSQL schema. If schema
-updates are required, add `--migrate` to both `stage` and `apply`. This mode
-requires `pg_dump` and `pg_restore`, and currently supports the active PostgreSQL
-schema without a separate log database. It validates backup connectivity
-before stopping, waits for clean writer shutdown and refund completion, saves
-a custom-format database dump, checks its archive inventory, applies the native
-migrations, then verifies the resulting schema before starting the candidate.
-Archive validation is not a full restore rehearsal. Unrelated historical tables
-can be excluded at stage with `--backup-exclude-table schema.table`; exact names
-are required and exclusions are retained in the immutable staged plan.
+常规路径要求 PostgreSQL 模式已经兼容。如果需要更新模式,请在 `stage` 和 `apply` 上都加上 `--migrate`。该模式需要 `pg_dump` 和 `pg_restore`,目前只支持正在使用的 PostgreSQL 模式,不支持独立的日志数据库。它会在停止服务前验证备份连通性,等待写入方干净退出和退款流程完成,保存自定义格式的数据库转储并检查归档清单,执行原生迁移,然后在启动候选版本前校验结果模式。归档校验不等于完整的恢复演练。无关的历史表可以在 stage 阶段用 `--backup-exclude-table schema.table` 排除,名称必须完全匹配,排除项会保留在不可变的暂存计划中。
 
-Private transaction state, old binary, environment copy, database backup (when
-selected), and logs remain in `/var/lib/lmm-api-deploy-systemd/REVISION`.
-Failures leave recovery evidence and never silently retry activation or roll
-back. Check `status`, the private logs, and the service journal before recovery:
+私有事务状态、旧二进制、环境副本、数据库备份(如果启用)和日志都保留在 `/var/lib/lmm-api-deploy-systemd/REVISION`。失败时会留下恢复证据,不会静默重试激活或自动回滚。恢复前先查看 `status`、私有日志和 service journal:
 
 ```sh
 scripts/lmm-api-deploy.sh systemd rollback --release REVISION --confirm api.lmm.best
 ```
 
-Rollback restores the previous binary and frontend, not the database. Schema
-migrations must remain compatible with the old binary; destructive migrations
-require a separate database recovery procedure. The script does not create a
-new server installation, configure a database, or support non-systemd hosts.
-
+回滚只恢复上一版二进制和前端,不恢复数据库。模式迁移必须保持与旧二进制兼容;破坏性迁移需要单独的数据库恢复流程。该脚本不会创建新的服务器安装、不配置数据库,也不支持非 systemd 主机。

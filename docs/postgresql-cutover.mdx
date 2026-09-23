@@ -1,37 +1,29 @@
 ---
-title: "PostgreSQL production boundary"
-description: "LMM API documentation: PostgreSQL production boundary"
+title: "PostgreSQL 生产边界"
+sidebarTitle: "PostgreSQL 切换"
+description: "PostgreSQL 生产环境的能力边界与限制。"
 ---
 
-The historical SQLite-to-PostgreSQL shell coordinator has been retired. New
-production migration, verification, deployment, confirmation, and recovery
-operations are backend CLI responsibilities and are invoked through
-`/usr/bin/lmm-api`.
+历史上的 SQLite 到 PostgreSQL shell 协调器已废弃。新的生产迁移、校验、部署、确认和恢复操作由后端 CLI 负责,并通过 `/usr/bin/lmm-api` 调用。
 
-This document does not authorize a new database cutover or Rust business-route
-ownership.
+本文不授权新的数据库切换,也不授权 Rust 接管业务路由。
 
-## Current-state rule
+## 当前状态规则
 
-A historical audit observed Go using PostgreSQL and the dedicated Valkey, but
-historical logs are not current acceptance. Before any database-changing release
-or provider switch, inspect the live process environment without printing
-values and verify:
+历史审计曾观察到 Go 使用 PostgreSQL 和专用 Valkey,但历史日志不等于当前验收。在任何改变数据库的发布或供应方切换之前,先在不打印取值的前提下检查运行中的进程环境,并校验:
 
-- exact PostgreSQL database/schema/application-role identity;
-- current forward-only write boundary and migration contract;
-- package/provider/frontend identities;
-- PostgreSQL and Valkey readiness;
-- authenticated canaries and representative business requests;
-- N/N-1 schema compatibility.
+- 精确的 PostgreSQL 数据库、模式与应用角色身份;
+- 当前的仅向前写入边界与迁移契约;
+- 软件包、供应方与前端身份;
+- PostgreSQL 与 Valkey 的就绪状态;
+- 带认证的灰度探针与代表性业务请求;
+- N / N-1 模式兼容性。
 
-Conflicting, missing, failed, or stale evidence is a hard stop. Do not run a new
-SQLite copy, point the service back to SQLite, edit the production environment
-by hand, or invent a boundary marker.
+证据冲突、缺失、校验失败或过期都属于硬停止条件。不要执行新的 SQLite 拷贝、不要把服务指回 SQLite、不要手工修改生产环境,也不要凭空创建边界标记。
 
-## CLI contract
+## CLI 契约
 
-Use the verified public provider symlink only:
+只使用经过校验的公开供应方符号链接:
 
 ```text
 /usr/bin/lmm-api migrate --apply
@@ -41,63 +33,43 @@ Use the verified public provider symlink only:
 /usr/bin/lmm-api-deploy production rollback ...
 ```
 
-CLI dispatch and status inspection must not expose DSNs or require unrelated
-server startup. A release-scoped candidate runs through a validated workspace
-symlink named `lmm-api`, never by directly executing `lmm-api-go` or
-`lmm-api-rs`.
+CLI 分发与状态检查不得暴露 DSN,也不得要求无关的服务端启动流程。发布作用域内的候选版本通过名为 `lmm-api` 的已校验工作区符号链接运行,绝不直接执行 `lmm-api-go` 或 `lmm-api-rs`。
 
-Migration input comes only from root-only environment configuration. Reports
-contain stable stages/categories and immutable hashes, not DSNs, row values,
-keys, tokens, financial values, or raw database errors.
+迁移输入只来自仅 root 可读的环境配置。报告包含稳定的阶段与类别以及不可变哈希,不包含 DSN、行值、键、令牌、财务数值或原始数据库错误。
 
-## Forward-only boundary
+## 仅向前边界
 
-Before a provider or release can write through a new schema contract, persist
-and fsync an immutable boundary that binds:
+在供应方或发布能够通过新的模式契约写入之前,必须持久化并 fsync 一份不可变边界,绑定:
 
-- deployment and contract identifiers;
-- database/schema identity without credentials;
-- candidate/N-1 package and Git revisions;
-- provider and migrator hashes;
-- migration/provenance hashes;
-- allowed reader/writer compatibility range.
+- 部署与契约标识;
+- 不含凭据的数据库与模式身份;
+- 候选与 N-1 软件包及 Git 修订版本;
+- 供应方与迁移器哈希;
+- 迁移与来源哈希;
+- 允许的读写方兼容区间。
 
-Once evidence shows the new PostgreSQL write boundary may have been crossed,
-SQLite is not an automatic or manual application rollback target. Application
-rollback restores only N-1 provider/package/link/frontend/configuration state
-that is proven compatible with the current PostgreSQL schema. Database restore
-is always a separate, explicitly authorized disaster-recovery operation.
+一旦证据表明可能越过了新的 PostgreSQL 写入边界,SQLite 就不再是自动或手动的应用回滚目标。应用回滚只恢复经过证明与当前 PostgreSQL 模式兼容的 N-1 供应方、软件包、链接、前端与配置状态。数据库恢复始终是单独且显式授权的灾难恢复操作。
 
-## Manual recovery
+## 手动恢复
 
-Production deployment has no timer and no automatic rollback. Before the first
-live mutation the CLI stores verified N/N-1 artifacts and a rollback-eligible
-state while holding the transaction lock.
+生产部署没有定时器,也没有自动回滚。在首次修改线上状态之前,CLI 会在持有事务锁的情况下保存经过校验的 N / N-1 产物和可回滚状态。
 
-- A pre-mutation failure becomes `FAILED_PREARM`.
-- A post-boundary failure becomes `ROLLBACK_REQUIRED` and retains evidence.
-- Healthy activation completes at least 120 seconds of observation and stops at
-  `AWAITING_CONFIRMATION`.
-- Only an explicit exact-ID `confirm` or `rollback` is terminal.
+- 变更前的失败进入 `FAILED_PREARM`。
+- 越过边界后的失败进入 `ROLLBACK_REQUIRED` 并保留证据。
+- 健康激活至少完成 120 秒观察,然后停在 `AWAITING_CONFIRMATION`。
+- 只有显式且 ID 精确匹配的 `confirm` 或 `rollback` 才是终态。
 
-A failed rollback remains retryable. It never restores the database and never
-reports success while service, provider-link, schema, or health identity is
-uncertain.
+失败的回滚仍可重试。它绝不恢复数据库,也不会在服务、供应方链接、模式或健康身份不确定时报告成功。
 
-## Rehearsal
+## 演练
 
-Before a new schema contract reaches production, rehearse it with a fresh
-marker-owned PostgreSQL database and dedicated Valkey instance containing no
-production data. Prove:
+在新的模式契约进入生产之前,使用全新的、由标记文件拥有且不含任何生产数据的 PostgreSQL 数据库和专用 Valkey 实例演练。需要证明:
 
-1. migration apply and verification against the immutable contract;
-2. package/provider-link switch and process identity;
-3. interruption at each post-mutation phase yields `ROLLBACK_REQUIRED`;
-4. explicit rollback restores compatible N-1 application state without a
-   database restore;
-5. explicit confirmation verifies health, restart count, PostgreSQL/Valkey,
-   provider link, packages, and authenticated canaries;
-6. no report, log, manifest, or process argument exposes secrets.
+1. 针对不可变契约的迁移应用与校验;
+2. 软件包与供应方链接切换以及进程身份;
+3. 在每个变更后阶段发生中断都会进入 `ROLLBACK_REQUIRED`;
+4. 显式回滚能在不做数据库恢复的前提下恢复兼容的 N-1 应用状态;
+5. 显式确认会校验健康状态、重启次数、PostgreSQL 与 Valkey、供应方链接、软件包以及带认证的灰度探针;
+6. 任何报告、日志、清单或进程参数都不暴露密钥。
 
-Repository fake-runner tests are necessary but do not authorize production.
-
+仓库内的假执行器测试是必要条件,但不构成生产授权。

@@ -1,6 +1,8 @@
 ---
-title: "Referral retry preparation"
-description: "LMM API documentation: Referral retry preparation"
+title: "推荐奖励重试准备"
+sidebarTitle: "推荐重试"
+description: "推荐奖励重试的前置准备与幂等要求。"
+icon: "refresh-cw"
 ---
 
 This is source preparation for PR #354 (continuing #344), not a production rollout.
@@ -26,4 +28,3 @@ Evidence is limited to 1000 Unicode code points after the existing edge-whitespa
 The dialog shows the matching character count and disables invalid submissions. Its native HTML maximum is 2000 UTF-16 units so that 1000 supplementary characters fit; the actual acceptance limit remains 1000 code points. Server or transport failures still retain the original payload and request ID for safe retries. Validation does not relax moderation authorization or change rewards, purchased balances, schema, workflows or deployment behavior.
 
 Regressions cover 334 Chinese characters (the former 1002-byte failure), 1000 Chinese/emoji characters, combining marks, over-limit and NUL input, no database effects on invalid requests, exact evidence persistence, and no duplicate deductions on retry or after appeal. `TestReferralPostgresUnicodeEvidenceAndRetry` uses the existing isolated PostgreSQL fixture and existing qualification job; it must actually pass there before release, not merely skip without a test database.
-

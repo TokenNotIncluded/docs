@@ -1,64 +1,40 @@
 ---
-title: "Component release architecture"
-description: "LMM API documentation: Component release architecture"
+title: "组件发布架构"
+sidebarTitle: "发布架构"
+description: "各组件的发布顺序与依赖架构。"
 ---
 
-Production release identities are component-scoped:
+生产发布标识按组件划分:
 
-| Component | Tag | Workflow | Published artifact |
+| 组件 | 标签 | 工作流 | 发布产物 |
 | --- | --- | --- | --- |
-| Go provider | `go-vX.Y.Z` | `release-go.yml` | signed archives containing real `lmm-api-go` plus package contracts |
-| Web frontend | `web-vX.Y.Z` | `release-web.yml` | signed immutable frontend archive |
-| Rust provider candidate | none | CI only | real `lmm-api-rs` test artifacts, never production ownership evidence |
+| Go 供应方 | `go-vX.Y.Z` | `release-go.yml` | 含真实 `lmm-api-go` 与软件包契约的签名归档 |
+| Web 前端 | `web-vX.Y.Z` | `release-web.yml` | 签名且不可变的前端归档 |
+| Rust 供应方候选 | 无 | 仅 CI | 真实的 `lmm-api-rs` 测试产物,永远不作为生产归属证据 |
 
-The historical root `VERSION`, `prepare-release.yml`, `promote-release.yml`,
-`release.yml`, and `scripts/release.mjs` coupled three independently moving
-components behind a generic `v*` identity. They are retired. Existing generic
-tags and releases remain immutable historical records; they must not be moved,
-deleted, recreated, or used as rollback evidence.
+历史上根目录的 `VERSION`、`prepare-release.yml`、`promote-release.yml`、`release.yml` 和 `scripts/release.mjs` 把三个独立演进的组件捆绑在通用的 `v*` 标识之后,现已被废弃。既有的通用标签与发布保留为不可变的历史记录,不得移动、删除、重建或作为回滚证据。
 
-## Publication gate
+## 发布门禁
 
-A component tag must resolve to an exact commit reachable from the default
-branch. Its workflow then requires successful CI, CodeQL, and release-contract
-checks for that commit before building. The tracked AUR version must be older
-than the proposed tag. Assets are checksum-bound, signed with the component
-workflow's Sigstore identity, and verified before publication.
+组件标签必须解析到默认分支可达的精确提交。其工作流随后要求该提交通过 CI、CodeQL 和发布契约检查,之后才会构建。被跟踪的 AUR 版本必须早于拟发布的标签。产物与校验和绑定,使用组件工作流的 Sigstore 身份签名,并在发布前完成校验。
 
-Creating a tag is deliberately an operator-controlled action. There is no
-workflow that infers a release from a root version-file change. A future
-component promoter may automate tag creation only after it proves the same
-commit checks and uses separately reviewed Go/Web version metadata.
+创建标签是刻意保留给运维人员的操作。没有任何工作流会根据根目录版本文件的变化推断发布。未来的组件提升工具只有在证明执行相同的提交检查并使用单独评审的 Go / Web 版本元数据之后,才可以自动化创建标签。
 
-## Compatibility
+## 兼容性
 
-Semantic versions remain independent. Compatibility is established by the
-content hash emitted by:
+语义版本保持相互独立,兼容性由以下命令输出的内容哈希确定:
 
 ```bash
 cd /path/to/api.lmm.best
 /usr/bin/lmm-api-deploy contract route print
 ```
 
-Both candidate packages must carry the expected
-`API_ROUTE_CONTRACT_REVISION`, and the production deployment controller rejects
-mixed candidates or rollback pairs whose contract revisions differ. The
-contract revision is a compatibility assertion, not a shared product version.
+两个候选软件包都必须携带预期的 `API_ROUTE_CONTRACT_REVISION`,生产部署控制器会拒绝契约修订版本不一致的混合候选或回滚组合。契约修订版本是兼容性断言,不是共享的产品版本号。
 
-## Rust boundary
+## Rust 边界
 
-Rust remains a loopback-only migration candidate. CI may build and test it, but
-there is no stable Rust tag, prebuilt AUR package, or production publication
-workflow. `lmm-api-rs-git` is source-preview-only and cannot be used as cutover
-evidence. Reintroducing a signed Rust binary requires a dedicated tag namespace,
-immutable asset contract, checksum-pinned AUR recipe, Sigstore identity, and an
-approved route-ownership cutover.
+Rust 仍是仅限回环的迁移候选。CI 可以构建和测试它,但不存在稳定的 Rust 标签、预构建的 AUR 软件包或生产发布工作流。`lmm-api-rs-git` 仅用于源码预览,不能作为切换证据。重新引入签名 Rust 二进制需要专门的标签命名空间、不可变产物契约、锁定校验和的 AUR 配方、Sigstore 身份,以及经过批准的路由归属切换。
 
-## Rollback
+## 回滚
 
-Rollback is explicit and selects previously verified component packages by
-their own versions and matching route-contract revision. Provider restoration
-also restores the verified one-hop `/usr/bin/lmm-api` target. There is no timed
-or automatic rollback. Never translate a historical generic `vX.Y.Z` into
-assumed Go, Web, or Rust component versions.
-
+回滚是显式操作,按各组件自身的版本和匹配的路由契约修订版本选择此前已验证的软件包。恢复供应方时同时恢复经过校验的一跳 `/usr/bin/lmm-api` 目标。不存在定时或自动回滚。绝不能把历史上的通用 `vX.Y.Z` 直接当作 Go、Web 或 Rust 组件版本。

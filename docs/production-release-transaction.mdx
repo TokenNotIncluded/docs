@@ -1,84 +1,50 @@
 ---
-title: "Manual release acceptance and rollback"
-description: "LMM API documentation: Manual release acceptance and rollback"
+title: "手动发布验收与回滚"
+sidebarTitle: "发布验收与回滚"
+description: "手动发布的验收标准与回滚流程。"
 ---
 
-Server deployment is manual. GitHub Actions only builds, tests, signs, and
-publishes artifacts; it does not connect to production. The local
-`scripts/production-release-transaction.py` wrapper remains available to an
-operator controlling the native CLI and a verified immutable plan.
+服务器部署是人工操作。GitHub Actions 只负责构建、测试、签名和发布产物,不连接生产环境。本地的 `scripts/production-release-transaction.py` 包装脚本仍可供运维人员使用,前提是由他控制原生 CLI 并持有经过校验的不可变计划。
 
-## One transaction owns acceptance
+## 由一个事务负责验收
 
-The operator runs the following transaction locally:
+运维人员在本地运行以下事务:
 
 ```text
-verify signed candidate and previous Go/Web artifacts
-  -> native plan and stage
-  -> native promote (one dispatch)
-  -> read-only reconciliation of the immutable deployment ID and plan digest
-  -> public backend version, entry pages and referenced assets
-  -> native confirm
-  -> read-only verification of CONFIRMED
+校验签名的候选与上一版 Go / Web 产物
+  -> 原生 plan 与 stage
+  -> 原生 promote(一次下发)
+  -> 只读核对不可变部署 ID 与计划摘要
+  -> 公网后端版本、入口页面与引用资源
+  -> 原生 confirm
+  -> 只读校验 CONFIRMED
 ```
 
-A Web-only release verifies the unchanged Go version too. Public checks run
-before native confirmation while the local controller plan is still available;
-they are no longer a separate step after the deployment script has deleted its
-temporary workspace. Only a matching native `CONFIRMED` result plus successful
-public acceptance gives the local wrapper a zero exit code.
+仅 Web 发布同样要校验未变更的 Go 版本。公网检查在原生确认之前、本地控制器计划仍然可用时执行,不再是部署脚本删除临时工作区之后的独立步骤。只有原生返回匹配的 `CONFIRMED` 且公网验收成功,本地包装脚本才返回零退出码。
 
-The native controller remains responsible for signatures, host identity,
-package integrity, the global deployment lock, billing drain, single-writer
-ownership, migrations, schema compatibility, observation and health gates.
-The wrapper does not restore the database or weaken a native rollback refusal.
+签名、主机身份、软件包完整性、全局部署锁、计费排空、单一写入方归属、迁移、模式兼容性、观察与健康门禁仍由原生控制器负责。包装脚本不会恢复数据库,也不会削弱原生回滚拒绝。
 
-## Failure and uncertainty
+## 失败与不确定状态
 
-A settled `ROLLBACK_REQUIRED` activation or failed public acceptance while
-`AWAITING_CONFIRMATION` triggers one native rollback request. The wrapper
-re-reads the state immediately before rollback and requires the final native
-state to be `ROLLED_BACK`. A recovered failed release still exits nonzero.
-A successful command that returned `CONFIRMED` instead of `ROLLED_BACK` is not
-accepted as rollback evidence.
+激活结果确定为 `ROLLBACK_REQUIRED`,或在 `AWAITING_CONFIRMATION` 期间公网验收失败时,会触发一次原生回滚请求。包装脚本会在回滚前立即重读状态,并要求最终原生状态为 `ROLLED_BACK`。已恢复的失败发布仍然以非零码退出。命令成功但返回 `CONFIRMED` 而不是 `ROLLED_BACK` 时,不能作为回滚证据。
 
-A lost promotion or rollback reply is reconciled with read-only status calls,
-not by repeating a mutation. In-flight phases are polled for a bounded interval.
-Unknown phases, malformed JSON, mismatched deployment IDs/plan digests/versions,
-unavailable status and incomplete native rollback all fail closed. The last
-known phase is never reused as current evidence after transport is lost.
+丢失的 promote 或 rollback 响应只通过只读状态查询来核对,绝不重复变更操作。进行中的阶段会在有界区间内轮询。未知阶段、格式错误的 JSON、部署 ID / 计划摘要 / 版本不匹配、状态不可用以及原生回滚不完整,一律以失败告终。传输中断后,不得把最后已知阶段当作当前证据使用。
 
-A failed confirmation response may hide a still-running remote confirmation.
-The controller only reconciles it. It must not race confirmation with rollback.
-An unresolved confirmation therefore leaves `recovery-required`, not success.
-Native `CONFIRMED` is terminal; this wrapper cannot roll back a previously
-confirmed release. Selecting and activating the previously confirmed A/B pair
-is still a separate native integration blocker, not implemented here.
+确认响应失败可能掩盖仍在运行的远端确认。控制器只对它做核对,不得让确认与回滚竞争。因此未决的确认会留下 `recovery-required`,而不是成功。原生的 `CONFIRMED` 是终态,本包装脚本无法回滚已确认的发布。选择并激活此前已确认的 A/B 组合仍是原生侧尚未实现的集成阻塞项。
 
-Controller interruption or power loss does not magically execute Python cleanup.
-The native target workspace remains the recovery authority. The initial result
-marker means "recovery required" until a terminal result replaces it. A host-side
-A/B boot/recovery mechanism and production-shaped crash tests are still needed.
+控制器中断或断电不会自动执行 Python 清理逻辑。原生目标工作区仍是恢复权威。在终态结果覆盖之前,初始结果标记的含义是“需要恢复”。主机侧的 A/B 启动与恢复机制以及贴近生产的崩溃测试仍然缺失。
 
-## Evidence and automation boundary
+## 证据与自动化边界
 
-The local wrapper writes a private, atomic result file with the deployment ID,
-plan digest, expected version, native status, outcome, and reason. Keep that file
-outside temporary controller directories. Preserve recovery evidence after an
-interrupted operation; a nonterminal receipt is not success.
+本地包装脚本会写出一份私有的原子结果文件,包含部署 ID、计划摘要、预期版本、原生状态、结果和原因。该文件要放在控制器的临时目录之外。操作被中断后要保留恢复证据;非终态回执不等于成功。
 
-No GitHub workflow loads production SSH credentials or invokes the deployment
-wrapper. Offline regression tests still run in the isolated server qualification
-workflow; these tests do not access production.
+没有任何 GitHub 工作流会加载生产 SSH 凭据或调用部署包装脚本。离线回归测试仍在隔离的服务器资格工作流中运行,这些测试不访问生产环境。
 
-## Local validation
+## 本地校验
 
 ```sh
 python3 -B scripts/test-production-release-transaction.py
 node --test scripts/workflow-topology.test.mjs
 ```
 
-Tests cover successful confirmation, failed public acceptance, rollback failures,
-ambiguous transport, stale evidence, and the absence of workflow server access.
-They do not prove a real server migration or production traffic switch.
-
+测试覆盖确认成功、公网验收失败、回滚失败、传输结果不明确、证据过期,以及工作流不得访问服务器。它们不能证明真实服务器迁移或生产流量切换已经完成。

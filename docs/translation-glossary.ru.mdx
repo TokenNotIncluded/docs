@@ -1,105 +1,105 @@
 ---
-title: "Russian Glossary (Project Terminology)"
-description: "LMM API documentation: Russian Glossary (Project Terminology)"
+title: "俄语术语词汇表"
+sidebarTitle: "俄语术语"
+description: "俄语界面与文档的术语对照表。"
 ---
 
-This glossary defines standard Russian terms used across project localization.
+本词汇表定义项目本地化中使用的标准俄语术语。
 
-## Core Concepts
+## 核心概念
 
-- Emojis are allowed only when present in the source text.
-- Purely technical terms are allowed when they appear in the source.
-- English technical terms are allowed when common in Russian technical usage (for example, API).
+- 只有当源文本本身包含表情符号时才保留它们。
+- 纯技术术语在源文本出现时可以保留。
+- 在俄语技术用法中常见的英文术语(例如 API)可以保留英文。
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Ratio | Коэффициент | Ratio/Multiplier | Multiplier used in price calculation. **Important:** For pricing, always use **Коэффициент** instead of **Множитель**. |
-| Token | Токен | Token | API credentials or text units processed by models. |
-| Channel | Канал | Channel | API provider access channel. |
-| Group | Группа | Group | Classification of users or tokens. |
-| Quota | Квота | Quota | Available service quota for the user. |
+| Ratio | Коэффициент | Ratio/Multiplier | 价格计算使用的倍率。**重要:**定价场景始终使用 **Коэффициент**,不要使用 **Множитель**。 |
+| Token | Токен | Token | API 凭据,或模型处理的文本单位。 |
+| Channel | Канал | Channel | API 供应方访问渠道。 |
+| Group | Группа | Group | 用户或令牌的分类。 |
+| Quota | Квота | Quota | 用户可用的服务额度。 |
 
-## Model Related
+## 模型相关
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Prompt | Prompt / Ввод | Prompt | Input content for model. |
-| Completion | Вывод | Completion | Model output. **Important:** Do not translate as alternatives like "дополнение" or "завершение". |
-| Input | Ввод | Input/Prompt | Content sent to the model. |
-| Output | Вывод | Output/Completion | Content returned by the model. |
-| Model Ratio | Коэффициент модели | Model Ratio | Pricing ratio for different models. |
-| Completion Ratio | Коэффициент вывода | Completion Ratio | Additional multiplier for output pricing. |
-| Price per call | Цена за запрос | Price per call | Price charged per API call. |
-| Pay-as-you-go | Оплата по объему | Pay-as-you-go | Usage-based pricing. |
-| Pay-per-view | Оплата за вызов | Pay-per-call | Flat price per call. |
+| Prompt | Prompt / Ввод | Prompt | 模型的输入内容。 |
+| Completion | Вывод | Completion | 模型输出。**重要:**不要译为 “дополнение” 或 “завершение” 等替代词。 |
+| Input | Ввод | Input/Prompt | 发送给模型的内容。 |
+| Output | Вывод | Output/Completion | 模型返回的内容。 |
+| Model Ratio | Коэффициент модели | Model Ratio | 不同模型的定价倍率。 |
+| Completion Ratio | Коэффициент вывода | Completion Ratio | 输出定价的附加倍率。 |
+| Price per call | Цена за запрос | Price per call | 每次 API 调用收取的价格。 |
+| Pay-as-you-go | Оплата по объему | Pay-as-you-go | 按用量计费。 |
+| Pay-per-view | Оплата за вызов | Pay-per-call | 每次调用的固定价格。 |
 
-## User Management
+## 用户管理
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Root User | Суперадминистратор | Root User | Administrator with highest privileges. |
-| Admin User | Администратор | Admin User | System administrator. |
-| Normal User | Обычный пользователь | Normal User | User with standard permissions. |
+| Root User | Суперадминистратор | Root User | 拥有最高权限的管理员。 |
+| Admin User | Администратор | Admin User | 系统管理员。 |
+| Normal User | Обычный пользователь | Normal User | 普通权限用户。 |
 
-## Recharge & Redemption
+## 充值与兑换
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Top Up | Пополнение | Top Up | Add quota to an account. |
-| Redemption Code | Код обмена | Redemption Code | Code redeemable for quota. |
+| Top Up | Пополнение | Top Up | 为账户增加额度。 |
+| Redemption Code | Код обмена | Redemption Code | 可兑换额度的码。 |
 
-## Channel Management
+## 渠道管理
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Channel | Канал | Channel | API access channel. |
-| API Key | API ключ | API Key | API access key. **Important:** Prefer **API ключ** over alternative wording. |
-| Priority | Приоритет | Priority | Channel selection priority. |
-| Weight | Вес | Weight | Load-balancing weight. |
-| Proxy | Прокси | Proxy | Proxy server address. |
-| Model Mapping | Перенаправление модели | Model Mapping | Replace model name in request payload. |
-| Provider | Поставщик | Provider/Vendor | Service or API provider. |
+| Channel | Канал | Channel | API 访问渠道。 |
+| API Key | API ключ | API Key | API 访问密钥。**重要:**优先使用 **API ключ**,不要使用其他说法。 |
+| Priority | Приоритет | Priority | 渠道选择优先级。 |
+| Weight | Вес | Weight | 负载均衡权重。 |
+| Proxy | Прокси | Proxy | 代理服务器地址。 |
+| Model Mapping | Перенаправление модели | Model Mapping | 替换请求载荷中的模型名称。 |
+| Provider | Поставщик | Provider/Vendor | 服务或 API 提供方。 |
 
-## Security Related
+## 安全相关
 
-| English Term | Russian Term | Canonical English | Description |
+| 英文术语 | 俄语术语 | 规范英文 | 说明 |
 |--------------|--------------|-------------------|-------------|
-| Two-Factor Authentication | Двухфакторная аутентификация | Two-Factor Authentication | Additional security verification method. |
-| 2FA | 2FA | Two-Factor Authentication | Abbreviation. |
+| Two-Factor Authentication | Двухфакторная аутентификация | Two-Factor Authentication | 额外的安全校验方式。 |
+| 2FA | 2FA | Two-Factor Authentication | 缩写。 |
 
-## Translation Guidance
+## 翻译指引
 
-### Prompt/Input Context
+### Prompt 与 Input 的语境
 
-- **Промпт**: user interaction, chat/LLM context.
-- **Ввод**: technical processing, billing, and calculation context.
-- **Rule:** Use **Промпт** for conversational UI, **Ввод** for backend and pipeline descriptions.
+- **Промпт**:用户交互、聊天与 LLM 语境。
+- **Ввод**:技术处理、计费与计算语境。
+- **规则**:对话界面使用 **Промпт**,后端与流水线描述使用 **Ввод**。
 
-### Token Context
+### Token 的语境
 
-- API token (API Token)
-- Text token processed by model (Text Token)
-- System access token (Access Token)
+- API 令牌(API Token)
+- 模型处理的文本 token(Text Token)
+- 系统访问令牌(Access Token)
 
-### Quota Notes
+### 额度说明
 
-- User service quota.
-- Sometimes translated as **Кредит**.
+- 用户服务额度。
+- 有时译作 **Кредит**。
 
-### Language Notes
+### 语言注意事项
 
-- Correct plural forms are required for localization files (`_one`, `_few`, `_many`, `_other`).
-- Watch case/declension in technical terms.
-- Respect grammatical gender (for example, `модель` is feminine, `канал` is masculine).
+- 本地化文件需要正确的复数形式(`_one`、`_few`、`_many`、`_other`)。
+- 注意技术术语的格与变格。
+- 注意语法性别(例如 `модель` 为阴性,`канал` 为阳性)。
 
-### Standardized Terms
+### 统一术语
 
-- **Completion / Вывод**: model output.
-- **Ratio / Коэффициент**: price multiplier.
-- **Redemption Code / Код обмена**: canonical phrasing for top-up code.
-- **Provider / Поставщик**: organization or service exposing APIs or models.
+- **Completion / Вывод**:模型输出。
+- **Ratio / Коэффициент**:价格倍率。
+- **Redemption Code / Код обмена**:充值码的规范说法。
+- **Provider / Поставщик**:对外提供 API 或模型的组织或服务。
 
 ---
 
-**Contributor note:** If you spot inconsistent terminology or have better Russian translations, open an Issue or Pull Request.
-
+**贡献说明:**如发现术语不一致或有更好的俄语译法,欢迎提交 Issue 或 Pull Request。

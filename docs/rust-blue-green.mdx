@@ -1,38 +1,28 @@
 ---
-title: "Rust backend provider rollout"
-description: "LMM API documentation: Rust backend provider rollout"
+title: "Rust 后端供应商蓝绿发布"
+sidebarTitle: "Rust 蓝绿发布"
+description: "Rust 后端供应商的蓝绿发布流程与切换判据。"
 ---
 
-The Rust backend is an independently built provider. Its real executable is
-`/usr/bin/lmm-api-rs`; production and operator commands enter through the
-one-hop `/usr/bin/lmm-api` symlink. The old shell-managed blue/green slot
-framework has been retired.
+Rust 后端是独立构建的供应方,真实可执行文件是 `/usr/bin/lmm-api-rs`,生产和运维命令通过一跳符号链接 `/usr/bin/lmm-api` 进入。旧的 shell 管理蓝绿槽位框架已废弃。
 
-The executable/link, manual rollback, shared command schemas, and package rules
-are normative in [`backend-cli-deployment-contract.md`](/docs/backend-cli-deployment-contract).
+可执行文件与链接、手动回滚、共享命令模式和软件包规则以[后端 CLI 部署契约](/docs/backend-cli-deployment-contract)为准。
 
-## Current ownership
+## 当前归属
 
-The current source-level gap review and configuration compatibility work are
-tracked in [`rust-go-parity.md`](/docs/rust-go-parity).
-
-Go still owns production business traffic. Rust route ownership is determined
-only by the current result of:
+Go 仍拥有生产业务流量。Rust 的路由归属只由以下文件的当前结果决定:
 
 ```text
 apps/api-rust/tests/fixtures/routes/route-gate.tsv
 ```
 
-A compiled binary, mounted candidate route, successful `/livez` or `/readyz`
-probe, provider symlink, historical rehearsal, or passing deployment CLI test
-does not transfer business ownership to Rust.
+已编译的二进制、挂载的候选路由、成功的 `/livez` 或 `/readyz` 探测、供应方符号链接、历史演练或通过的部署 CLI 测试,都不会把业务归属转移给 Rust。
 
-The Rust provider MUST fail closed when a requested production switch would
-claim routes that lack independent differential evidence and approval.
+当请求的生产切换会声明缺少独立差分证据与批准的路由时,Rust 供应方必须以失败告终。
 
-## Build and package
+## 构建与打包
 
-Build the real provider binary from an immutable revision:
+从不可变修订版本构建真实供应方二进制:
 
 ```bash
 cd apps/api-rust
@@ -40,68 +30,48 @@ LMM_BUILD_REVISION="$(git rev-parse HEAD)" cargo build --release --locked --bin 
 sha256sum target/release/lmm-api-rs
 ```
 
-The Rust package installs that real binary and its signed identity metadata. It
-must not install a regular `/usr/bin/lmm-api`, a reverse
-`lmm-api-rs -> lmm-api` alias, or shell deployment wrappers. Go and Rust
-provider packages may coexist.
+Rust 软件包安装该真实二进制及其签名身份元数据,不得安装普通的 `/usr/bin/lmm-api`、反向别名 `lmm-api-rs -> lmm-api`,也不得安装 shell 部署包装脚本。Go 与 Rust 供应方软件包可以共存。
 
-Provider selection is performed only through the currently verified public CLI:
+供应方选择只能通过当前经过校验的公开 CLI 执行:
 
 ```bash
 /usr/bin/lmm-api backend status
 /usr/bin/lmm-api backend select rust
 ```
 
-Selection verifies package ownership, release identity, target mode and hash,
-then atomically replaces `/usr/bin/lmm-api` with a relative `lmm-api-rs`
-symlink. Confirmation and rollback after a provider switch must also be invoked
-through `/usr/bin/lmm-api`.
+选择操作会校验软件包归属、发布身份、目标模式与哈希,然后原子地把 `/usr/bin/lmm-api` 替换为指向 `lmm-api-rs` 的相对符号链接。供应方切换后的确认与回滚同样必须通过 `/usr/bin/lmm-api` 调用。
 
-## Configuration and service lifecycle
+## 配置与服务生命周期
 
-CLI dispatch occurs before service configuration or database initialization.
-Commands such as `version`, `backend status`, deployment status, confirmation,
-and rollback must not fail merely because server-only environment variables are
-absent.
+CLI 分发发生在服务配置和数据库初始化之前。`version`、`backend status`、部署状态、确认和回滚等命令,不得仅因为缺少服务端专用环境变量而失败。
 
-Go and Rust use the same PostgreSQL authority and dedicated Valkey deployment.
-Rust accepts the provider-neutral production keys and the documented Go-key
-aliases without logging their values. Conflicting aliases are rejected rather
-than guessed.
+Go 与 Rust 使用同一套 PostgreSQL 权威和专用 Valkey 部署。Rust 接受供应方中立的生产键名以及文档中列出的 Go 键名别名,并且不会记录它们的值。出现相互冲突的别名时会直接拒绝,而不是猜测。
 
-The package-owned `lmm-api.service` always executes:
+由软件包拥有的 `lmm-api.service` 始终执行:
 
 ```text
 /usr/bin/lmm-api serve
 ```
 
-A provider transition records the previous link target and package identity in
-the immutable deployment manifest. There is no systemd rollback timer and no
-automatic rollback. A post-mutation failure becomes `ROLLBACK_REQUIRED`; the
-operator explicitly runs `confirm` or `rollback` through the public symlink.
+供应方切换会把之前的链接目标和软件包身份记录到不可变部署清单中。不存在 systemd 回滚定时器,也没有自动回滚。变更后的失败会进入 `ROLLBACK_REQUIRED`,运维人员通过公开符号链接显式执行 `confirm` 或 `rollback`。
 
-## Production enablement gate
+## 生产启用门禁
 
-Rust may own business traffic only after all of the following are independently
-verified:
+只有以下条件全部独立验证通过后,Rust 才可以拥有业务流量:
 
-1. Active PostgreSQL identity, schema contract, and forward-only boundary.
-2. Route, authentication, quota, billing, streaming, and error-contract
-   differentials against the immutable Go oracle.
-3. N/N-1 expand-and-contract compatibility and singleton background-job leases.
-4. Shared Valkey session, revocation, and fail-closed rate-limit semantics.
-5. HTTP, SSE, and WebSocket draining/reconnection behavior without retrying
-   non-idempotent requests.
-6. Explicit route-by-route approval in `route-gate.tsv`.
-7. A manual rollback rehearsal using the same signed provider packages and
-   shared deployment-state schema that production will use.
+1. 活跃 PostgreSQL 身份、模式契约与仅向前边界。
+2. 相对不可变 Go 基准的路由、认证、配额、计费、流式和错误契约差分。
+3. N / N-1 扩展与收缩兼容性,以及单例后台任务租约。
+4. 共享 Valkey 的会话、吊销与失败关闭限流语义。
+5. HTTP、SSE 和 WebSocket 的排空与重连行为,且不重试非幂等请求。
+6. 在 `route-gate.tsv` 中逐条路由的显式批准。
+7. 使用与生产相同的签名供应方软件包和共享部署状态模式完成的手动回滚演练。
 
-Until those gates pass and ownership is explicitly handed over, selecting Rust
-for production business traffic is rejected.
+在这些门禁通过并显式移交归属之前,为生产业务流量选择 Rust 会被拒绝。
 
-## Current verification
+## 当前校验
 
-Use read-only route evidence checks:
+使用只读的路由证据检查:
 
 ```bash
 awk -F '\t' 'NR > 1 { owner[$8]++; mount[$5]++; diff[$6]++ }
@@ -113,11 +83,10 @@ bash apps/api-rust/tests/scripts/check-route-plan.sh
 bash apps/api-rust/tests/scripts/check-real-integration-gates.sh
 ```
 
-Historical differential suites require an external immutable Go tree:
+历史差分套件需要一份外部的不可变 Go 源码树:
 
 ```bash
 LMM_GO_ORACLE_ROOT=/absolute/path/to/5418ce6b6d45ed69167b0aad53f2f595e5bc8de9
 ```
 
-Never use a dirty `apps/api-go` tree as oracle or rollback evidence. Never edit
-gate rows merely to make a check pass.
+绝不要使用有改动的 `apps/api-go` 源码树作为基准或回滚证据,也绝不要为了让检查通过而修改门禁行。

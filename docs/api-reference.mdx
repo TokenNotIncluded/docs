@@ -1,31 +1,56 @@
 ---
-title: "API reference"
-sidebarTitle: "Overview"
-description: "Choose the OpenAPI contract that matches the LMM API surface you are integrating."
+title: "API 参考"
+sidebarTitle: "API 总览"
+description: "选择与集成面匹配的 OpenAPI 契约：中继 API 用于模型与媒体请求，管理 API 用于面板与运维端点。"
 ---
 
-The repository publishes two machine-readable OpenAPI contracts. Use the relay contract for model and media requests. Use the admin contract for panel, account, model, billing, and operational endpoints.
+LMM API 提供两套机器可读的 OpenAPI 契约。接入模型或媒体请求时使用中继契约，管理面板、账户、模型、计费和运维时使用管理契约。
 
 <CardGroup cols={2}>
-  <Card title="Relay API" icon="bot" href="/docs/responses-tool-compatibility">
-    OpenAI-compatible chat, Responses, Messages, Gemini, media, embeddings, audio, reranking, and moderation endpoints.
+  <Card title="中继 API" icon="bot" href="/docs/responses-tool-compatibility">
+    兼容 OpenAI 的 Chat、Responses、Messages、Gemini、媒体、嵌入、音频、重排序和审核端点。源文件:`docs/openapi/relay.json`。
   </Card>
-  <Card title="Admin API" icon="settings" href="/docs/read-only-query-api">
-    System, user, authentication, channel, token, billing, model, task, and administration endpoints.
+  <Card title="管理 API" icon="settings-2" href="/docs/read-only-query-api">
+    系统、用户、登录注册、渠道、令牌、计费、模型、任务和系统设置端点。源文件:`docs/openapi/api.json`。
   </Card>
 </CardGroup>
 
-## Authentication
+## 基础地址
 
-Most relay endpoints use a bearer token:
+两个契约共用同一个生产基础地址,端点路径直接拼接在其后。
+
+```text
+https://api.lmm.best
+```
+
+例如模型列表端点的完整地址为 `https://api.lmm.best/v1/models`,面板登录端点为 `https://api.lmm.best/api/user/login`。
+
+## 认证
+
+中继端点和多数管理端点使用 Bearer 令牌:
 
 ```bash
 curl https://api.lmm.best/v1/models \
   -H "Authorization: Bearer $LMM_API_KEY"
 ```
 
-See [User authentication and login sessions](/docs/authentication) for access tokens, refresh cookies, personal access tokens, session limits, trusted proxies, and security proofs.
+登录、刷新和登出使用 HttpOnly 刷新 Cookie,高风险操作额外要求 `X-Security-Proof` 请求头。令牌、Cookie、PAT 和会话限制的完整说明见[认证与会话](/docs/authentication)。
 
 <Info>
-  The OpenAPI files are copied from the upstream repository and remain available at `docs/openapi/api.json` and `docs/openapi/relay.json` for client generation and contract review.
+  侧边栏 **API 端点** 分组中的每个页面都由 OpenAPI 规范自动生成,包含参数表、响应结构、错误码、代码示例和可交互的请求构造器。规范更新后端点页面自动跟随,不需要手写。
 </Info>
+
+## 端点分组
+
+<AccordionGroup>
+  <Accordion title="中继 API:模型与媒体">
+    模型列表、Chat Completions、Responses、Claude Messages、Gemini generateContent、嵌入、文本补全、图像生成与编辑、视频生成（Sora、Kling、即梦）、音频转写与合成、重排序、审核和 Realtime。
+  </Accordion>
+  <Accordion title="管理 API:面板与运维">
+    系统状态与设置、登录注册与 OAuth、用户与权限、充值支付、两步验证与安全验证、渠道与供应商、令牌与兑换码、日志与统计、分组、任务和模型管理。
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  规范中标记为未实现的端点（Fine-tunes、Files）尚未上线,调用会返回错误。请在集成前确认目标端点状态。
+</Warning>

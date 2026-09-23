@@ -1,37 +1,20 @@
 ---
-title: "CC Switch account balance"
-description: "LMM API documentation: CC Switch account balance"
+title: "CC Switch 账户余额"
+sidebarTitle: "CC Switch 余额"
+description: "CC Switch 账户余额查询的行为与接口约定。"
 ---
 
-The keys page can import a read-only wallet balance query into CC Switch.
-In the import dialog, the owner must explicitly enable **Allow this key to read
-account balance**. This immediately grants every holder of that key access to
-the account's persisted wallet balance. Reopen the dialog and turn it off to
-revoke access, even without importing again. Cancelling the import does not undo
-an explicit permission change. Do not enable it on a shared key unless that
-disclosure is intended.
+密钥页面可以把只读的钱包余额查询导入 CC Switch。在导入对话框中,所有者必须显式启用**允许此密钥读取账户余额**。这会立即授予该密钥的所有持有者访问账户持久化钱包余额的能力。重新打开对话框并关闭即可撤销,无需再次导入。取消导入不会撤销已经做出的显式权限变更。除非确实希望披露,否则不要在共享密钥上启用该选项。
 
-The import carries `usageScript` (base64), `usageEnabled=true`, `usageBaseUrl`,
-and `usageAutoInterval=5`, using CC Switch's provider deep-link protocol. The
-script uses the provider credential through `{{apiKey}}`; it does not embed a
-second credential or a browser session. CC Switch still asks the user to confirm
-the imported configuration. Older clients without usage-script import support
-need an upgrade or manual query configuration.
+导入通过 CC Switch 的供应方深链接协议携带 `usageScript`(base64)、`usageEnabled=true`、`usageBaseUrl` 和 `usageAutoInterval=5`。脚本通过 `{{apiKey}}` 使用供应方凭据,不内嵌第二份凭据或浏览器会话。CC Switch 仍会要求用户确认导入的配置。不支持用量脚本导入的旧客户端需要升级或手动配置查询。
 
 ## API
 
-`PUT /api/token/:id/account-balance-access` accepts `{"enabled":true}` or
-`{"enabled":false}` using the existing owner-authenticated key-management API.
-The ID must belong to the authenticated owner. OAuth-managed keys are excluded.
-An ordinary relay API key cannot grant itself access.
+`PUT /api/token/:id/account-balance-access` 在既有的所有者认证密钥管理 API 上接受 `{"enabled":true}` 或 `{"enabled":false}`。ID 必须属于已认证的所有者,OAuth 托管的密钥被排除。普通中继 API 密钥无法为自己授予权限。
 
-`GET /v1/balance` accepts `Authorization: Bearer API_KEY`. It uses the same
-persisted key authentication as `/v1/usage`: disabled, expired, deleted,
-OAuth-managed and IP-restricted keys are rejected, as are disabled accounts.
-Exhausted keys can still check balance. An ungranted key receives HTTP 403 with
-`account_balance_access_required`, not a zero balance.
+`GET /v1/balance` 接受 `Authorization: Bearer API_KEY`,使用与 `/v1/usage` 相同的持久化密钥认证:已禁用、已过期、已删除、OAuth 托管以及受 IP 限制的密钥都会被拒绝,已禁用账户同样被拒绝。额度耗尽的密钥仍可查询余额。未获授权的密钥会收到 HTTP 403 与 `account_balance_access_required`,而不是零余额。
 
-Example successful response (fictional data):
+成功响应示例(虚构数据):
 
 ```json
 {
@@ -44,27 +27,12 @@ Example successful response (fictional data):
 }
 ```
 
-`remaining` is the owner's persisted wallet quota divided by `QuotaPerUnit`,
-always USD regardless of the site's display currency or `DisplayTokenStatEnabled`.
-Zero and negative balances are preserved. Subscription allowances, token limits,
-and cumulative spend are not included. Pending usage writes can delay the
-snapshot; this is not a spending authorization or an atomic billing guarantee.
-Responses use `Cache-Control: no-store`. Queries share the existing per-account
-30/minute quota-query rate limit; imported clients refresh every five minutes.
+`remaining` 是所有者持久化钱包额度除以 `QuotaPerUnit`,无论站点显示货币或 `DisplayTokenStatEnabled` 如何设置,始终以美元表示。零余额与负余额都会保留。订阅额度、令牌限制和累计消费不计入其中。未决的用量写入可能延迟快照,它既不是消费授权,也不构成原子计费保证。响应使用 `Cache-Control: no-store`。查询共享既有的按账户 30 次/分钟的额度查询限流;导入的客户端每五分钟刷新一次。
 
-`/v1/usage` remains token-scoped. An unlimited token still returns null remaining
-quota there; it does not imply an unlimited account balance.
+`/v1/usage` 仍以令牌为作用域。无限制令牌在该接口中仍返回空的剩余额度,这不代表账户余额无限制。
 
-## Migration and release note
+## 迁移与发布说明
 
-The additive migration `apps/api-rust/migrations/0010_account_balance_access.sql`
-adds `tokens.account_balance_read` as a non-null boolean defaulting to false.
-Existing keys gain no access automatically. Apply that forward migration (or
-the equivalent Go model migration) before enabling the Rust routes. Older Go
-releases ignore the additive column. Both Go and Rust read the persisted flag
-on every balance request, so revocation is immediate. No production deployment
-or provider ownership change is included.
+增量迁移 `apps/api-rust/migrations/0010_account_balance_access.sql` 新增 `tokens.account_balance_read`,为非空布尔值,默认 false。已有密钥不会自动获得权限。在启用 Rust 路由之前先应用该向前迁移(或等价的 Go 模型迁移)。较早的 Go 版本会忽略这个增量列。Go 与 Rust 都会在每次余额请求时读取持久化标记,因此撤销立即生效。本次不包含生产部署或供应方归属变更。
 
-Release note: keys-page CC Switch imports can include account wallet balance
-after an explicit, revocable owner grant, instead of showing only token usage.
-
+发布说明:在所有者显式且可撤销的授权之后,密钥页面的 CC Switch 导入可以包含账户钱包余额,而不再只显示令牌用量。

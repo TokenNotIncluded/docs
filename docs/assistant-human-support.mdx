@@ -1,6 +1,7 @@
 ---
 title: "助手内的人工技术支持"
-description: "LMM API documentation: 助手内的人工技术支持"
+sidebarTitle: "人工技术支持"
+description: "在助手会话中转接人工技术支持的流程与约束。"
 ---
 
 登录用户可以在助手里说“转人工”，或点击转人工入口。请求提交后，用户继续使用原来的站内会话。所有启用的管理员和超级管理员都会在待办中心看到待接单请求；其中一人接受后，由该管理员在同一会话回复。
@@ -37,4 +38,3 @@ description: "LMM API documentation: 助手内的人工技术支持"
 本功能运行在生产 Go 服务和共享 Web 前端。新增 `assistant_support_requests` 表，并为会话消息新增人工作者字段。通过现有 Go 数据库迁移流程应用变更，再启动使用 `LMM_DB_MIGRATION_MODE=verify` 的服务；生产部署控制器会执行候选二进制的 `migrate --apply`。没有修改 Rust 预览 API。
 
 接口位于 `/api/assistant/support`：资格查询、本人请求查询、提交请求、读取详情、接单、发送消息和结束服务均要求站内登录。它们不依赖调用 AI 模型。预约与接单均不会触发站外通知，也不会自动发送人工回复。
-

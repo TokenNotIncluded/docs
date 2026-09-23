@@ -1,42 +1,22 @@
 ---
-title: "Rust relay timeout boundaries"
-description: "LMM API documentation: Rust relay timeout boundaries"
+title: "Rust 中继超时边界"
+sidebarTitle: "Rust 超时边界"
+description: "Rust 中继各阶段的超时边界与重试策略。"
 ---
 
-The Rust candidate uses a connection deadline (at most three seconds), an
-adapter-owned deadline around sending the request and receiving response headers,
-and a reqwest read timeout. The read timeout resets after each successful read;
-it is not a total stream lifetime limit. A provider that sends headers and then
-stops producing bytes must fail rather than retain a pending read indefinitely.
-Transport bytes, including heartbeats, count as progress, not just model tokens.
+Rust 候选使用连接截止时间(最多三秒)、适配器自有的“发送请求并接收响应头”截止时间,以及 reqwest 读取超时。读取超时在每次成功读取后重置,不是整条流的生命周期上限。只发响应头然后停止产出字节的供应方必须失败,不能无限保留挂起的读取。传输字节(包括心跳)都算作进展,而不只是模型 token。
 
-The listener currently passes `LMM_DEPENDENCY_TIMEOUT_SECONDS` (default: 2) to
-both the relay builder and the adapters. No default is changed here. This short
-dependency setting may be unsuitable for real model first-token waits. Separate
-operator-facing relay configuration remains migration work; increasing this
-shared setting also affects non-relay dependencies.
+监听器当前把 `LMM_DEPENDENCY_TIMEOUT_SECONDS`(默认 2)同时传给中继构建器和适配器,这里不修改任何默认值。这个偏短的依赖设置在真实模型的首 token 等待场景下可能不适用。面向运维人员的独立中继配置仍是迁移工作的一部分;直接调大这个共享设置也会影响非中继依赖。
 
-The shared client is used by OpenAI, Anthropic/Gemini, media/Midjourney, misc
-relay and assistant adapters. Read-timeout protection applies to their consumed
-response bodies as well. Existing adapter-specific deadlines and body-size
-limits are unchanged. Control-plane `outbound_http::client` retains its total
-request timeout. TLS validation and redirect rejection remain unchanged.
+共享客户端被 OpenAI、Anthropic / Gemini、媒体与 Midjourney、杂项中继和助手适配器使用,读取超时保护同样作用于它们消费的响应体。既有的适配器专属截止时间与响应体大小限制保持不变。控制面的 `outbound_http::client` 保留其整体请求超时。TLS 校验与重定向拒绝行为保持不变。
 
-This is not full Go timeout parity: Go supports an optional total `RELAY_TIMEOUT`
-as well as `RELAY_RESPONSE_HEADER_TIMEOUT`. Rust's adapter deadline also includes
-request sending; it is not solely the post-upload wait. A read timeout does not
-bound an indefinitely progressing stream, nor provide an absolute request or
-slow-consumer deadline. Cancellation is tested by dropping the downstream body
-and observing the loopback producer being released.
+这还没有达到与 Go 完全一致:Go 除 `RELAY_RESPONSE_HEADER_TIMEOUT` 外还支持可选的整体 `RELAY_TIMEOUT`。Rust 的适配器截止时间还包含发送请求的时间,不只是上传后的等待。读取超时无法限制持续进展的流,也不提供绝对的请求截止时间或慢消费者截止时间。取消行为通过丢弃下游响应体并观察回环生产者是否被释放来测试。
 
-Run the loopback regression suite without database or provider credentials:
+无需数据库或供应方凭据即可运行回环回归套件:
 
 ```sh
 cd apps/api-rust
 cargo test --locked --test relay_openai_first_token
 ```
 
-It exercises the real relay client and HTTP router for missing headers,
-progressing streams beyond both configured deadlines, stalled bodies, and
-downstream cancellation. No production rollout or accounting changes are made.
-
+它针对缺失请求头、超过两个配置截止时间仍在进展的流、停滞的响应体以及下游取消,驱动真实的中继客户端和 HTTP 路由。本次不进行任何生产发布或计费变更。

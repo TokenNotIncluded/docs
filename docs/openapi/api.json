@@ -10,7 +10,8 @@
       "name": "系统"
     },
     {
-      "name": "用户登陆注册"
+      "name": "用户登陆注册",
+      "x-group": "登录与注册"
     },
     {
       "name": "OAuth"
@@ -7020,7 +7021,12 @@
       }
     }
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "https://api.lmm.best",
+      "description": "生产环境"
+    }
+  ],
   "security": [
     {
       "Combination343": []

@@ -1,6 +1,8 @@
 ---
-title: "Controller-only production backup evidence"
-description: "LMM API documentation: Controller-only production backup evidence"
+title: "仅控制器生产备份证据"
+sidebarTitle: "控制器备份"
+description: "仅控制器节点保存生产备份证据的范围与格式。"
+icon: "archive"
 ---
 
 This change replaces automatic target/controller/off-host backup creation for new release plans with an explicitly selected controller-owned import. Native source streaming is not part of this change. An independently authorized source-encrypted collection must finish before import. Target hosts receive only signed verification receipts; private keys, archives, dumps and ciphertext never leave the controller during import/stage/confirm.

@@ -1,287 +1,287 @@
 ---
-title: "Open-Source Bounty Playbook"
-description: "LMM API documentation: Open-Source Bounty Playbook"
+title: "开源赏金指南"
+sidebarTitle: "赏金指南"
+description: "开源赏金任务的参与流程与验收标准。"
 ---
 
-## 1. What This Is
+## 1. 这是什么
 
-The Open-Source Bounty program is a real-defect bounty mechanism for public GitHub projects.
+开源赏金计划面向公开 GitHub 项目的真实缺陷。
 
-A project sponsor can escrow repair rewards using API balance, pay a low, platform-visible bounty fee, and invite contributors to accept challenges. Contributors can submit reproducible Issues, corresponding fix PRs, or both.
+项目赞助方可以用 API 余额托管修复奖励,支付一笔较低且平台公开的赏金费用,并邀请贡献者领取任务。贡献者可以提交可复现的 Issue、对应的修复 PR,或两者同时提交。
 
-After the project owner approves submissions, the locked reward is transferred directly into the contributor’s API balance.
+项目所有者批准提交后,被锁定的奖励会直接转入贡献者的 API 余额。
 
-This playbook is independent of any Challenge II restoration process. The platform does not preconfigure, default-publish, or auto-pin any repository, including `TokenNotIncluded/api.lmm.best`. All projects must be created manually by a sponsor using their own balance, and owners, admins, and regular users follow the same fee rules.
+本指南与任何 Challenge II 恢复流程无关。平台不会预先配置、默认发布或自动置顶任何仓库,包括 `TokenNotIncluded/api.lmm.best`。所有项目都必须由赞助方使用自己的余额手动创建,所有者、管理员和普通用户适用相同的费用规则。
 
-## 2. Core Principles
+## 2. 核心原则
 
-1. Only genuine, reproducible code defects are eligible.
-2. Submitted Issue/PR must belong to the GitHub repository specified by the bounty.
-3. PR submissions must focus on bounty goals and include relevant tests or validation; if an Issue is submitted, it must be referenced by the PR.
-4. Publishing a bounty immediately deducts the admin-configured and publicly visible bounty fee and locks the full reward pool.
-5. Daily check-in rewards are credited to general balance and can offset part or all of bounty fees.
-6. Only unused escrowed reward is refunded when a project is closed. Collected bounty fees are non-refundable.
-7. After approval, rewards are transferred directly from escrow to contributor balance, and each challenge is paid only once.
-8. Low-quality reports, fabricated defects, duplicates, unrelated PRs, mechanical cleanup-only changes, and actions taken solely to collect rewards are disqualified.
+1. 只有真实、可复现的代码缺陷才符合条件。
+2. 提交的 Issue 或 PR 必须属于赏金指定的 GitHub 仓库。
+3. PR 必须围绕赏金目标,并包含相关测试或验证;如果同时提交 Issue,PR 必须引用该 Issue。
+4. 发布赏金会立即扣除管理员配置且公开可见的赏金费用,并锁定全部奖励池。
+5. 每日签到奖励计入通用余额,可以抵扣部分或全部赏金费用。
+6. 项目关闭时只退还尚未使用的托管奖励,已收取的赏金费用不予退还。
+7. 批准后奖励从托管直接转入贡献者余额,每个任务只支付一次。
+8. 低质量报告、伪造缺陷、重复提交、无关 PR、纯机械清理改动以及仅为领取奖励而做的操作都不合格。
 
-## 3. How Sponsors Run a Bounty
+## 3. 赞助方如何发布赏金
 
-### 3.1 Create a Draft
+### 3.1 创建草稿
 
-In **Profile -> Submit Ticket -> Open-Source Bounty**, select **Create Bounty** and provide:
+在**个人资料 → 提交工单 → 开源赏金**中选择**创建赏金**,并提供:
 
-- GitHub repository URL
-- Bounty title
-- Scope and target defect description
-- Acceptance and verification rules
-- Reward amount per fix
-- Number of reward slots
+- GitHub 仓库 URL
+- 赏金标题
+- 范围与目标缺陷描述
+- 验收与验证规则
+- 每个修复的奖励金额
+- 奖励名额数量
 
-Draft creation and edits do not charge and are not visible in the bounty market.
+创建与编辑草稿不扣费,也不会在赏金市场显示。
 
-### 3.2 Publish and Escrow Rewards
+### 3.2 发布并托管奖励
 
-Total cost at publish time:
+发布时的总成本:
 
-`reward per fix × number of slots + bounty fee`
+`每个修复的奖励 × 名额数量 + 赏金费用`
 
-Where:
+其中:
 
-- The reward pool enters system escrow and can only be used for approved transfers or refund of unused escrow when a project is closed.
-- The bounty fee is set by admin and publicly shown; it is calculated as a percentage of the total reward pool. Current default is `1%`. This fee snapshot is saved with the project. The fee is charged from the sponsor, not deducted from contributor rewards, and is not refunded when the project is closed.
-- Daily check-in rewards add directly to account balance and can be used to pay all or part of the bounty fee.
-- Publishing fails if sponsor balance is insufficient.
-- Platform owners or admins publishing their own project must also pay from their own balance; no special exemption applies.
+- 奖励池进入系统托管,只能用于已批准的转账,或在项目关闭时退还未使用的托管资金。
+- 赏金费用由管理员设置并公开显示,按奖励池总额的一定百分比计算,当前默认为 `1%`。该费用快照随项目保存。费用由赞助方承担,不从贡献者奖励中扣除,项目关闭时也不退还。
+- 每日签到奖励直接计入账户余额,可以用于支付全部或部分赏金费用。
+- 赞助方余额不足时发布失败。
+- 平台所有者或管理员发布自己的项目同样要使用自己的余额支付,没有特殊豁免。
 
-### 3.3 Manage an Active Bounty
+### 3.3 管理进行中的赏金
 
-After publishing, sponsors can:
+发布后,赞助方可以:
 
-- Pause: stop accepting new challengers temporarily while keeping existing accepted challenges.
-- Resume: reopen remaining slots.
-- View full lifecycle: participants, Issue/PR status, completion notes, review result, and balance ledger.
-- Cancel unsubmitted challenge: if a contributor accepted but did not submit, sponsor can cancel and release the slot.
-- Tip: pay goodwill for partial but valuable work by sending immediate tip from own balance.
-- Close: end bounty and refund any unused escrowed reward.
+- 暂停:暂时停止接受新的挑战者,已领取的任务继续保留。
+- 恢复:重新开放剩余名额。
+- 查看完整生命周期:参与者、Issue 与 PR 状态、完成说明、审核结果和余额流水。
+- 取消未提交的任务:贡献者已领取但未提交时,赞助方可以取消并释放名额。
+- 打赏:用自有余额即时打赏,肯定部分但有价值的工作。
+- 关闭:结束赏金并退还尚未使用的托管奖励。
 
-A bounty cannot be closed while challenges remain in `accepted` or `submitted` states.
+当仍有任务处于 `accepted` 或 `submitted` 状态时,赏金不能关闭。
 
-Sponsors may cancel only challenges without submissions. Submitted challenges must be approved or rejected first; cancellation is not a way to bypass review.
+赞助方只能取消没有提交的任务。已提交的任务必须先批准或拒绝;取消不能成为绕过审核的方式。
 
-Contributors may also withdraw voluntarily.
+贡献者也可以主动退出。
 
-After rejection there is a 7-day appeal window. During appeal and while no dispute is created yet, the affected reward slot and escrowed funds remain frozen; sponsor cannot immediately close and refund those resources.
+被拒绝后有 7 天申诉窗口。在申诉期间且尚未建立争议时,相关奖励名额与托管资金保持冻结,赞助方不能立即关闭并退还这些资源。
 
-Once a contributor files a dispute, freezing remains until administrator judgment. Frozen funds are released only after rejection is denied or the 7-day period expires with no appeal.
+一旦贡献者发起争议,冻结会持续到管理员裁决。只有在拒绝被否定,或 7 天期限届满且无人申诉时,冻结资金才会释放。
 
-### 3.4 Review and Transfer
+### 3.4 审核与转账
 
-After contributors submit results, sponsors must verify:
+贡献者提交结果后,赞助方必须核实:
 
-- Issue submissions describe a real and reproducible defect.
-- Issue includes affected project/module, reproducible steps, expected behavior, actual behavior, and impact.
-- For Issue+PR submissions, PR must link to the Issue.
-- PR only changes files needed to solve the bounty objective.
-- The fix is valid and includes reasonable tests or validation.
-- Issue/PR belongs to the bounty repository.
+- Issue 描述的是真实且可复现的缺陷。
+- Issue 包含受影响的项目或模块、复现步骤、预期行为、实际行为和影响。
+- 同时提交 Issue 与 PR 时,PR 必须引用该 Issue。
+- PR 只改动解决赏金目标所需的文件。
+- 修复有效,并包含合理的测试或验证。
+- Issue 或 PR 属于赏金仓库。
 
-Review outcomes:
+审核结果:
 
-- Approved and transferred: system deducts one reward and adds it directly to contributor balance. Operation is idempotent and cannot be duplicated.
-- Rejected: no reward paid and a 7-day appeal period starts. Rewards and slots stay escrowed during appeal.
+- 批准并转账:系统扣除一份奖励,直接计入贡献者余额。该操作幂等,不能重复执行。
+- 拒绝:不支付奖励,并开始 7 天申诉期。申诉期间奖励与名额保持托管状态。
 
-Escrow is only released and slot freed after appeal is denied by third-party admin or after 7 days with no appeal.
+只有在第三方管理员否定申诉,或 7 天内无人申诉之后,托管资金才会释放、名额才会重新可用。
 
-When all reward slots are approved, the project is marked complete automatically.
+当所有奖励名额都被批准后,项目自动标记为完成。
 
-Sponsors must give each contributor a `1-5` rating and public feedback. Score, comment, and contributor average rating are visible to both parties and dispute admins.
+赞助方必须给每位贡献者 `1-5` 的评分和公开反馈。评分、评论和贡献者平均分对双方以及争议管理员可见。
 
-## 4. How Contributors Participate
+## 4. 贡献者如何参与
 
-### 4.1 Accept a Challenge
+### 4.1 领取任务
 
-In bounty market, choose a project with available slots and click **Accept Challenge**, then provide your GitHub username.
+在赏金市场中选择仍有名额的项目,点击**领取挑战**,然后填写你的 GitHub 用户名。
 
-The system reserves one reward slot for that contributor. The same user cannot accept the same bounty multiple times.
+系统会为该贡献者预留一个奖励名额。同一用户不能重复领取同一个赏金。
 
-Sponsors cannot accept their own bounty.
+赞助方不能领取自己发布的赏金。
 
-### 4.2 Find and Record Real Defects
+### 4.2 查找并记录真实缺陷
 
-For Issue submissions, create a valid GitHub Issue in the bounty repository and include at least:
+提交 Issue 时,在赏金仓库中创建有效的 GitHub Issue,并至少包含:
 
-- affected project/module
-- reproducible steps
-- expected behavior
-- actual behavior
-- defect impact
+- 受影响的项目或模块
+- 复现步骤
+- 预期行为
+- 实际行为
+- 缺陷影响
 
-Do not create synthetic issues, duplicate issues, non-reproducible cases, or submit support-only questions as bounty issues.
+不要创建人为构造的 Issue、重复 Issue、无法复现的案例,也不要把仅求助的问题当作赏金 Issue 提交。
 
-### 4.3 Submit Focused Fixes
+### 4.3 提交聚焦的修复
 
-For PR submissions, ensure the PR:
+提交 PR 时,确保 PR:
 
-- links to the corresponding Issue when both are provided
-- touches only files required to fix the defect
-- adds meaningful automated tests, regression coverage, or verifiable validation steps
-- belongs to the bounty repository
+- 同时提交 Issue 时引用对应 Issue
+- 只改动修复该缺陷所需的文件
+- 增加有意义的自动化测试、回归覆盖或可验证的验证步骤
+- 属于赏金仓库
 
-A PR cannot be used to claim reward more than once.
+同一个 PR 不能重复用于领取奖励。
 
-### 4.4 Submit in System
+### 4.4 在系统中提交
 
-Go to **Open-Source Bounty -> Accepted Challenges** and submit:
+进入**开源赏金 → 已领取挑战**并提交:
 
-- GitHub Issue URL or GitHub PR URL (at least one; both optional)
-- optional completion note
+- GitHub Issue URL 或 GitHub PR URL(至少一个,两者都可选)
+- 可选的完成说明
 
-The system checks repository ownership and rejects repeated use of the same PR.
+系统会校验仓库归属,并拒绝重复使用同一个 PR。
 
-### 4.5 Direct Review and Settlement
+### 4.5 直接审核与结算
 
-After contributor submission, the project owner reviews Issue, PR, and notes directly.
+贡献者提交后,项目所有者直接审核 Issue、PR 和说明。
 
-After approval, reward is credited to contributor API balance for use with platform-supported models.
+批准后,奖励计入贡献者的 API 余额,可用于平台支持的模型。
 
-If rejected, contributor can dispute within 7 days. Reward and slot remain escrowed during this window.
+被拒绝时,贡献者可以在 7 天内提出争议。该窗口内奖励与名额保持托管。
 
-If appeal expires without action or is denied, challenge ends and slot becomes available again.
+申诉期满未处理或被否定后,任务结束,名额重新可用。
 
-Contributors may exit before review completion. After exit, the reserved slot is released. Time already invested by contributor is not compensated.
+贡献者可以在审核完成前退出。退出后预留名额会被释放,已经投入的时间不予补偿。
 
-After review completion, contributors can rate publisher/validator with `1-5` and public comment. Sponsor reputation appears in bounty market; contributor reputation appears on acceptance screen. Single review, comment text, average score, and count are visible to both parties.
+审核完成后,贡献者可以对发布方或验证方给出 `1-5` 评分和公开评论。赞助方信誉显示在赏金市场,贡献者信誉显示在领取页面。单条评价、评论内容、平均分和次数对双方可见。
 
-This reputation system creates social accountability against bad-faith rejections, unfair low scores, and low-quality delivery.
+这套信誉机制对恶意拒绝、不公平低分和低质量交付形成社会约束。
 
-## 5. Partial Work and Tipping
+## 5. 部分工作与打赏
 
-Tips are direct off-chain transfers outside bounty reward:
+打赏是赏金奖励之外的链下直接转账:
 
-- Sponsor can tip while challenge is active, including partial completion with meaningful progress.
-- Tip is deducted from payer balance and credited directly to contributor.
-- Tips do not reduce escrow reward and do not represent formal acceptance.
-- Tips are non-refundable once sent; the UI and MCP must confirm amount, recipient, and consequence before submission.
-- Admins can see cumulative tip records to understand prior fund movement between parties.
+- 赞助方可以在任务进行中打赏,包括对有明显进展的部分完成工作打赏。
+- 打赏从付款方余额扣除,直接计入贡献者。
+- 打赏不减少托管奖励,也不代表正式验收。
+- 打赏一经发出不可退还;UI 与 MCP 必须在提交前确认金额、接收方和后果。
+- 管理员可以查看累计打赏记录,了解双方之间的历史资金往来。
 
-## 6. Dispute Tickets and Third-Party Arbitration
+## 6. 争议工单与第三方仲裁
 
-When payment or acceptance is disputed, either party can open a ticket from challenge card by selecting **Open-Source Bounty Dispute**, and fill challenge ID, reason, title, and fact summary.
+当支付或验收出现争议时,任何一方都可以在任务卡片中选择**开源赏金争议**,填写任务 ID、原因、标题和事实摘要。
 
-Regular refund, technical, or billing tickets are still handled through email; bounty disputes are persisted in-system and reviewed by a third-party administrator.
+普通退款、技术或计费工单仍通过邮件处理;赏金争议会持久化在系统内,由第三方管理员审核。
 
-A rejected contributor must submit a dispute within 7 days of rejection. The system preserves escrowed reward and slot during this period, so sponsors cannot close/reconcile to remove appeal opportunity.
+被拒绝的贡献者必须在拒绝后 7 天内提交争议。系统在该期间保留托管奖励和名额,赞助方无法通过关闭或对账来消除申诉机会。
 
-Only one final dispute case per challenge can be opened by one party. Once resolved, the case cannot be reopened to re-freeze funds; the other party may file its own case only when no pending case exists.
+每个任务每方只能开启一个最终争议案件。案件解决后不能重新开启以再次冻结资金;只有在没有未决案件时,另一方才能提交自己的案件。
 
-Typical scenarios:
+典型情形:
 
-- Fix merged and public requirements met, but sponsor refuses payment.
-- Submission matches agreement yet is rejected.
-- Sponsor changes acceptance rules after publication.
-- Harassment, abuse, or other inappropriate behavior.
-- Other bounty disagreements requiring neutral review.
+- 修复已合并且满足公开要求,但赞助方拒绝付款。
+- 提交符合约定却被拒绝。
+- 赞助方在发布后更改验收规则。
+- 骚扰、滥用或其他不当行为。
+- 其他需要中立评审的赏金分歧。
 
-The system links disputes to canonical backend records instead of trusting URL query parameters. Linked records include project, repository, Issue, PR, original commit, acceptance notes, reward, tip, escrow flow, ratings, and comments.
+系统把争议关联到规范的后端记录,而不是信任 URL 查询参数。关联记录包括项目、仓库、Issue、PR、原始提交、验收说明、奖励、打赏、托管流水、评分和评论。
 
-During open dispute:
+争议开启期间:
 
-- Both parties see `waiting for third-party review` status and original submission.
-- Escrowed reward and reward slots remain frozen.
-- Existing ratings and trust history are visible.
-- Admin must preserve original acceptance reason, dispute statement, and final conclusion; conclusions cannot erase original evidence.
+- 双方看到“等待第三方评审”状态和原始提交。
+- 托管奖励与奖励名额保持冻结。
+- 已有评分与信任历史可见。
+- 管理员必须保留原始验收理由、争议陈述和最终结论;结论不能抹去原始证据。
 
-Admin may take two actions:
+管理员可以采取两种处置:
 
-- Pay from escrow: confirm Issue, PR, completion validity and transfer one reward from bounty escrow to contributor. Mark challenge as approved. This action is single-use.
-- Reject appeal: no formal reward transfer, record neutral admin conclusion. Rejection indicates current evidence is insufficient or claim is not established; it does not automatically imply bad-faith from claimant.
+- 从托管中支付:确认 Issue、PR 与完成的有效性,并从赏金托管中向贡献者转出一份奖励,把任务标记为已批准。该操作只能执行一次。
+- 驳回申诉:不进行正式奖励转账,记录中立的管理员结论。驳回表示当前证据不足或主张不成立,并不自动意味着申诉方恶意。
 
-An arbitrator must be a true third party. If an admin is the bounty owner or assignee for the same challenge, system blocks both pay and reject actions in the same database transaction.
+仲裁人必须是真正的第三方。如果管理员同时是同一任务的赏金所有者或受让人,系统会在同一数据库事务中阻止支付与驳回两种操作。
 
-Arbitration result, status, and timeline are visible to both parties. Pay/reject actions require explicit second confirmation in both web and MCP.
+仲裁结果、状态和时间线对双方可见。支付与驳回操作在 Web 和 MCP 中都要求显式二次确认。
 
-## 7. MCP End-to-End Support
+## 7. MCP 全流程支持
 
-Each user can generate a dedicated personal MCP token and access `/mcp` with Bearer Token.
+每个用户都可以生成专用的个人 MCP 令牌,并使用 Bearer Token 访问 `/mcp`。
 
-MCP follows MCP `2026-07-28` with stateless streamable HTTP. The database stores only a token hash; plaintext appears only once at generation or rotation and can be revoked any time.
+MCP 遵循 MCP `2026-07-28`,使用无状态可流式 HTTP。数据库只保存令牌哈希,明文只在生成或轮换时出现一次,并可随时吊销。
 
-The web app provides one-click copy prompts containing endpoint, MCP spec version, auth method, and operation principles.
+Web 应用提供一键复制的提示词,其中包含端点、MCP 规范版本、认证方式和操作准则。
 
-MCP covers full lifecycle: draft, publish, accept, submit evidence, accept, pay, reject, tip, rating, dispute open, query dispute, and admin adjudication.
+MCP 覆盖完整生命周期:草稿、发布、领取、提交证据、验收、支付、拒绝、打赏、评分、发起争议、查询争议以及管理员裁决。
 
-For sensitive actions involving balance, escrow, refunds, exits, public ratings, or dispute rulings, AI must display exact action, target, evidence, fee, and balance impact before explicit confirmation. Confirmation state is bound to user, tool, and normalized parameters with short life and one-time use.
+对于涉及余额、托管、退款、退出、公开评分或争议裁决的敏感操作,AI 必须在显式确认前展示确切的动作、目标、证据、费用以及余额影响。确认状态与用户、工具和规范化参数绑定,有效期很短且只能使用一次。
 
-Publishing, acceptance payment, rejection, closure refund, tip, rating, dispute creation/judgment, draft deletion, and withdrawal are all persisted within the same transaction as business mutation. If a response is lost, retries return committed results and do not duplicate charges, transfers, ratings, or freezes.
+发布、验收支付、拒绝、关闭退款、打赏、评分、争议创建与裁决、草稿删除和退出,都与业务变更在同一事务中持久化。如果响应丢失,重试会返回已提交结果,不会重复扣费、转账、评分或冻结。
 
-## 8. Balance and Refund Rules
+## 8. 余额与退款规则
 
-Assume sponsor sets:
+假设赞助方设置:
 
-- reward per fix: `20`
-- slots: `3`
-- admin bounty fee: `2.5%`
+- 每个修复的奖励:`20`
+- 名额:`3`
+- 管理员赏金费用:`2.5%`
 
-One-time publish charge:
+一次性发布扣费:
 
 `20 × 3 + 60 × 2.5% = 61.5`
 
-Funds movement:
+资金流向:
 
-- `60` enters reward escrow.
-- `1.5` is platform bounty fee and non-refundable.
-- `1.5` check-in reward can be paid from sponsor general balance.
-- Each approved fix transfers `20` from escrow to contributor.
-- If the project is closed after 1 approved fix, remaining `40` returns to sponsor balance.
-- Transferred rewards and platform bounty fee are non-refundable.
+- `60` 进入奖励托管。
+- `1.5` 为平台赏金费用,不予退还。
+- `1.5` 可以用签到奖励或赞助方通用余额支付。
+- 每个批准的修复从托管中转出 `20` 给贡献者。
+- 如果在 1 个修复获批后关闭项目,剩余 `40` 退回赞助方余额。
+- 已转出的奖励与平台赏金费用不予退还。
 
-System logs include fee records, escrow in/out, normal and dispute transfers, tip transfers, and escrow refunds.
+系统日志包含费用记录、托管转入转出、普通与争议转账、打赏转账以及托管退款。
 
-## 9. Status Definitions
+## 9. 状态定义
 
-### Project Status
+### 项目状态
 
-- Draft: not paid and not visible.
-- Published: visible in bounty market and accepting challengers.
-- Paused: no longer accepting new challengers.
-- Completed: all reward slots paid.
-- Closed: manually closed and unused escrow returned.
+- 草稿:未付款且不可见。
+- 已发布:在赏金市场可见并接受挑战者。
+- 已暂停:不再接受新的挑战者。
+- 已完成:所有奖励名额均已支付。
+- 已关闭:手动关闭,未使用的托管资金已退回。
 
-### Challenge Status
+### 任务状态
 
-- Accepted: contributor reserved a slot; no evidence submitted yet.
-- Submitted: Issue or PR and completion notes submitted, waiting review.
-- Approved: review passed and reward transferred.
-- Rejected: review failed; reward and slot remain escrowed for 7 days.
-- Withdrawn: contributor left challenge.
-- Sponsor canceled: sponsor canceled an unsubmitted challenge and slot is released; submitted challenges cannot enter this state.
+- 已领取:贡献者预留了名额,尚未提交证据。
+- 已提交:已提交 Issue 或 PR 以及完成说明,等待审核。
+- 已批准:审核通过且奖励已转出。
+- 已拒绝:审核未通过,奖励与名额继续托管 7 天。
+- 已退出:贡献者退出挑战。
+- 赞助方取消:赞助方取消了未提交的任务,名额被释放;已提交的任务不能进入该状态。
 
-### Dispute Status
+### 争议状态
 
-- Pending: evidence and funds frozen, waiting administrator verification.
-- Resolved by payment: admin confirmed and executed escrow transfer.
-- Rejected: admin did not approve and saved conclusion/time as visible record.
+- 待处理:证据与资金冻结,等待管理员核实。
+- 支付解决:管理员确认并执行了托管转账。
+- 已驳回:管理员未批准,并把结论与时间保存为可见记录。
 
-## 10. Reward Ineligibility Conditions
+## 10. 奖励不合格情形
 
-Examples include but are not limited to:
+示例包括但不限于:
 
-- Non-reproducible or no-impact issues.
-- Fake, forced, or inflated defects.
-- Already existing duplicate Issue.
-- PR unrelated to bounty or clearly out of scope.
-- Mechanical-only edits (formatting, dependency bumps, mass search/replace).
-- Missing tests or unverifiable fixes.
-- Issue/PR not in bounty repository.
-- Duplicate submission of same PR.
-- Spam, harassment, automated reward farming.
-- Code changes motivated solely by reward collection rather than solving real engineering problems.
+- 无法复现或无影响的 Issue。
+- 伪造、强行构造或夸大的缺陷。
+- 已存在的重复 Issue。
+- 与赏金无关或明显超出范围的 PR。
+- 纯机械改动(格式化、依赖升级、批量查找替换)。
+- 缺少测试或无法验证的修复。
+- Issue 或 PR 不在赏金仓库中。
+- 同一个 PR 重复提交。
+- 垃圾信息、骚扰、自动化刷奖励。
+- 动机只在于领取奖励而非解决真实工程问题的代码改动。
 
-Initial acceptance is sponsor responsibility. If dispute arises, third-party administrator decision based on system evidence is final.
+初次验收由赞助方负责。若产生争议,第三方管理员基于系统证据作出的裁决为最终结果。
 
-## 11. Short Promotional Copy
+## 11. 简短宣传文案
 
-Find a real bug, document reproducible steps, and submit both Issue and fix PR. After sponsor review, escrowed reward is transferred directly to your API balance.
+找到真实缺陷,记录可复现步骤,同时提交 Issue 与修复 PR。赞助方审核通过后,托管奖励直接转入你的 API 余额。
 
-Anyone can publish open-source bounties with their own balance, including maintainers. No default projects are pre-pinned by the platform: full reward is escrowed at publish time, and a low, admin-visible fee is charged. Daily check-in rewards can directly offset this fee. Partial-tip support, public two-sided reputation, and third-party dispute tickets are available. If a merged fix is rejected without basis, administrators can verify evidence and force escrow transfer.
-
+任何人都可以用自己的余额发布开源赏金,包括维护者。平台不会默认置顶任何项目:发布时全额奖励进入托管,并收取由管理员配置且公开可见的低额费用。每日签到奖励可以直接抵扣该费用。平台提供部分打赏、公开双向信誉和第三方争议工单。如果已合并的修复被无依据拒绝,管理员可以核实证据并强制从托管中转账。

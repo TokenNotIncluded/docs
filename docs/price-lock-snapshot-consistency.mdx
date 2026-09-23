@@ -1,44 +1,17 @@
 ---
-title: "Price-lock response consistency"
-description: "LMM API documentation: Price-lock response consistency"
+title: "价格锁响应一致性"
+sidebarTitle: "价格锁一致性"
+description: "价格锁响应与快照之间的一致性要求。"
 ---
 
-The Go provider's single-model `PUT /api/option/` lock operation returns an
-optional `pricing` object alongside `success`, `warnings` and `locked_models`.
-Its values use the existing JSON-encoded option format. The eleven keys are
-`ModelPriceLock`, `ModelPrice`, `ModelRatio`, `CompletionRatio`, `CacheRatio`,
-`CreateCacheRatio`, `ImageRatio`, `AudioRatio`, `AudioCompletionRatio`,
-`billing_setting.billing_mode` and `billing_setting.billing_expr`.
+Go 供应方的单模型 `PUT /api/option/` 锁定操作会在 `success`、`warnings` 和 `locked_models` 之外返回可选的 `pricing` 对象,其取值沿用既有的 JSON 编码配置格式。涉及的十一个键为 `ModelPriceLock`、`ModelPrice`、`ModelRatio`、`CompletionRatio`、`CacheRatio`、`CreateCacheRatio`、`ImageRatio`、`AudioRatio`、`AudioCompletionRatio`、`billing_setting.billing_mode` 和 `billing_setting.billing_expr`。
 
-The snapshot is captured from the database while the existing pricing-policy
-row is locked. It describes the pricing protected by that lock transaction,
-not a subsequent read of a possibly stale process cache. It is returned only
-when both the transaction and runtime publication succeed. Ordinary option
-writes do not attach it. No unrelated option, credential or user record is
-included. Existing permissions and locked-price write protection are unchanged.
+该快照在持有定价策略行锁的情况下直接从数据库捕获,描述的是该锁定事务所保护的定价,而不是之后可能读取到的进程陈旧缓存。只有在事务与运行时发布都成功时才会返回。普通配置项写入不会附带该快照,也不会包含无关配置项、凭据或用户记录。既有权限与锁定价格写入保护保持不变。
 
-The frontend still checks live price-lock support before each write. When the
-write returns a snapshot, it validates the complete key set, each encoded map,
-and the requested model's lock state. It then replaces only the cached pricing
-fields and uses those accepted values to discard the locked model's drafts.
-There is no additional GET between the committed response and that update.
-Unrelated query-cache changes are retained.
+前端在每次写入前仍会检查实时的价格锁支持能力。当写入返回快照时,前端会校验完整的键集合、每个编码映射以及所请求模型的锁定状态,然后只替换缓存中的定价字段,并用这些被接受的值丢弃已锁定模型的草稿。提交响应到这次更新之间不会再有额外的 GET 请求,无关的查询缓存变更会被保留。
 
-Older Go/Rust providers that omit `pricing` retain the follow-up GET path;
-that read must succeed, still advertise price-lock support and report the
-requested lock state. A present but malformed snapshot cannot fall back to a
-potentially stale GET. A write/refresh error invalidates cached options and
-returns no successful draft result: a transport error is not proof that a
-write was rolled back.
+省略 `pricing` 的旧 Go / Rust 供应方继续走后续 GET 路径;该读取必须成功,仍然声明价格锁支持,并报告所请求的锁定状态。存在但格式错误的快照不能回退到可能陈旧的 GET。写入或刷新出错会使缓存的配置项失效,并且不返回成功的草稿结果:传输错误不能证明写入已经回滚。
 
-`GET /api/option/` also waits for the complete process-local option publication,
-including periodic database reloads, before copying options and deriving
-`CompletionRatioMeta`. Existing endpoint filtering still excludes sensitive
-fields. This does not turn independently cached replicas into a global
-linearizable read service; another administrator may commit a later change.
+`GET /api/option/` 也会等待完整的进程内配置项发布(包括周期性的数据库重载)结束后再复制配置项并派生 `CompletionRatioMeta`。既有的端点过滤仍会排除敏感字段。这不会把各自缓存的副本变成全局可线性化的读取服务;其他管理员仍可能提交更晚的变更。
 
-No schema migration, version change, release or deployment is required by this
-source change. Existing installations need the updated Go binary before the
-snapshot response is available. The checked legacy path remains necessary
-when frontend and provider versions differ.
-
+本次源码变更不需要模式迁移、版本变更、发布或部署。已有安装需要更新后的 Go 二进制才能获得快照响应。当前端与供应方版本不一致时,保留检查过的旧路径仍是必要的。

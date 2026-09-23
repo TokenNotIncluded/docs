@@ -1,20 +1,14 @@
 ---
-title: "Server operations are manual"
-description: "LMM API documentation: Server operations are manual"
+title: "服务器运维以人工操作为准"
+sidebarTitle: "服务器运维"
+description: "服务器运维以人工操作为准的流程与检查项。"
 ---
 
-GitHub Actions no longer performs server diagnosis, repair, or deployment.
-The server operations workflow, incident-request trigger, and SSH transport have
-been removed. Production SSH secrets are not kept in GitHub Actions.
+GitHub Actions 不再执行服务器诊断、修复或部署。服务器运维工作流、事件请求触发器和 SSH 传输都已移除,生产环境 SSH 凭据不再存放在 GitHub Actions 中。
 
-Use operator-controlled SSH and the native deployment CLI for server work.
-Package-owned installations keep their signed package transaction; standalone
-systemd installations use the separate manual deployment path.
+服务器操作请使用由运维人员控制的 SSH 和原生部署 CLI。软件包管理的安装保留其签名软件包事务;独立的 systemd 安装使用单独的手动部署路径。
 
-- [Native transaction and acceptance](/docs/production-release-transaction)
-- [Manual systemd deployment](/docs/manual-systemd-deployment)
-- [Workflow responsibilities](/docs/ci-workflow-layout)
+- [原生事务与验收](/docs/production-release-transaction)
+- [手动 systemd 部署](/docs/manual-systemd-deployment)
 
-Historical operation logs and recovery state on the servers remain available for
-manual inspection. Removing workflow automation does not authorize deleting
-backups, transaction locks, or recovery evidence.
+服务器上的历史操作日志和恢复状态仍可人工检查。移除工作流自动化并不代表可以删除备份、事务锁或恢复证据。

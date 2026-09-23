@@ -1,0 +1,54 @@
+---
+title: "文档索引"
+sidebarTitle: "文档索引"
+description: "LMM API 的接入、端点、运维、产品和法务文档总索引。"
+icon: "list"
+---
+
+本站是上游 `api.lmm.best` 文档集的完整站点。侧边栏只有一个,按标题分成五个分组,不再使用顶部标签页。
+
+## 分组索引
+
+<AccordionGroup>
+  <Accordion title="开始使用">
+    先完成接入,再查端点。
+
+    - [总览](/introduction):站点结构和推荐阅读路径。
+    - [认证与会话](/docs/authentication):面板访问令牌、刷新 Cookie、PAT 和会话限制。
+    - [API 总览](/docs/api-reference):两套 OpenAPI 契约、基础地址和鉴权方式。
+    - [启动设置](/docs/setup-startup):启动时的设置记录持久化。
+    - [产品术语](/docs/product-terminology):界面术语与导航约定。
+  </Accordion>
+  <Accordion title="API 端点">
+    端点页面由 `docs/openapi/relay.json` 和 `docs/openapi/api.json` 自动生成,每个页面都带可交互的请求构造器。
+
+    - 中继 API（模型与媒体）:模型列表、Chat、Responses、Messages、Gemini、图像、视频、音频、嵌入、重排序和审核。
+    - 管理 API（面板与运维）:系统、登录注册、OAuth、用户、充值、两步验证、渠道、令牌、兑换码、日志、统计、分组、任务、供应商、模型和系统设置。
+    - 端点专题:[Responses 兼容性](/docs/responses-tool-compatibility)、[只读查询](/docs/read-only-query-api)、[图像异步轮询](/docs/ali-image-polling)、[Pi 远程控制](/docs/pi-remote-control-api)。
+  </Accordion>
+  <Accordion title="平台运维">
+    发布、升级、数据库、缓存、诊断、备份和事件恢复。生产变更时按部署顺序阅读。
+
+    - 部署与发布:[CLI 部署契约](/docs/backend-cli-deployment-contract)、[手动部署](/docs/manual-systemd-deployment)、[三节点部署](/docs/three-node-deployment)、[无缝升级](/docs/seamless-upgrades)。
+    - 工程与运行时:[发布架构](/docs/release-architecture)、[CI 工作流](/docs/ci-workflow-layout)、[Rust 蓝绿发布](/docs/rust-blue-green)、[Rust / Go 一致性](/docs/rust-go-parity)。
+    - 数据与诊断:[数据库迁移](/docs/postgresql-migration)、[PostgreSQL 切换](/docs/postgresql-cutover)、[Valkey](/docs/valkey-lmm-api)、[Go 诊断](/docs/pprof-diagnostics)、[服务器运维](/docs/server-ops)。
+    - 事件与恢复:[Incident 343 恢复](/docs/incident-343-forward-recovery)、[恢复退役记录](/docs/incidents/2026-09-20-recovery-retirement)、[上游评审](/docs/new-api-upstream-review-2026-09-09)。
+  </Accordion>
+  <Accordion title="产品与体验">
+    计费、助手、渠道和体验设计。
+
+    - 计费与增长:[价格锁](/docs/model-price-locks)、[支付金额](/docs/payment-money-contract)、[推荐奖励](/docs/referral-rewards)、[赏金指南](/docs/open-source-bounties)。
+    - 助手与渠道:[管理操作与权限](/docs/assistant-admin-control)、[人工技术支持](/docs/assistant-human-support)、[助手注册保护](/docs/security/assistant-registration-guard)、[渠道设置](/docs/channel/other_setting)。
+    - 工具与体验:[工具市场实施](/docs/tool-market-implementation)、[体验实施清单](/docs/product-experience-rollout)、[前端设计](/docs/frontend-design)。
+  </Accordion>
+  <Accordion title="术语与政策">
+    术语表与法律条款。
+
+    - 术语与本地化:[术语词汇表](/docs/translation-glossary)、[法语术语](/docs/translation-glossary.fr)、[俄语术语](/docs/translation-glossary.ru)。
+    - 法律与政策:[用户协议](/docs/legal/user-agreement)、[隐私政策](/docs/legal/privacy-policy)、[服务条款](/docs/legal/terms-of-service)。
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  两份源规范为 `docs/openapi/api.json`（管理 API）和 `docs/openapi/relay.json`（中继 API），在 `docs.json` 中通过 `api.openapi` 和导航的 `openapi` 字段注册。修改规范不需要手写端点页面。
+</Info>

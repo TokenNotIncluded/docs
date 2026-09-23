@@ -1,6 +1,8 @@
 ---
 title: "工具市场实施记录"
-description: "LMM API documentation: 工具市场实施记录"
+sidebarTitle: "工具市场实施"
+description: "工具市场的实施记录与上线范围。"
+icon: "list-check"
 ---
 
 ## 第二批：Remote、元 MCP 和页面已接通
@@ -138,4 +140,3 @@ description: "LMM API documentation: 工具市场实施记录"
 新增模型与路由测试覆盖价格快照、整数边界、重复调用、原子划转失败回滚、冻结计入多级预算、模型与工具余额竞争、授权撤销、私有目录、版本变更、未校验禁止发布、管理员暂停、跨账户读取以及伪造状态不能结算。
 
 并发用例使用 SQLite 单连接的事务串行化，配合 Go race 检查；它们验证应用层防重和数据竞争，不代替 PostgreSQL 多连接锁竞争、真实远端执行与生产故障恢复验证。
-

@@ -1,21 +1,14 @@
 ---
-title: "On-demand Go diagnostics"
-description: "LMM API documentation: On-demand Go diagnostics"
+title: "按需 Go 诊断"
+sidebarTitle: "Go 诊断"
+description: "按需开启 Go pprof 诊断的入口与安全约束。"
 ---
 
-`ENABLE_PPROF=true` enables the existing pprof HTTP endpoints. The defaults stay
-`PPROF_BIND_ADDRESS=127.0.0.1` and `PPROF_PORT=8005`; only the exact loopback
-addresses `127.0.0.1` and `::1` are accepted. The endpoint mux and request-header
-timeout are unchanged.
+`ENABLE_PPROF=true` 启用已有的 pprof HTTP 端点,默认仍为 `PPROF_BIND_ADDRESS=127.0.0.1` 和 `PPROF_PORT=8005`,只接受精确的回环地址 `127.0.0.1` 和 `::1`。端点 mux 与请求头超时保持不变。
 
-The old automatic high-CPU sampler (`common.Monitor`) has been removed. Enabling
-pprof no longer polls CPU usage or creates timestamped files under `./pprof`.
-This removes the unchecked CPU sample/panic path, unbounded profile accumulation
-and file descriptor leak on failed profile starts. Out-of-tree callers of the
-removed Go helper must use the on-demand HTTP interface instead. Existing
-profile files are not deleted by the application.
+旧的高 CPU 自动采样器(`common.Monitor`)已移除。启用 pprof 不再轮询 CPU 使用率,也不再在 `./pprof` 下创建带时间戳的文件。这同时移除了未受检查的 CPU 采样与 panic 路径、无上限的 profile 累积,以及 profile 启动失败时的文件描述符泄漏。源码树之外的调用方如果依赖已移除的 Go 辅助函数,应改用按需的 HTTP 接口。应用不会删除已有的 profile 文件。
 
-For a deliberate local capture, choose the output location and permissions:
+需要本地抓取时,自行指定输出位置和权限:
 
 ```sh
 umask 077
@@ -23,20 +16,8 @@ curl --fail 'http://127.0.0.1:8005/debug/pprof/profile?seconds=10' -o cpu.pprof
 go tool pprof cpu.pprof
 ```
 
-Profiles can contain operational details. Store or remove them deliberately;
-do not expose the diagnostic port publicly. There is no automatic retention
-policy because the application no longer creates these profile files.
+profile 可能包含运行细节。请有意地保存或删除它们,不要把诊断端口暴露到公网。由于应用不再创建这些 profile 文件,系统不提供自动保留策略。
 
-The diagnostic server now belongs to the application's runtime-loop registry.
-On cancellation, request contexts are canceled, allowing pprof CPU/trace captures
-to stop. HTTP shutdown gets a five-second drain budget (below the ten-second
-loop budget), then force-closes connections if necessary. The serving goroutine
-is joined and the listener is closed on cancellation or a serving error. This
-also applies to startup paths that stop the runtime registry before returning.
-Pyroscope configuration and the application's normal HTTP listener are unchanged.
+诊断服务器现在纳入应用的运行时循环注册表。取消时请求上下文被取消,使 pprof 的 CPU 与 trace 抓取能够停止。HTTP 关停获得五秒排空预算(低于十秒的循环预算),必要时再强制关闭连接。取消或发生服务错误时,服务 goroutine 会被回收,监听器会被关闭。这条路径同样适用于在返回前停止运行时注册表的启动流程。Pyroscope 配置与应用正常的 HTTP 监听保持不变。
 
-The regression suite covers request cancellation, idle/listening sockets,
-interruption of a real long-running CPU profile, bounded forced closure,
-listen/serve errors and canceled startup. It does not exercise a production
-process or production profile data.
-
+回归套件覆盖请求取消、空闲与监听中的 socket、真实长时 CPU profile 的中断、有界强制关闭、监听与服务错误以及被取消的启动。它不会涉及生产进程或生产 profile 数据。

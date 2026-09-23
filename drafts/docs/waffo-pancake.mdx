@@ -1,6 +1,8 @@
 ---
 title: "Waffo Pancake（测试环境）"
-description: "LMM API documentation: Waffo Pancake（测试环境）"
+sidebarTitle: "Waffo Pancake"
+description: "Waffo Pancake 测试环境的接入方式与限制。"
+icon: "test-tube-2"
 ---
 
 当前 Go 后端使用官方 `github.com/waffo-com/waffo-pancake-sdk-go` 完成服务端集成。仓库根目录另外安装官方 `@waffo/pancake-ts`，仅供服务端 smoke runner 使用；不要把它放进 Web bundle：Waffo 的私钥只能留在服务端。
@@ -116,4 +118,3 @@ SDK 默认的 45 分钟签名重放窗口。可通过
 cd apps/api-go
 go test ./model ./service ./controller -run 'WaffoPancake|PaymentWebhook' -count=1
 ```
-

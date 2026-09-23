@@ -1,20 +1,19 @@
 ---
-title: "Read-only quota and price queries"
-description: "LMM API documentation: Read-only quota and price queries"
+title: "只读配额与价格查询"
+sidebarTitle: "只读查询"
+description: "只读配额与价格的查询接口与限流规则。"
 ---
 
-Use the site's API origin (the same origin used by your client), over HTTPS.
-These endpoints do not generate model output, recharge an account, change keys,
-or deduct quota. Never embed a real key in a public page, URL, screenshot or log.
+使用站点的 API 源站(与客户端一致的源站),并走 HTTPS。这些端点不会生成模型输出、不会为账户充值、不会修改密钥,也不会扣减额度。绝不要把真实密钥放进公开页面、URL、截图或日志。
 
-## Quota: `GET /v1/usage`
+## 配额:`GET /v1/usage`
 
 ```sh
 curl https://api.lmm.best/v1/usage \
   -H 'Authorization: Bearer API_KEY'
 ```
 
-The successful response is a JSON object, without a `data` wrapper:
+成功响应是一个 JSON 对象,不带 `data` 包装:
 
 ```json
 {
@@ -33,75 +32,42 @@ The successful response is a JSON object, without a `data` wrapper:
 }
 ```
 
-- **Scope is one API key**, not the shared account wallet or subscription balance.
-  A key may have more allowance than the account can currently spend.
-- Amounts are USD, converted from internal quota by the configured quota-per-USD
-  factor. They are not internal quota integers. No display-currency conversion is applied.
-- `remaining` is the persisted key allowance, `used_total` is its cumulative usage,
-  and `total_quota = remaining + used_total`; changing a key's allowance changes
-  this total. It is not the account's lifetime recharge amount.
-- With `unlimited: true`, `remaining` and `total_quota` are JSON `null`.
-  Unlimited means the key has no own cap; the account is still subject to billing.
-- `used_today` sums this key's retained consumption logs since 00:00 UTC.
-  It is `null` when consumption logging is disabled. Deleted logs and logging
-  interruptions can make it incomplete. It is not an accounting reconciliation record.
-- `updated_at` is the snapshot query time in Unix seconds, not the last purchase
-  or use time. Queued accounting/cache updates and asynchronous logs may lag;
-  the two data stores are not read in one cross-database transaction.
-- Exhausted keys may query their remaining quota. Invalid, deleted, disabled and
-  expired keys cannot. User bans and key IP restrictions are respected. Only
-  `Authorization: Bearer ...` is accepted; no query-string keys or channel suffixes.
-- No response contains the key, account email, or other keys' consumption.
-- Limit: 30 queries per minute per account, across its keys and these query APIs.
-  Poll once per minute; on 429 respect `Retry-After` and use backoff.
+- **作用域是单个 API 密钥**,不是共享的账户钱包或订阅余额。一个密钥的额度可能多于账户当前可支出的金额。
+- 金额以美元表示,由配置的“每美元额度”系数从内部额度换算而来,不是内部额度整数,也不做显示货币换算。
+- `remaining` 是持久化的密钥额度,`used_total` 是其累计用量,`total_quota = remaining + used_total`;修改密钥额度会改变该总量,它不是账户的累计充值金额。
+- `unlimited: true` 时 `remaining` 与 `total_quota` 为 JSON `null`。无限制表示该密钥自身没有上限,账户仍受计费约束。
+- `used_today` 汇总该密钥自 UTC 00:00 起的保留消费日志。消费日志关闭时为 `null`。被删除的日志和记录中断会使其不完整,它不是会计对账记录。
+- `updated_at` 是快照查询时间(Unix 秒),不是上次购买或使用时间。排队中的计费与缓存更新以及异步日志可能滞后,两个数据存储不是在同一跨库事务中读取的。
+- 额度耗尽的密钥仍可查询剩余额度;无效、已删除、已禁用和已过期的密钥不可以。用户封禁与密钥 IP 限制同样生效。只接受 `Authorization: Bearer ...`,不接受查询串密钥或渠道后缀。
+- 响应中不包含密钥、账户邮箱或其他密钥的用量。
+- 限制:每个账户每分钟 30 次查询,覆盖其所有密钥与本类查询接口。请每分钟轮询一次;遇到 429 时遵守 `Retry-After` 并退避。
 
-| Status | Meaning |
+| 状态码 | 含义 |
 | --- | --- |
-| 200 | Valid key and successful read |
-| 401 | Missing, invalid, disabled, expired or deleted key/account |
-| 403 | Client IP is not allowed by the key |
-| 429 | Query rate exceeded (`Retry-After` seconds) |
-| 500 | Database or quota configuration unavailable; do not interpret as zero balance |
+| 200 | 密钥有效且读取成功 |
+| 401 | 密钥或账户缺失、无效、已禁用、已过期或已删除 |
+| 403 | 客户端 IP 不被该密钥允许 |
+| 429 | 超过查询频率(`Retry-After` 秒) |
+| 500 | 数据库或额度配置不可用,不要当作零余额 |
 
-Authentication/read failures use `{"valid":false,"error":"invalid_api_key"}`
-or another generic error code. The shared rate limiter may use its standard
-error envelope; rely on HTTP status and `Retry-After`.
+认证或读取失败会返回 `{"valid":false,"error":"invalid_api_key"}` 或其他通用错误码。共享限流器可能使用其标准错误封装,请以 HTTP 状态码和 `Retry-After` 为准。
 
-## Prices: `GET /v1/pricing?model=gpt-4o`
+## 价格:`GET /v1/pricing?model=gpt-4o`
 
 ```sh
 curl 'https://api.lmm.best/v1/pricing?model=gpt-4o' \
   -H 'Authorization: Bearer API_KEY'
 ```
 
-Omit `model` to list the key's configured models. Normal relay authentication
-applies (including key state, allowance, IP and developer access restrictions).
-This endpoint does not reserve quota or call an upstream model.
+省略 `model` 会列出该密钥已配置的模型。适用常规中继认证(包括密钥状态、额度、IP 和开发者访问限制)。该端点不预留额度,也不调用上游模型。
 
-The response has `success`, `data` (one entry per model and permitted routing
-group), `updated_at`, `scope: "token"`, `price_basis: "configured_base_rates"`
-and `final_cost_depends_on_usage: true`. Automatic-group keys may see several
-entries for the same model; these are alternatives, not additive charges.
-Token model restrictions and usable groups limit the results. Unknown and
-inaccessible models both return 404. Oversized model queries return 400;
-temporarily unavailable pricing returns 503.
+响应包含 `success`、`data`(每个模型与每个允许的路由分组一条)、`updated_at`、`scope: "token"`、`price_basis: "configured_base_rates"` 以及 `final_cost_depends_on_usage: true`。自动分组密钥可能看到同一模型的多个条目,它们是备选路由,不是叠加收费。令牌的模型限制与可用分组会限制返回结果。未知模型与无权访问的模型都返回 404。过大的模型查询返回 400;定价临时不可用返回 503。
 
-Each entry includes `model`, `group`, `currency: "USD"`, `billing_mode`, `unit`,
-effective `group_ratio` (including the user's special group ratio and trust
-discount), and `trust_discount_ratio`.
+每个条目包含 `model`、`group`、`currency: "USD"`、`billing_mode`、`unit`、生效的 `group_ratio`(含用户的特殊分组倍率与信任折扣)以及 `trust_discount_ratio`。
 
-- `per_token` / `million_tokens`: `input_price` and `output_price` are USD per
-  million text tokens. The configured `model_ratio`, `completion_ratio`,
-  `cache_ratio` and `create_cache_ratio` retain their billing meanings.
-- `per_request` / `request`: `request_price` is the configured USD base price
-  per request after the group/trust factor.
-- `tiered_expr` / `expression`: `billing_expression` is the live billing rule;
-  no false fixed price is returned for a usage-dependent expression.
-- Returned numbers are configured rates, not a locked quote. Images, audio,
-  tools, resolution/quality and cache-duration policies can add or alter charges.
-  Final cost is determined by the actual request and usage.
+- `per_token` / `million_tokens`:`input_price` 与 `output_price` 是每百万文本 token 的美元价格。配置的 `model_ratio`、`completion_ratio`、`cache_ratio` 和 `create_cache_ratio` 保留其计费含义。
+- `per_request` / `request`:`request_price` 是应用分组与信任系数后配置的每请求美元基础价。
+- `tiered_expr` / `expression`:`billing_expression` 是实时计费规则;对依赖用量的表达式不会返回虚假的固定价格。
+- 返回的数字是配置倍率,不是锁定报价。图像、音频、工具、分辨率与质量以及缓存时长策略都可能增加或改变费用。最终成本由实际请求与用量决定。
 
-Price configuration is read from the same live settings used for billing.
-The available-model catalog is cached; newly enabled models can appear after
-the normal catalog refresh. Responses are `Cache-Control: no-store`.
-
+价格配置读取自与计费相同的实时设置。可用模型目录有缓存,新启用的模型会在常规目录刷新后出现。响应使用 `Cache-Control: no-store`。

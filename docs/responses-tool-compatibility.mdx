@@ -1,6 +1,7 @@
 ---
 title: "Responses 工具兼容性"
-description: "LMM API documentation: Responses 工具兼容性"
+sidebarTitle: "Responses 兼容性"
+description: "Responses 端点工具调用的兼容范围与差异。"
 ---
 
 Codex 使用 Responses 协议。客户端保持 `wire_api = "responses"`，API 地址使用站点的 `/v1` 基址。配置与协议依据：[Codex 配置参考](https://learn.chatgpt.com/docs/config-file/config-reference)、[工具搜索](https://developers.openai.com/api/docs/guides/tools-tool-search)、[命名空间函数](https://developers.openai.com/api/docs/guides/function-calling)。
@@ -30,4 +31,3 @@ Codex 使用 Responses 协议。客户端保持 `wire_api = "responses"`，API �
 - 自定义工具、托管工具以及有状态字段仍受原有转换器能力限制。此变更没有新增 Claude/AWS/Vertex 渠道的原生 Responses 路由，也没有扩展 Rust 预览后端。
 - 命名空间或客户端搜索转换需要复用同一份 `convmeta.Meta` 执行请求转换、响应转换和流结束处理。Go 服务已有该上下文；独立 relaykit 调用方可使用 `convmeta.Values`。
 - 回归测试使用本地协议数据与模拟上游，覆盖转发和工具调用往返；线上客户端、渠道配置及具体上游模型仍需部署后联调。
-

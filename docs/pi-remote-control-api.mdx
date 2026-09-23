@@ -1,48 +1,29 @@
 ---
-title: "Pi Remote Control API v1"
-description: "LMM API documentation: Pi Remote Control API v1"
+title: "Pi 远程控制 API v1"
+sidebarTitle: "Pi 远程控制"
+description: "Pi 远程控制 API v1 的端点、鉴权与错误码。"
 ---
 
-`/api/remote-control/v1/pi` is an authenticated, ephemeral relay for a Pi
-plugin and its browser controller. It stores data only in the current API
-process memory. Restarting the API or reaching the two-minute heartbeat TTL
-removes a session and its messages.
+`/api/remote-control/v1/pi` 是面向 Pi 插件及其浏览器控制端的、需要认证的临时中继,只把数据保存在当前 API 进程内存中。重启 API 或达到两分钟心跳 TTL 都会删除会话及其消息。
 
-The server never receives a PIN or plaintext. The v1 client encryption contract
-is fixed so browser and Pi implementations are interoperable:
+服务端永远不会收到 PIN 或明文。v1 客户端加密契约是固定的,以保证浏览器与 Pi 实现互通:
 
-- Encode the PIN exactly as entered with UTF-8. Do not trim or normalize it.
-- Derive a non-exportable AES-256 key with WebCrypto PBKDF2, SHA-256, 210,000
-  iterations, and UTF-8 salt `lmm-pi-remote:v1:<session_id>`.
-- Encrypt with AES-GCM, a new cryptographically random 12-byte nonce for every
-  payload, and a 128-bit authentication tag. WebCrypto appends the tag to the
-  ciphertext returned by `subtle.encrypt`.
-- Encode the nonce and ciphertext-plus-tag as unpadded base64url.
-- Metadata additional authenticated data is UTF-8
-  `lmm-pi-remote:v1:metadata:<session_id>:<device_id>`.
-- Message additional authenticated data is UTF-8
-  `lmm-pi-remote:v1:message:<session_id>:<sender>`.
+- 按用户输入的原始形态使用 UTF-8 编码 PIN,不要裁剪或规范化。
+- 使用 WebCrypto PBKDF2、SHA-256、210,000 次迭代和 UTF-8 盐 `lmm-pi-remote:v1:<session_id>` 派生不可导出的 AES-256 密钥。
+- 使用 AES-GCM 加密,每个载荷都使用新的密码学随机 12 字节 nonce 和 128 位认证标签。WebCrypto 会把标签附加到 `subtle.encrypt` 返回的密文之后。
+- 把 nonce 与“密文加标签”编码为不带填充的 base64url。
+- 元数据的附加认证数据为 UTF-8 字符串 `lmm-pi-remote:v1:metadata:<session_id>:<device_id>`。
+- 消息的附加认证数据为 UTF-8 字符串 `lmm-pi-remote:v1:message:<session_id>:<sender>`。
 
-Metadata plaintext is a UTF-8 JSON object. It may contain `version` (`1`),
-`started_at`, `runtime`, `directory`, and `summary`. Each message plaintext is a
-UTF-8 JSON object containing `type` and the type-specific fields such as
-`content`, `question`, `options`, `tool_name`, or `arguments`. The relay's
-`sequence`, `sender`, and `created_at` remain outside the ciphertext, but
-`sender` is authenticated by the message AAD.
+元数据明文是一个 UTF-8 JSON 对象,可以包含 `version`(`1`)、`started_at`、`runtime`、`directory` 和 `summary`。每条消息的明文是包含 `type` 以及类型相关字段(`content`、`question`、`options`、`tool_name`、`arguments` 等)的 UTF-8 JSON 对象。中继的 `sequence`、`sender` 和 `created_at` 保留在密文之外,但 `sender` 由消息附加认证数据认证。
 
-The browser keeps the entered PIN and derived key only in the mounted session
-view. It never sends them to the API or writes them to browser storage. Locking
-or switching sessions unmounts that view and drops its key and decrypted query
-cache.
+浏览器只在已挂载的会话视图中保留输入的 PIN 与派生密钥,绝不发送给 API,也不写入浏览器存储。锁定或切换会话会卸载该视图,并丢弃其中的密钥与已解密查询缓存。
 
-All endpoints require normal user authentication. Sessions are keyed by both
-the authenticated user ID and `session_id`; one user cannot list or read
-another user's sessions even when the session ID is known.
+所有端点都需要常规用户认证。会话以已认证用户 ID 与 `session_id` 共同作为键;即使知道会话 ID,一个用户也无法列出或读取另一个用户的会话。
 
-## Endpoints
+## 端点
 
-- `PUT /api/remote-control/v1/pi/sessions/:session_id` upserts a plugin
-  heartbeat. Body:
+- `PUT /api/remote-control/v1/pi/sessions/:session_id` 更新插件心跳,请求体:
 
   ```json
   {
@@ -51,22 +32,14 @@ another user's sessions even when the session ID is known.
   }
   ```
 
-- `GET /api/remote-control/v1/pi/sessions` lists the caller's active encrypted
-  session snapshots.
-- `POST /api/remote-control/v1/pi/sessions/:session_id/messages` appends an
-  opaque message. Body:
+- `GET /api/remote-control/v1/pi/sessions` 列出调用方活跃的加密会话快照。
+- `POST /api/remote-control/v1/pi/sessions/:session_id/messages` 追加一条不透明消息,请求体:
 
   ```json
   {"sender": "plugin", "nonce": "...", "ciphertext": "..."}
   ```
 
-  `sender` is `plugin` or `controller` and is routing metadata, not a trusted
-  identity assertion.
-- `GET /api/remote-control/v1/pi/sessions/:session_id/messages?after=12`
-  returns messages whose server-assigned `sequence` is greater than `after`.
+  `sender` 取值为 `plugin` 或 `controller`,属于路由元数据,不是可信身份断言。
+- `GET /api/remote-control/v1/pi/sessions/:session_id/messages?after=12` 返回服务端分配的 `sequence` 大于 `after` 的消息。
 
-Metadata plaintext is limited to a 16 KiB ciphertext envelope and messages to
-64 KiB each. A session retains its newest 128 messages. IDs are 8-64 ASCII
-letters, digits, `_`, or `-`. The service validates only envelope syntax and
-size; it does not decrypt or interpret ciphertext.
-
+元数据明文限制在 16 KiB 密文信封内,每条消息限制 64 KiB。会话保留最新的 128 条消息。ID 为 8 到 64 个 ASCII 字母、数字、`_` 或 `-`。服务只校验信封语法与大小,不解密也不解释密文。

@@ -1,86 +1,86 @@
 ---
-title: "Translation Glossary"
-description: "LMM API documentation: Translation Glossary"
+title: "产品术语翻译词汇表"
+sidebarTitle: "术语词汇表"
+description: "产品术语的中英对照与统一译法。"
 ---
 
-This glossary provides reference translations for key project terminology to keep documentation and localization consistent.
+本词汇表给出关键项目术语的参考译法,用于保持文档与本地化的一致性。
 
-## Core Concepts
+## 核心概念
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Ratio | Multiplier used in price calculation | Use in all pricing logic and billing references. |
-| Token | API credential or model input text unit | If possible, prefer context-specific labels such as **API token**, **text token**, or **access token**. |
-| Channel | API provider entry point | Used for provider integration and traffic routing. |
-| Group | User or token classification | Affects quota and pricing policy. |
-| Quota | Available service quota | Numeric service entitlement for a user account. |
+| Ratio | 价格计算中使用的倍率 | 所有定价逻辑与计费说明统一使用该词。 |
+| Token | API 凭据或模型输入的文本单位 | 条件允许时优先使用更具体的称呼,例如 **API 令牌**、**文本 token** 或 **访问令牌**。 |
+| Channel | API 供应方入口 | 用于供应方集成与流量路由。 |
+| Group | 用户或令牌的分类 | 影响额度与定价策略。 |
+| Quota | 可用服务额度 | 用户账户所拥有的数值化服务权益。 |
 
-## Model Related
+## 模型相关
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Prompt | Input content for a model | In user-facing UI, this is usually prompt-style text. |
-| Completion | Model output | Output returned by the model. |
-| Input | Data sent to a model | Includes prompt-like and request-context payloads. |
-| Output | Data returned by a model | Includes completion and structured output payloads. |
-| Model Ratio | Pricing ratio for each model | Used to scale usage costs by model family. |
-| Completion Ratio | Price multiplier applied to output | Separate coefficient from input ratio. |
-| Price per call | Cost per request | Flat charge model. |
-| Pay-as-you-go | Usage-based billing | Charged according to consumed units. |
-| Pay-per-view | Charge per invocation | Alternate naming used in legacy UI text. |
+| Prompt | 模型的输入内容 | 在面向用户的界面中通常指提示词形式的文本。 |
+| Completion | 模型输出 | 模型返回的结果。 |
+| Input | 发送给模型的数据 | 包含提示词类内容与请求上下文载荷。 |
+| Output | 模型返回的数据 | 包含补全结果与结构化输出载荷。 |
+| Model Ratio | 每个模型的定价倍率 | 用于按模型族缩放用量成本。 |
+| Completion Ratio | 应用于输出的价格倍率 | 与输入倍率分开的系数。 |
+| Price per call | 单次请求费用 | 固定计费模式。 |
+| Pay-as-you-go | 按用量计费 | 按消耗单位计费。 |
+| Pay-per-view | 按调用计费 | 旧界面文案中使用过的另一种说法。 |
 
-## User Management
+## 用户管理
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Root User | Highest-privilege account | Usually operator-level admin role. |
-| Admin User | System administrator | Can manage users, policies, and platform settings. |
-| Normal User | Standard account | No elevated privileges. |
+| Root User | 最高权限账户 | 通常是运维级管理员角色。 |
+| Admin User | 系统管理员 | 可以管理用户、策略和平台设置。 |
+| Normal User | 普通账户 | 无额外权限。 |
 
-## Recharge & Redemption
+## 充值与兑换
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Top Up | Add quota to account | Increases available balance/credits. |
-| Redemption Code | Code redeemable for quota | Also used for coupon-like promotions. |
+| Top Up | 为账户增加额度 | 增加可用余额或点数。 |
+| Redemption Code | 可兑换额度的码 | 也用于类似优惠券的促销场景。 |
 
-## Channel Management
+## 渠道管理
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Channel | Provider integration channel | Defines where API requests are routed. |
-| Key | API access key | Prefer **API Key** in UI text when used for authentication. |
-| Priority | Channel selection priority | Higher values determine preferred routing. |
-| Weight | Load balance weight | Used for distribution across channels. |
-| Proxy | Proxy server address | May include protocol and host validation rules. |
-| Model Mapping | Request model remapping | Rewrites model name in request body. |
+| Channel | 供应方集成渠道 | 决定 API 请求的路由去向。 |
+| Key | API 访问密钥 | 用于认证时,界面文案优先使用 **API 密钥**。 |
+| Priority | 渠道选择优先级 | 数值越高越优先路由。 |
+| Weight | 负载均衡权重 | 用于在多个渠道之间分流。 |
+| Proxy | 代理服务器地址 | 可能包含协议与主机校验规则。 |
+| Model Mapping | 请求模型重映射 | 改写请求体中的模型名称。 |
 
-## Security Related
+## 安全相关
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Two-Factor Authentication | Additional account verification step | Usually shown as 2FA. |
-| 2FA | Two-Factor Authentication | Use uppercase acronym consistently. |
+| Two-Factor Authentication | 额外的账户验证步骤 | 通常简写为 2FA。 |
+| 2FA | 双重验证 | 统一使用大写缩写。 |
 
-## Billing Related
+## 计费相关
 
-| English Term | Meaning | Notes |
+| 英文术语 | 含义 | 说明 |
 |--------------|---------|-------|
-| Ratio | Price multiplier | Same as Multiplier in many contexts. |
-| Multiplier | Price multiplier | Use carefully with ratio context to avoid redundancy. |
+| Ratio | 价格倍率 | 在许多语境下与 Multiplier 同义。 |
+| Multiplier | 价格倍率 | 与 ratio 语境同时出现时注意避免重复表述。 |
 
-## Translation Notes
+## 翻译说明
 
-- **Prompt**: model input.
-- **Completion**: model output.
-- **Ratio**: multiplier used for pricing calculations.
-- **Quota**: available service quota; sometimes also translated as **Credit**.
-- **Token** context can mean:
-  - API Token
-  - Text Token
-  - Access Token
+- **Prompt**:模型输入。
+- **Completion**:模型输出。
+- **Ratio**:用于价格计算的倍率。
+- **Quota**:可用服务额度;有时也译作**点数**。
+- **Token** 在不同语境下可能指:
+  - API 令牌
+  - 文本 token
+  - 访问令牌
 
 ---
 
-**Contribution note:** If you find terminology issues or have better translation suggestions, please open an Issue or Pull Request.
-
+**贡献说明:**如果发现术语问题或有更好的译法,欢迎提交 Issue 或 Pull Request。

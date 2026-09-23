@@ -1,31 +1,31 @@
 ---
-title: "First-paid-top-up referral rewards"
-description: "LMM API documentation: First-paid-top-up referral rewards"
+title: "首次充值推荐奖励"
+sidebarTitle: "推荐奖励"
+description: "首次充值推荐奖励的发放条件与结算方式。"
 ---
 
-An invitation is bound at registration to an existing enabled account. Registration increments the invitation count but no longer issues inviter/invitee referral credit. General `QuotaForNewUser` gifts are unchanged. Existing balances and historical affiliate totals are preserved; old signup rewards are not retroactively attributed or clawed back.
+邀请关系在注册时绑定到一个已启用的既有账户。注册会增加邀请计数,但不再发放邀请方与被邀请方的推荐额度。通用的 `QuotaForNewUser` 赠送保持不变。已有余额与历史推广总额都会保留;旧的注册奖励不会被追溯归属或回收。
 
-## Policy and rollout
+## 策略与上线
 
-Configure **Billing → Quota Settings**. `QuotaForInviter` is the fixed reward in raw quota units (0 disables new awards). `ReferralMinTopUpQuota` is the minimum credited platform quota of the first paid top-up, not its currency amount. `ReferralMaxRewardQuota` caps a reward (0 means no additional cap). `ReferralPenaltyPercent` defaults to 20 and accepts integers 0–100. `ReferralMaxPenaltyQuota` caps the extra penalty (0 means no additional cap). All quota values must be non-negative JavaScript-safe integers. Payment compliance confirmation is still required. Existing reward amount is retained, not enabled or increased by this migration. `QuotaForInvitee` is a retired compatibility option with no reward effect.
+在**计费 → 额度设置**中配置。`QuotaForInviter` 是固定奖励的原始额度单位(为 0 时关闭新发放)。`ReferralMinTopUpQuota` 是首次付费充值的最低入账平台额度,不是其货币金额。`ReferralMaxRewardQuota` 限制单次奖励上限(0 表示不额外封顶)。`ReferralPenaltyPercent` 默认 20,接受 0 到 100 的整数。`ReferralMaxPenaltyQuota` 限制额外罚扣上限(0 表示不额外封顶)。所有额度值必须是非负且 JavaScript 安全范围内的整数。支付合规确认仍然必需。已有奖励金额会被保留,本次迁移不会启用或提高它。`QuotaForInvitee` 是已废弃的兼容配置项,不再产生奖励效果。
 
-The first verified cash top-up sets a permanent eligibility marker even if rewards are disabled, the threshold is not met, the inviter is ineligible, or the account already has a historical successful cash top-up. Do not reset that marker on refund or appeal. No retroactive catch-up is performed. Manual order completion is explicitly excluded from referral eligibility and does not consume the first real top-up. Historical manual completions cannot reliably be distinguished from older paid orders, so legacy successful cash rows conservatively consume eligibility.
+首次通过校验的现金充值会写入永久资格标记,即使奖励处于关闭状态、未达到门槛、邀请方不符合条件,或账户历史上已有成功的现金充值。不要因为退款或申诉而重置该标记,也不会做追溯补发。手动完成订单被明确排除在推荐资格之外,也不消耗首次真实充值。由于历史手动完成订单无法与更早的付费订单可靠区分,历史成功现金记录会保守地消耗资格。
 
-Only signed settlement through `CompleteExternalTopUp` grants rewards: Stripe, Creem, Waffo, Waffo Pancake, and CNY ePay cash payments. LinuxDO/community credits, wallet transfers, gifts, admin adjustments, manual completions, and subscriptions do not qualify. The standard payment-evidence and quota-capacity validation remains in force. There is one reward per invitee and one per top-up, enforced in the database. Payment credit, first-payment marker, reward credit and ledger entry commit or roll back together.
+只有通过 `CompleteExternalTopUp` 完成的签名结算才发放奖励:Stripe、Creem、Waffo、Waffo Pancake 以及人民币 ePay 现金支付。LinuxDO 社区额度、钱包转账、赠送、管理员调整、手动完成以及订阅都不符合条件。标准的支付证据与额度容量校验继续生效。每个被邀请人只有一次奖励,每次充值只有一次奖励,并由数据库强制。支付入账、首充标记、奖励入账和流水记录在同一事务中提交或回滚。
 
-## Moderation and refunds
+## 治理与退款
 
-Ordinary **Disable/Enable** does not touch rewards. Use **Ban for abuse** for a confirmed abuse or bulk-registration decision; evidence is required. The corresponding reward is revoked. The extra penalty checkbox defaults off and requires explicit administrator confirmation of inviter involvement. Same-IP inference alone is not a supported automatic penalty trigger. Policy is snapshotted when a reward is earned; later setting changes do not alter that grant's penalty.
+普通的**禁用/启用**不会影响奖励。对确认的滥用或批量注册,请使用**因滥用封禁**,并要求提供证据,对应奖励会被撤销。额外罚扣勾选项默认关闭,并且需要管理员显式确认邀请方存在关联。仅凭同 IP 推断不构成受支持的自动罚扣依据。策略在奖励发放时被快照,之后的设置变更不会改变该次发放的罚扣规则。
 
-`POST /api/user/manage` accepts `action=ban_abuse`, `reason=abuse|bulk_registration`, `evidence` (1–1000 bytes), `penalize_inviter` and a stable `request_id`. Reuse the exact payload and request ID on retry; changing it is rejected. The acting administrator is revalidated against persisted status/role and must outrank the target. No reward means no affiliate financial deduction. Repeated bans never deduct the same grant again.
+`POST /api/user/manage` 接受 `action=ban_abuse`、`reason=abuse|bulk_registration`、`evidence`(1 到 1000 字节)、`penalize_inviter` 以及稳定的 `request_id`。重试时必须复用完全相同的载荷与请求 ID,改动会被拒绝。执行操作的管理员会按持久化的状态与角色重新校验,且必须高于目标账户。没有奖励就不会产生推广资金扣减。重复封禁不会对同一次发放再次扣减。
 
-Use **Overturn abuse ban** (`action=restore_referral`, `reason=mistaken_ban`, evidence, a new request ID, no penalty flag) to enable the account and append reversal entries. Replaying a previously processed ban after an appeal cannot disable the account or charge again. An ordinary re-enable does not silently restore rewards. A subsequent new confirmed ban may revoke a restored award once again, with a new revision.
+使用**撤销滥用封禁**(`action=restore_referral`、`reason=mistaken_ban`、证据、新的请求 ID、不带罚扣标记)可重新启用账户并追加冲正记录。在申诉之后重放已处理过的封禁,既不会再次禁用账户,也不会再次扣费。普通的重新启用不会静默恢复奖励。之后再次确认的封禁可以再次撤销已恢复的奖励,并产生新的修订记录。
 
-Cumulative full refund of the original top-up revokes its referral reward without a new abuse penalty. Partial refunds retain it until the original paid amount is fully refunded. If a full refund follows a ban, an appeal may reverse the penalty but cannot restore the invalid reward. Refund provider verification and existing payer-wallet refund constraints are unchanged.
+对原始充值累计全额退款会撤销其推荐奖励,但不附加新的滥用罚扣。部分退款会保留奖励,直到原始支付金额被全额退回。如果全额退款发生在封禁之后,申诉可以撤销罚扣,但无法恢复已失效的奖励。退款供应方的校验与既有的付款钱包退款约束保持不变。
 
-## Accounting, privacy and operations
+## 账务、隐私与运维
 
-`users.aff_quota` is a signed reward-only balance. Negative values are debt; future rewards repay it before transfer becomes possible. Purchased `users.quota` is never reduced by referral moderation, even if a former reward was already transferred or spent. `aff_history` remains lifetime gross earned credit, not net earnings. The self API exposes non-negative `aff_quota` plus `aff_debt`. The reward history API `GET /api/user/self/aff/rewards?before=<cursor>` returns at most 50 entries, available balance, debt and current public policy. Identity comes only from authentication; no invitee emails, payment IDs or private evidence are returned. Entries show award, clawback, penalty and appeal reversal separately.
+`users.aff_quota` 是带符号的奖励专用余额,负值表示欠账,后续奖励会先偿还欠账,之后才可能转出。购买所得的 `users.quota` 绝不会因推荐治理而减少,即使此前的奖励已经转出或消费。`aff_history` 仍然是历史累计获得额度,不是净收益。自助接口暴露非负的 `aff_quota` 以及 `aff_debt`。奖励历史接口 `GET /api/user/self/aff/rewards?before=<cursor>` 最多返回 50 条记录、可用余额、欠账和当前公开策略。身份只来自认证,不返回被邀请人邮箱、支付 ID 或私有证据。记录会分别展示发放、收回、罚扣和申诉冲正。
 
-Main and fast migrations create `referral_rewards`, `referral_ledger_entries`, `referral_moderation_events` and add the first-payment/manual-exclusion columns. Do not drop them on application rollback. Roll all settlement/moderation writers to this version together; old binaries do not understand the first-payment contract and still issue signup rewards. Keep a database backup and run the provided payment/concurrency/moderation/refund tests before enabling the policy. No production balances or options are modified by tests.
-
+主迁移与快速迁移会创建 `referral_rewards`、`referral_ledger_entries`、`referral_moderation_events`,并添加首充与手动排除相关列。应用回滚时不要删除它们。所有结算与治理写入方必须一起回滚到该版本;旧二进制不理解首充契约,仍会发放注册奖励。启用策略之前请保留数据库备份,并运行随仓库提供的支付、并发、治理与退款测试。测试不会修改生产余额或配置。

@@ -1,6 +1,8 @@
 ---
-title: "PostgreSQL scanner leadership integration"
-description: "LMM API documentation: PostgreSQL scanner leadership integration"
+title: "PostgreSQL 扫描器领导集成"
+sidebarTitle: "扫描器集成"
+description: "PostgreSQL 扫描器的领导选举与集成行为。"
+icon: "scan-search"
 ---
 
 The Go service coordinates three periodic scanners that must run once across a
@@ -39,4 +41,3 @@ contexts prevent most post-lease database writes, but channel balance writes
 still lack a per-channel epoch/CAS predicate. A response accepted immediately
 before lock loss could therefore race the new leader near a handoff. Strict
 hard fencing requires a per-channel version included in the final update.
-

@@ -7,67 +7,88 @@
   },
   "tags": [
     {
-      "name": "获取模型列表"
+      "name": "获取模型列表",
+      "x-group": "模型列表"
     },
     {
-      "name": "OpenAI格式(Chat)"
+      "name": "OpenAI格式(Chat)",
+      "x-group": "OpenAI 格式（Chat）"
     },
     {
-      "name": "OpenAI格式(Responses)"
+      "name": "OpenAI格式(Responses)",
+      "x-group": "OpenAI 格式（Responses）"
     },
     {
-      "name": "图片生成"
+      "name": "图片生成",
+      "x-group": "图片生成"
     },
     {
-      "name": "图片生成/OpenAI兼容格式"
+      "name": "图片生成/OpenAI兼容格式",
+      "x-group": "图片生成 · OpenAI 兼容格式"
     },
     {
-      "name": "图片生成/Qwen千问"
+      "name": "图片生成/Qwen千问",
+      "x-group": "图片生成 · Qwen 千问"
     },
     {
-      "name": "视频生成"
+      "name": "视频生成",
+      "x-group": "视频生成"
     },
     {
-      "name": "视频生成/Sora兼容格式"
+      "name": "视频生成/Sora兼容格式",
+      "x-group": "视频生成 · Sora 兼容格式"
     },
     {
-      "name": "视频生成/Kling格式"
+      "name": "视频生成/Kling格式",
+      "x-group": "视频生成 · Kling 格式"
     },
     {
-      "name": "视频生成/即梦格式"
+      "name": "视频生成/即梦格式",
+      "x-group": "视频生成 · 即梦格式"
     },
     {
-      "name": "Claude格式(Messages)"
+      "name": "Claude格式(Messages)",
+      "x-group": "Claude 格式（Messages）"
     },
     {
-      "name": "Gemini格式"
+      "name": "Gemini格式",
+      "x-group": "Gemini 格式"
     },
     {
-      "name": "OpenAI格式(Embeddings)"
+      "name": "OpenAI格式(Embeddings)",
+      "x-group": "OpenAI 格式（Embeddings）"
     },
     {
-      "name": "文本补全(Completions)"
+      "name": "文本补全(Completions)",
+      "x-group": "文本补全（Completions）"
     },
     {
-      "name": "OpenAI音频(Audio)"
+      "name": "OpenAI音频(Audio)",
+      "x-group": "OpenAI 音频（Audio）"
     },
     {
-      "name": "重排序(Rerank)"
+      "name": "重排序(Rerank)",
+      "x-group": "重排序（Rerank）"
     },
     {
-      "name": "Moderations"
+      "name": "Moderations",
+      "x-group": "内容审核（Moderations）"
     },
     {
-      "name": "Realtime"
+      "name": "Realtime",
+      "x-group": "实时（Realtime）"
     },
     {
-      "name": "未实现"
+      "name": "未实现",
+      "x-group": "未实现"
     },
     {
-      "name": "未实现/Fine-tunes"
+      "name": "未实现/Fine-tunes",
+      "x-group": "未实现 · Fine-tunes"
     },
     {
-      "name": "未实现/Files"
+      "name": "未实现/Files",
+      "x-group": "未实现 · Files"
     }
   ],
   "paths": {
@@ -6075,7 +6096,12 @@
       }
     }
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "https://api.lmm.best",
+      "description": "生产环境"
+    }
+  ],
   "security": [
     {
       "BearerAuth": []

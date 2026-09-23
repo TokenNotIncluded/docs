@@ -1,16 +1,9 @@
 ---
-title: "Setup record persistence at startup"
-description: "LMM API documentation: Setup record persistence at startup"
+title: "启动时的设置记录持久化"
+sidebarTitle: "启动设置"
+description: "启动阶段设置记录的持久化与恢复行为。"
 ---
 
-When migration-write startup finds an existing root user without a setup record,
-it creates the existing singleton setup record before marking setup complete.
-Failure to persist that record now returns a startup error through the existing
-migration-session cleanup path, instead of logging the error and continuing with
-an initialized in-memory state.
+带迁移写入的启动流程如果发现存在 root 用户却没有设置记录,会在把初始化标记为完成之前创建这条单例设置记录。现在持久化失败会通过已有的迁移会话清理路径返回启动错误,而不是记录日志后继续使用已初始化的内存状态。
 
-An empty database remains legitimately uninitialized. An existing setup record
-is preserved, and repeated successful checks do not create extra records.
-Read-only startup still requires exactly one setup record and a root user.
-This change does not alter first-time setup's transaction/concurrency protocol.
-
+空数据库仍属于合法的未初始化状态。已有的设置记录会被保留,重复的成功检查不会创建多余记录。只读启动仍然要求恰好一条设置记录和一个 root 用户。本次变更不改变首次设置的流程与并发协议。

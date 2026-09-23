@@ -1,88 +1,50 @@
 ---
-title: "Go relay memory management"
-description: "LMM API documentation: Go relay memory management"
+title: "Go 中继内存管理"
+sidebarTitle: "内存管理"
+description: "Go 中继的内存分配策略与回收边界。"
 ---
 
-The Go backend retains request data while converting, retrying, and streaming
-upstream requests. A request-body size limit is not a process-memory limit:
-parsed JSON, provider DTOs, encoding buffers, and concurrent requests add to it.
+Go 后端在转换、重试和流式转发上游请求期间会保留请求数据。请求体大小限制不等于进程内存上限:解析后的 JSON、供应方 DTO、编码缓冲区和并发请求都会叠加占用。
 
-## What the request path does
+## 请求路径的行为
 
-- Large bodies can spill into the configured disk cache. The default directory
-  is `new-api-body-cache` under Go's temporary directory (`TMPDIR` on Unix).
-  If `/tmp` is tmpfs, this is still RAM-backed storage, not ordinary disk.
-- Decoded gzip, Brotli, and Zstandard bodies have unknown decoded length. The
-  original compressed `Content-Length` must not select a small in-memory buffer
-  or bypass large-request admission. Both compressed and decoded byte ceilings
-  remain enforced. Zstandard uses lazy, single-stream decoding instead of eager
-  asynchronous prefetch. Decoder resources are closed even on early rejection;
-  the HTTP server retains ownership of the original wire body, so rejecting a
-  request does not wait for an unread slow sender to finish uploading.
-- Deep-copying `json.RawMessage` and `[]byte` fields uses a bulk clone instead
-  of reflecting/allocating once per byte. This applies to converted requests
-  too, without sharing mutable byte arrays with the original DTO.
-- Responses and Chat Completions passthrough isolate top-level request metadata
-  without deep-copying payloads that will be replayed verbatim. Converted paths
-  retain deep copies so provider mutations cannot corrupt retries.
-- Closing memory storage drops its owned buffer references. Already-open replay
-  readers remain independent and usable; opening new readers after close fails.
-  Legacy byte caches are cleared when ownership transfers to storage or cleanup
-  runs. This makes data collectible; it does not force the Go GC or OS reclaim.
+- 大请求体可以溢出到配置的磁盘缓存。默认目录是 Go 临时目录(Unix 下的 `TMPDIR`)中的 `new-api-body-cache`。如果 `/tmp` 是 tmpfs,它仍然是内存支持的存储,而不是普通磁盘。
+- gzip、Brotli 和 Zstandard 解压后的长度未知,因此不能根据原始压缩后的 `Content-Length` 选择较小的内存缓冲区,也不能据此绕过大型请求准入。压缩字节与解压字节两个上限都继续生效。Zstandard 使用惰性单流解码,不做预取的异步解码。即使提前拒绝,解码器资源也会被关闭;HTTP 服务器保留对原始网络请求体的所有权,因此拒绝请求不需要等待未读取的慢速发送方完成上传。
+- `json.RawMessage` 和 `[]byte` 字段的深拷贝改为批量克隆,不再逐字节反射分配。转换后的请求同样适用,且不会与原始 DTO 共享可变字节数组。
+- Responses 与 Chat Completions 的透传路径只隔离顶层请求元数据,不深拷贝将被原样重放的载荷。经过转换的路径保留深拷贝,以免供应方的修改破坏重试。
+- 关闭内存存储会释放其持有的缓冲区引用。已经打开的 replay 读取器保持独立且可继续使用;关闭后再打开新读取器会失败。当所有权移交给存储或执行清理时,旧的字节缓存会被清空。这只是让数据可被回收,不会强制 Go GC 或操作系统立即回收。
 
-JSON parsing and encoding can still allocate complete values. Spilling a body
-is not a claim of constant-memory JSON processing, and passthrough improvements
-do not apply to routes that must convert or override the JSON payload.
+JSON 解析和编码仍会分配完整值。请求体溢出并不代表 JSON 处理是常量内存的,透传优化也不适用于必须转换或覆盖 JSON 载荷的路由。
 
-## Optional large-request admission
+## 可选的大型请求准入
 
-These settings are read once when the Go router is created; restart to change
-them. They are **per process**, shared across authenticated HTTP relay protocols
-and playground HTTP requests, not distributed quotas across replicas.
+这些设置在创建 Go 路由时读取一次,修改后需要重启。它们按**进程**生效,由所有已认证的 HTTP 中继协议和 playground HTTP 请求共享,不是在多个副本之间分配的配额。
 
-| Environment variable | Default | Meaning |
+| 环境变量 | 默认值 | 含义 |
 | --- | --- | --- |
-| `RELAY_LARGE_REQUEST_MAX_CONCURRENCY` | `0` | Maximum in-flight large HTTP requests; `0` disables this control. |
-| `RELAY_LARGE_REQUEST_THRESHOLD_MB` | `4` | Body size in MiB at or above which a request takes a slot. |
+| `RELAY_LARGE_REQUEST_MAX_CONCURRENCY` | `0` | 同时在途的大型 HTTP 请求上限;`0` 表示关闭该控制。 |
+| `RELAY_LARGE_REQUEST_THRESHOLD_MB` | `4` | 请求体达到或超过该 MiB 值时占用一个名额。 |
 
-Unknown-length bodies, including decompressed bodies, conservatively take a
-slot. Known small bodies, empty bodies, GET, HEAD, and OPTIONS bypass the pool.
-WebSocket upgrades/frames and background task execution are not covered. Task
-submission HTTP handlers are covered only for their HTTP handler lifetime.
+长度未知的请求体(包括解压后的请求体)会保守地占用名额。已知的小请求体、空请求体、GET、HEAD 和 OPTIONS 不经过该池。WebSocket 升级与帧以及后台任务执行不在覆盖范围内;任务提交的 HTTP 处理器只在其 HTTP 处理生命周期内被覆盖。
 
-Admission runs after authentication and before body/model parsing. A slot lasts
-until the handler returns, including streaming. It is released on normal return,
-client cancellation once the handler exits, or panic. There is no waiting queue.
-Saturation returns **HTTP 429**, `Retry-After: 1`, and the stable error code
-`large_request_concurrency_exceeded` (Google-native clients receive ErrorInfo).
-OpenAI, Claude, and native Gemini routes retain their respective error envelopes.
-Clients should honor Retry-After and apply bounded backoff/jitter, not tight
-retry loops. Long streams and slow uploads can occupy slots for a long time;
-this shared pool is not a per-user fairness policy. Keep appropriate client,
-proxy, and upstream timeouts. Existing 413 byte limits, model rate limits,
-quota checks, and the system-performance 503 guard remain separate controls.
+准入发生在认证之后、请求体与模型解析之前。名额持续到处理器返回,流式响应期间同样占用。名额在正常返回、客户端取消且处理器退出后,或发生 panic 时释放,不存在排队等待。饱和时返回 **HTTP 429**、`Retry-After: 1`,以及固定错误码 `large_request_concurrency_exceeded`(Google 原生客户端会收到 ErrorInfo)。OpenAI、Claude 和原生 Gemini 路由保留各自的错误封装。
 
-The default is off so an upgrade does not silently change admission on existing
-instances. Invalid/negative concurrency falls back to disabled with a startup
-warning; invalid, nonpositive, or overflowing thresholds fall back to 4 MiB.
+客户端应遵守 Retry-After 并采用有界退避与抖动,而不是紧凑重试。长时间流和慢速上传可能长时间占用名额;该共享池不是按用户公平的调度策略。请保持合适的客户端、代理与上游超时。既有的 413 字节上限、模型限流、配额检查和系统性能 503 保护仍然是独立控制。
 
-For a small instance, an initial opt-in configuration is:
+默认关闭,以避免升级后静默改变现有实例的准入行为。并发值非法或为负时回退为关闭并记录启动告警;阈值非法、非正数或溢出时回退为 4 MiB。
+
+小规格实例的一个初始启用配置是:
 
 ```dotenv
 RELAY_LARGE_REQUEST_MAX_CONCURRENCY=2
 RELAY_LARGE_REQUEST_THRESHOLD_MB=4
 ```
 
-This prevents multiple large request-processing pipelines from entering at
-once; it is not a byte-precise cap on total heap/RSS, nor a promise that any two
-requests will fit. One unusually large request can still exceed the available
-budget. Keep per-request and cgroup limits, then tune using actual traffic.
+它可以避免多条大型请求处理流水线同时进入,但不是对总堆内存或 RSS 的字节级上限,也不保证任意两个请求都能容纳。单个特别大的请求仍可能超出可用预算。请保留单请求限制与 cgroup 限制,再根据真实流量调优。
 
-## Small-memory systemd deployments
+## 小内存 systemd 部署
 
-For a service with `PrivateTmp=yes`, verify the filesystem in the **service's
-mount namespace**, not just the host's `/tmp`. If `/var/tmp` is a writable,
-disk-backed private mount, a service drop-in can set:
+对于设置了 `PrivateTmp=yes` 的服务,要检查**服务挂载命名空间内**的文件系统,而不只是宿主机的 `/tmp`。如果 `/var/tmp` 是可写、磁盘支持的私有挂载,可以通过 drop-in 设置:
 
 ```ini
 [Service]
@@ -90,106 +52,67 @@ Environment="TMPDIR=/var/tmp"
 Environment="GOMEMLIMIT=192MiB"
 ```
 
-Check that no later EnvironmentFile overrides these settings. The example Go
-budget is a starting point for a roughly 1 GiB host, not a universal default.
-Lowering it can increase GC/CPU and latency. Keep RAM for other services and for
-non-Go allocations and page cache; a 256 MiB Go budget does not imply 256 MiB RSS.
-Disk-backed file cache can still count toward the cgroup's memory usage, although
-it is more reclaimable than tmpfs data. Do not disable the existing memory guard
-or blindly raise its threshold to hide an overload.
+确认后续没有 EnvironmentFile 覆盖这些设置。示例中的 Go 预算是约 1 GiB 主机的起点,不是通用默认值。调低它会增加 GC 与 CPU 开销以及延迟。要为其他服务、非 Go 分配和页缓存保留内存;256 MiB 的 Go 预算并不意味着 256 MiB 的 RSS。磁盘支持的文件缓存仍会计入 cgroup 内存用量,尽管它比 tmpfs 数据更容易回收。不要关闭已有的内存保护,也不要为了掩盖过载而盲目提高其阈值。
 
-Verify under representative traffic after the restart:
+重启后在代表性流量下核对:
 
-- effective `TMPDIR` and `GOMEMLIMIT` in `/proc/<pid>/environ`;
-- actual cache file paths/filesystem, without reading request contents;
-- cgroup `memory.current`, `memory.peak`, `memory.events`, swap and memory PSI;
-- host `MemAvailable`, CPU/GC cost, request latency, and actual relay responses;
-- 429 admission rejections separately from local memory 503s and upstream 503s.
+- `/proc/<pid>/environ` 中生效的 `TMPDIR` 与 `GOMEMLIMIT`;
+- 实际缓存文件路径与文件系统(不要读取请求内容);
+- cgroup 的 `memory.current`、`memory.peak`、`memory.events`、swap 和 memory PSI;
+- 宿主机 `MemAvailable`、CPU / GC 开销、请求延迟和真实中继响应;
+- 把 429 准入拒绝与本地内存 503、上游 503 分开统计。
 
-A status endpoint returning 200 alone does not validate upstream relay traffic.
-Do not delete live body-cache files, flush Valkey data, or run periodic forced
-restarts as a substitute for memory budgeting. Remove only your own drop-in and
-restart to roll back deployment tuning; setting concurrency back to `0` disables
-admission on the next restart. These source changes do not deploy themselves.
+仅状态端点返回 200 不能验证上游中继流量。不要删除活跃的请求体缓存文件、清空 Valkey 数据,或用周期性强制重启替代内存预算。回滚部署调优时只移除自己的 drop-in 并重启;把并发改回 `0` 会在下次重启后关闭准入。这些源码变更不会自行部署。
 
-## Tests and allocation benchmarks
+## 测试与分配基准
 
-From `apps/api-go`:
+在 `apps/api-go` 下运行:
 
 ```bash
 go test ./pkg/admission ./common ./middleware ./relay ./relay/common ./relay/channel ./router
-go test -race ./pkg/admission # on a supported race-detector platform
+go test -race ./pkg/admission # 在支持竞态检测的平台
 GOMAXPROCS=2 go test -run '^$' -bench '^BenchmarkCopyRequestForRelay$' \
   -benchmem -benchtime=3x ./relay
 go test -run '^$' -bench '^BenchmarkLargeRequestAdmission$' -benchmem ./pkg/admission
 ```
 
-The copy benchmark compares the legacy reflection-based copy, optimized deep
-copy, and passthrough for identical DTOs, including a 28 MiB Responses payload.
-Report allocation savings for that operation, not as a promised percentage
-reduction in total server RAM.
-The admission benchmark includes disabled and small-request fast paths. Use
-representative concurrency/load tests and supported Linux CI in addition to
-local allocation benchmarks before releasing.
+拷贝基准对相同 DTO 比较旧的反射拷贝、优化后的深拷贝和透传,其中包含 28 MiB 的 Responses 载荷。报告应给出该操作的分配节省,而不是承诺服务器总内存按比例下降。准入基准包含关闭状态和小请求快速路径。发布前除本地分配基准外,还要使用代表性并发与负载测试以及受支持的 Linux CI。
 
-### Local allocation sample
+### 本地分配采样
 
-Measured with Go 1.27.1 on Android/arm64, `GOMAXPROCS=2`, `GOMEMLIMIT=768MiB`,
-`-benchtime=3x -count=3`, using synthetic payloads (not production request data):
+使用 Go 1.27.1、Android/arm64、`GOMAXPROCS=2`、`GOMEMLIMIT=768MiB`、`-benchtime=3x -count=3` 测量,载荷为合成数据(不是生产请求数据):
 
-| Copy of a 28 MiB Responses input | Bytes allocated/op | Allocations/op |
+| 28 MiB Responses 输入的拷贝方式 | 每次操作分配字节 | 每次操作分配次数 |
 | --- | ---: | ---: |
-| Legacy reflection copy | about 58,722,320 | 29,360,145 |
-| Optimized deep copy | 29,362,720 | 16 |
-| Passthrough metadata copy | 768 | 1 |
+| 旧反射拷贝 | 约 58,722,320 | 29,360,145 |
+| 优化后的深拷贝 | 29,362,720 | 16 |
+| 透传元数据拷贝 | 768 | 1 |
 
-The optimized deep copy still owns an independent 28 MiB payload. The savings
-are the discarded per-byte reflection allocations, not a removal of retry
-isolation. Passthrough shares only data that the handler will not mutate.
-Converter lookup has a small fixed cost: in the empty-payload DTO benchmark it
-added 640 bytes and one allocation/op compared with the legacy copier. These
-are operation-level allocation results, **not** total process RSS or end-to-end
-throughput guarantees. Native Linux CI/load testing remains a release gate.
+优化后的深拷贝仍持有独立的 28 MiB 载荷,节省的是被丢弃的逐字节反射分配,并不是取消重试隔离。透传只共享处理器不会修改的数据。转换器查找有少量固定开销:在空载荷 DTO 基准中,相比旧拷贝器多出 640 字节和一次分配。这些是操作级分配结果,**不是**进程总 RSS 或端到端吞吐保证。原生 Linux CI 与负载测试仍是发布门禁。
 
+## 进程内字节缓存分配
 
-## In-process byte-cache allocations
+`pkg/cachex.ByteCache` 现在随键插入逐步增长 map,不再在构造和 `Purge` 之后按配置的条目上限预留空间,替换已有值时复用其条目与 LRU 节点。这降低了通知与验证缓存以及内存限流器的空闲分配,并在更新请求计数时消除缓存节点抖动。插入、替换和淘汰在原有互斥锁下共用同一实现。
 
-`pkg/cachex.ByteCache` grows its map as keys are inserted, instead of reserving
-space for the configured entry limit at construction and after `Purge`.
-Replacing an existing value reuses its entry and LRU node. This reduces idle
-allocation for notification/verification caches and the in-memory rate limiter,
-and removes cache-node churn when request counters are updated. Insertion,
-replacement, and eviction share one implementation under the existing mutex.
+条目上限、权重记账、LRU 顺序、TTL 刷新与重置以及原子 `Compute` 语义都保持不变。超大的 `SetWithTTL` 仍不会改变已有值,超大的 `Compute` 结果仍会被移除,过期仍然是惰性的,`Purge` 只丢弃 map 与条目而不强制 GC。配置的字节预算统计调用方提供的权重,不含 map 与链表开销,也不代表进程总 RSS;填满的 map 在 purge 之前可能保留容量。
 
-Entry limits, weight accounting, LRU order, TTL refresh/reset, and atomic
-`Compute` semantics are preserved. An oversized `SetWithTTL` still leaves an
-existing value unchanged; an oversized `Compute` result still removes it.
-Expiry remains lazy. Purging drops the map and entries without forcing GC.
-The configured byte budget counts caller-supplied weights, not map/list overhead
-or total process RSS; a filled map can retain capacity until a purge.
+Linux/amd64 合成分配测量,Go 1.25.1,每种场景三次运行:
 
-Synthetic Linux/amd64 allocation measurements, Go 1.25.1, three runs per case:
-
-| Operation | Before (bytes/op) | After (bytes/op) |
+| 操作 | 之前(字节/次) | 之后(字节/次) |
 | --- | ---: | ---: |
-| Create empty cache, 256-entry limit | 13,784 | 176 |
-| Create empty cache, 16,384-entry limit | about 873,912 | 176 |
-| Create empty cache, 65,536-entry limit | about 3,495,223 | 176 |
-| Replace existing integer, `SetWithTTL` | 112 (2 allocations) | 0 (0 allocations) |
-| Increment existing integer, `Compute` | 112 (2 allocations) | 0 (0 allocations) |
-| Insert one integer then purge, 65,536-entry limit | about 3,495,206 | 368 |
-| Insert/evict distinct string keys, 256-entry limit | 119 | 119 |
+| 创建空缓存,256 条目上限 | 13,784 | 176 |
+| 创建空缓存,16,384 条目上限 | 约 873,912 | 176 |
+| 创建空缓存,65,536 条目上限 | 约 3,495,223 | 176 |
+| 替换已有整数,`SetWithTTL` | 112(2 次分配) | 0(0 次分配) |
+| 递增已有整数,`Compute` | 112(2 次分配) | 0(0 次分配) |
+| 插入一个整数后 purge,65,536 条目上限 | 约 3,495,206 | 368 |
+| 插入并淘汰不同字符串键,256 条目上限 | 119 | 119 |
 
-These measure allocation volume for the named operations, not retained heap or
-whole-server savings. New keys still allocate nodes, and growing the index on
-demand shifts map growth work to insertion. User callbacks and values may also
-allocate; zero-allocation updates here use integer values and a simple callback.
-No production throughput or latency claim is made from these microbenchmarks.
+这些数字衡量的是指定操作的分配量,不是保留堆或整机节省。新键仍会分配节点,按需增长索引只是把 map 增长的开销转移到插入时。用户回调与值也可能分配;这里的零分配更新使用整数值和简单回调。这些微基准不构成任何生产吞吐或延迟结论。
 
-Reproduce from `apps/api-go`:
+在 `apps/api-go` 下复现:
 
 ```bash
 go test -race ./pkg/cachex
 go test -run '^$' -bench '^BenchmarkByteCache' -benchmem -count=3 ./pkg/cachex
 ```
-

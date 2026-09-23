@@ -1,23 +1,20 @@
 ---
-title: "SQLite to PostgreSQL migration contract"
-description: "LMM API documentation: SQLite to PostgreSQL migration contract"
+title: "SQLite 到 PostgreSQL 迁移契约"
+sidebarTitle: "数据库迁移"
+description: "SQLite 迁移到 PostgreSQL 的契约与校验步骤。"
 ---
 
-This document describes the auditable offline rehearsal and verification
-workflow for the PostgreSQL 18 target. It does not authorize or implement a
-production cutover. Production may already be running Go with PostgreSQL after
-a historical coordinator run, but that runtime fact does not replace current
-boundary, schema, canary, backup, and operator evidence.
+本文描述针对 PostgreSQL 18 目标的可审计离线演练与校验流程,不授权也不实现生产切换。生产环境可能在某次历史协调器运行后已经以 Go + PostgreSQL 运行,但这一运行事实不能替代当前的边界、模式、灰度探针、备份与运维证据。
 
-The fresh contract-1 PostgreSQL baseline requires `users.console_activated_at BIGINT NOT NULL DEFAULT 0`. This fresh-schema contract does not upgrade an existing PostgreSQL schema. Contract 2 is the separately reviewed, forward-only expand step for the eight open-source-bounty tables used by the mounted Rust routes; it never changes the frozen 34-table manifest.
+新的契约 1 PostgreSQL 基线要求 `users.console_activated_at BIGINT NOT NULL DEFAULT 0`。这份全新模式契约不会升级已有的 PostgreSQL 模式。契约 2 是单独评审、仅向前的扩展步骤,针对挂载到 Rust 路由的八张开源赏金表,它不会改变已冻结的 34 张表清单。
 
-## Evidence and scope
+## 证据与范围
 
-The versioned manifest defines 34 application tables, their columns, keys, indexes, converters, sequence ownership, and verification rules. CI rehearses the contract on PostgreSQL 18 and validates 34 tables, 424 columns, 172 indexes, and 29 owned sequences.
+版本化清单定义了 34 张应用表及其列、键、索引、转换器、序列归属和校验规则。CI 在 PostgreSQL 18 上演练该契约,并校验 34 张表、424 个列、172 个索引和 29 个自有序列。
 
-## Commands
+## 命令
 
-Run from `apps/api-rust/`:
+在 `apps/api-rust/` 下运行:
 
 ```bash
 cargo run -p lmm-db-migrate -- manifest-validate \
@@ -69,51 +66,34 @@ bash crates/lmm-db-migrate/scripts/rehearse-postgres.sh
 crates/lmm-db-migrate/scripts/verify-provenance.sh
 ```
 
-The PostgreSQL DSN is accepted only through `LMM_MIGRATE_DATABASE_URL`. It is never accepted as a command-line argument or written to an audit report.
+PostgreSQL DSN 只通过 `LMM_MIGRATE_DATABASE_URL` 传入,绝不接受命令行参数,也不会写入审计报告。
 
-## Offline source boundary
+## 离线源边界
 
-All source commands reject symlinks, special files, and SQLite `-wal`, `-journal`, or `-shm` sidecars. Before opening the source, `rehearse` and `verify` capture its canonical path, device, inode, size, nanosecond modification time, and SHA-256. The opened file descriptor is immediately measured and hashed again, then retained while SQLite is opened read-only through its `/proc/self/fd` path. This closes the path-replacement window while preserving SQLite read-lock semantics.
+所有涉及源库的命令都拒绝符号链接、特殊文件,以及 SQLite 的 `-wal`、`-journal`、`-shm` 附属文件。打开源库之前,`rehearse` 和 `verify` 会记录其规范路径、设备号、inode、大小、纳秒级修改时间和 SHA-256。已打开的文件描述符会立即再次测量与哈希,并在通过其 `/proc/self/fd` 路径以只读方式打开 SQLite 期间持续保留。这样既关闭了路径替换窗口,又保留了 SQLite 的读锁语义。
 
-A single SQLite read-only transaction remains open throughout COPY and source-side verification. Immediately before PostgreSQL commit, the path identity, metadata, SHA-256, schema contract, and absence of sidecars are checked again. The SQLite transaction is committed only after PostgreSQL commits successfully, so the protected source snapshot is never released early.
+整个 COPY 与源侧校验期间保持同一个 SQLite 只读事务。PostgreSQL 提交之前,会再次检查路径身份、元数据、SHA-256、模式契约以及是否存在附属文件。只有在 PostgreSQL 成功提交之后才提交 SQLite 事务,因此受保护的源快照不会被提前释放。
 
-## Rehearsal transaction
+## 演练事务
 
-The target schema identifier must match the strict lower-case identifier contract. A PostgreSQL transaction-scoped advisory lock serializes creation of that schema, and schema existence is checked under the same transaction.
+目标模式标识必须符合严格的小写标识符契约。事务作用域的 PostgreSQL advisory lock 串行化该模式的创建,并在同一事务内检查模式是否存在。
 
-The baseline is applied to a new isolated schema. All 34 tables are streamed through PostgreSQL COPY using the manifest's explicit column lists and converters. Rows use complete primary-key order: SQLite text keys use byte ordering and PostgreSQL text keys use `COLLATE "C"`. JSON, booleans, UTC timestamps, fixed-scale decimals, finite REAL values, NULL, and COPY control characters have explicit canonical behavior.
+基线被应用到新的隔离模式。34 张表全部使用清单中显式列出的列和转换器通过 PostgreSQL COPY 流式写入。行序按完整主键排序:SQLite 文本键按字节序,PostgreSQL 文本键使用 `COLLATE "C"`。JSON、布尔值、UTC 时间戳、定点小数、有限 REAL 值、NULL 以及 COPY 控制字符都有明确的规范化行为。
 
-After COPY, all 29 owned sequences are advanced with `setval`; an empty table correctly produces `nextval = 1`. The live PostgreSQL catalog is validated against the manifest. SQLite and PostgreSQL are then read independently and compared using per-table counts and canonical BLAKE3 table hashes. Financial aggregate checks cover users, tokens, logs, quota data, top-ups, subscription orders, and channels without publishing aggregate values.
+COPY 之后,29 个自有序列通过 `setval` 推进;空表的正确处理结果是 `nextval = 1`。运行时 PostgreSQL 目录会按清单校验,随后分别读取 SQLite 与 PostgreSQL,用逐表计数和规范化 BLAKE3 表哈希比对。财务聚合校验覆盖用户、令牌、日志、配额数据、充值、订阅订单和渠道,但不会输出聚合值。
 
-Account-balance parity is an additive forward step and does not rewrite the
-published table manifest. On an existing PostgreSQL schema, apply
-`migrations/0010_account_balance_access.sql` through the normal forward-migration
-review process as schema contract 10. The forward verifier checks the exact
-`tokens.account_balance_read BOOLEAN NOT NULL DEFAULT FALSE` shape; rerunning
-the migration is idempotent and existing keys remain denied.
+账户余额对等性是一个增量的向前步骤,不改写已发布的表清单。在已有 PostgreSQL 模式上,按常规向前迁移评审流程以模式契约 10 应用 `migrations/0010_account_balance_access.sql`。向前校验器检查 `tokens.account_balance_read BOOLEAN NOT NULL DEFAULT FALSE` 的精确形态;重复运行该迁移是幂等的,已有键继续保持拒绝状态。
 
-COPY, catalog, sequence, or verification failure rolls back the complete target schema transaction. `verify` uses a read-only, repeatable-read PostgreSQL snapshot.
+COPY、目录、序列或校验失败都会回滚整个目标模式事务。`verify` 使用只读、可重复读的 PostgreSQL 快照。
 
-## Audit output
+## 审计输出
 
-Success and failure reports are created with mode `0600`, written through a same-directory temporary file, fsynced, atomically renamed, and followed by a parent-directory fsync. Reports contain no DSN, row value, primary-key value, financial value, or underlying error text. Failure reports contain only a stable stage and error category. Standard error uses the same classifications and does not print conversion values or PostgreSQL/SQLite error details.
+成功与失败报告都以 `0600` 权限创建,通过同目录临时文件写入、fsync、原子重命名,随后对父目录执行 fsync。报告不包含 DSN、行值、主键值、财务数值或底层错误文本。失败报告只包含稳定的阶段与错误类别。标准错误输出使用相同的分类,不打印转换值或 PostgreSQL / SQLite 错误细节。
 
-## Production transaction
+## 生产事务
 
-The retired shell coordinator is not a production entry point. Provider-native
-migration and deployment operations are invoked only through `/usr/bin/lmm-api`
-and follow [`postgresql-cutover.md`](/docs/postgresql-cutover) plus the normative
-[`backend-cli-deployment-contract.md`](/docs/backend-cli-deployment-contract).
+已废弃的 shell 协调器不是生产入口。供应方原生的迁移与部署操作只能通过 `/usr/bin/lmm-api` 调用,并遵循 [PostgreSQL 切换](/docs/postgresql-cutover)与规范性的[后端 CLI 部署契约](/docs/backend-cli-deployment-contract)。
 
-A migration command may create or verify an isolated schema or apply an
-explicitly bound forward contract, but it cannot silently authorize traffic or
-provider ownership. If a live target is PostgreSQL-backed, first verify the
-active schema, durable write boundary, candidate/package hashes, and
-authenticated canaries. Missing or failed evidence blocks migration and backend
-selection.
+迁移命令可以创建或校验隔离模式,也可以应用显式绑定契约的向前迁移,但不能静默授权流量或供应方归属。如果线上目标是 PostgreSQL,先校验活跃模式、持久写入边界、候选与软件包哈希以及带认证的灰度探针。证据缺失或校验失败会阻止迁移和后端选择。
 
-After the PostgreSQL write boundary may have been crossed, application rollback
-is manual and restores only N-1 code, provider link, frontend, and configuration
-that remain compatible with the current schema. It never restores SQLite or a
-database snapshot. PostgreSQL remains the persistent authority; Valkey carries
-reconstructable cache, session/revocation, and rate-limit state.
+一旦可能越过了 PostgreSQL 写入边界,应用回滚就是人工操作,且只恢复与当前模式兼容的 N-1 代码、供应方链接、前端和配置,绝不恢复 SQLite 或数据库快照。PostgreSQL 始终是持久权威;Valkey 承载可重建的缓存、会话与吊销以及限流状态。

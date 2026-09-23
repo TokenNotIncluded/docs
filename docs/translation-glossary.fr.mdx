@@ -1,105 +1,105 @@
 ---
-title: "French Glossary (Project Terminology)"
-description: "LMM API documentation: French Glossary (Project Terminology)"
+title: "法语术语词汇表"
+sidebarTitle: "法语术语"
+description: "法语界面与文档的术语对照表。"
 ---
 
-This glossary defines preferred French translations used across the project documentation and UI.
+本词汇表定义项目文档与界面中推荐使用的法语译法。
 
-## Core Concepts
+## 核心概念
 
-- Emojis are allowed only if they already exist in the source text.
-- Technical terms may remain in English when the original text uses them.
-- English technical terms are allowed when widely used in French-speaking technical environments (for example, API).
+- 只有当源文本本身包含表情符号时才保留表情符号。
+- 原文使用英文的技术术语可以保留英文。
+- 在法语技术环境中广泛使用的英文术语(例如 API)可以保留英文。
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Ratio | Ratio | Ratio/Multiplier | Multiplier used for price calculation. **Important:** In pricing context, always use **Ratio** instead of **Multiplicateur**. |
-| Token | Jeton | Token | API access credentials or text units processed by models. |
-| Channel | Canal | Channel | Access path to API providers. |
-| Group | Groupe | Group | Classification used for users or tokens. |
-| Quota | Quota | Quota | Available service quota for a user. |
+| Ratio | Ratio | Ratio/Multiplier | 价格计算使用的倍率。**重要:**定价语境中始终使用 **Ratio**,不要使用 **Multiplicateur**。 |
+| Token | Jeton | Token | API 访问凭据,或模型处理的文本单位。 |
+| Channel | Canal | Channel | 通往 API 供应方的访问路径。 |
+| Group | Groupe | Group | 用于区分用户或令牌的分类。 |
+| Quota | Quota | Quota | 用户可用的服务额度。 |
 
-## Model Related
+## 模型相关
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Prompt | Invite | Prompt | Input content for the model. |
-| Completion | Complétion | Completion | Model output content. **Important:** Do not use alternatives such as *achèvement* or *finalisation* in this context. |
-| Input | Entrée | Input/Prompt | Data sent to the model. |
-| Output | Sortie | Output/Completion | Data returned by the model. |
-| Model Ratio | Ratio du modèle | Model Ratio | Pricing ratio for different models. |
-| Completion Ratio | Ratio de complétion | Completion Ratio | Extra billing ratio for model output. |
-| Price per call | Prix fixe | Price per call | Price charged per request. |
-| Pay-as-you-go | Paiement à l'utilisation | Pay-as-you-go | Usage-based pricing model. |
-| Pay-per-call | Paiement par appel | Pay-per-call | Flat charge per request. |
+| Prompt | Invite | Prompt | 模型的输入内容。 |
+| Completion | Complétion | Completion | 模型的输出内容。**重要:**该语境下不要使用 *achèvement* 或 *finalisation* 等替代词。 |
+| Input | Entrée | Input/Prompt | 发送给模型的数据。 |
+| Output | Sortie | Output/Completion | 模型返回的数据。 |
+| Model Ratio | Ratio du modèle | Model Ratio | 不同模型的定价倍率。 |
+| Completion Ratio | Ratio de complétion | Completion Ratio | 针对模型输出的额外计费倍率。 |
+| Price per call | Prix fixe | Price per call | 每次请求收取的固定价格。 |
+| Pay-as-you-go | Paiement à l'utilisation | Pay-as-you-go | 按用量计费模式。 |
+| Pay-per-call | Paiement par appel | Pay-per-call | 每次请求固定收费。 |
 
-## User Management
+## 用户管理
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Root User | Super-administrateur | Root User | Administrator with highest privileges. |
-| Admin User | Administrateur | Admin User | System administrator. |
-| Normal User | Utilisateur normal | Normal User | User with standard privileges. |
+| Root User | Super-administrateur | Root User | 拥有最高权限的管理员。 |
+| Admin User | Administrateur | Admin User | 系统管理员。 |
+| Normal User | Utilisateur normal | Normal User | 普通权限用户。 |
 
-## Recharge & Redemption
+## 充值与兑换
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Top up | Recharge | Top Up | Add quota to an account. |
-| Redemption Code | Code d'échange | Redemption Code | Code that can be redeemed for quota. |
+| Top up | Recharge | Top Up | 为账户增加额度。 |
+| Redemption Code | Code d'échange | Redemption Code | 可兑换额度的码。 |
 
-## Channel Management
+## 渠道管理
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Channel | Canal | Channel | API provider access channel. |
-| API Key | Clé API | API Key | API access key. **Important:** Prefer **Clé API** over generic translations of token. |
-| Priority | Priorité | Priority | Channel selection priority. |
-| Weight | Poids | Weight | Load-balancing weight. |
-| Proxy | Proxy | Proxy | Proxy server address. |
-| Model Mapping | Redirection de modèle | Model Mapping | Replace model name in request body. |
-| Provider | Fournisseur | Provider/Vendor | API/AI service provider. |
+| Channel | Canal | Channel | API 供应方访问渠道。 |
+| API Key | Clé API | API Key | API 访问密钥。**重要:**优先使用 **Clé API**,不要使用 token 的泛化译法。 |
+| Priority | Priorité | Priority | 渠道选择优先级。 |
+| Weight | Poids | Weight | 负载均衡权重。 |
+| Proxy | Proxy | Proxy | 代理服务器地址。 |
+| Model Mapping | Redirection de modèle | Model Mapping | 替换请求体中的模型名称。 |
+| Provider | Fournisseur | Provider/Vendor | API 或 AI 服务提供方。 |
 
-## Security Related
+## 安全相关
 
-| English Term | French Term | Canonical English | Description |
+| 英文术语 | 法语术语 | 规范英文 | 说明 |
 |--------------|-------------|-------------------|-------------|
-| Two-Factor Authentication | Authentification à deux facteurs | Two-Factor Authentication | Extra account security check. |
-| 2FA | 2FA | Two-Factor Authentication | Abbreviation for two-factor authentication. |
+| Two-Factor Authentication | Authentification à deux facteurs | Two-Factor Authentication | 额外的账户安全校验。 |
+| 2FA | 2FA | Two-Factor Authentication | 双重验证的缩写。 |
 
-## Translation Guidance
+## 翻译指引
 
-### Context-Aware Prompt/Input Distinction
+### 按语境区分 Prompt 与 Input
 
-- **Invite / Prompt**: User interaction and LLM prompt contexts.
-- **Entrée / Input**: Billing, technical documentation, and data-processing descriptions.
-- **Rule**: Use *Invite/Prompt* for UI/interaction wording and *Entrée/Input* for backend or calculation contexts.
+- **Invite / Prompt**:用户交互与 LLM 提示词语境。
+- **Entrée / Input**:计费、技术文档与数据处理描述。
+- **规则**:界面与交互文案用 *Invite/Prompt*,后端或计算语境用 *Entrée/Input*。
 
-### Token Meaning by Context
+### Token 的语境含义
 
-- API token for access control (API Token)
-- Text token processed by the model (Text Token)
-- System access token for authentication flow (Access Token)
+- 用于访问控制的 API 令牌(API Token)
+- 模型处理的文本 token(Text Token)
+- 认证流程使用的系统访问令牌(Access Token)
 
-### Quota Notes
+### 额度说明
 
-- Service quota available to a user.
-- Sometimes also translated as **Crédit** depending on context.
+- 用户可用的服务额度。
+- 视语境有时也译作 **Crédit**。
 
-### French Language Notes
+### 法语语言注意事项
 
-- Keep plural forms valid for localization frameworks (`_one`, `_other`).
-- Pay attention to gender and grammar in French terms.
-- Examples: `modèle` is masculine, `canal` is masculine.
+- 保持复数形式符合本地化框架要求(`_one`、`_other`)。
+- 注意法语术语的性数与语法。
+- 例如:`modèle` 为阳性,`canal` 为阳性。
 
-### Standardized Terms
+### 统一术语
 
-- **Complétion**: model output.
-- **Ratio**: multiplier for pricing.
-- **Code de redemption / code d'échange**: prefer **Code d'échange**.
-- **Fournisseur**: organization or service exposing API or models.
+- **Complétion**:模型输出。
+- **Ratio**:定价使用的倍率。
+- **Code de redemption / code d'échange**:优先使用 **Code d'échange**。
+- **Fournisseur**:对外提供 API 或模型的组织或服务。
 
 ---
 
-**Contributor note:** If you spot inconsistent terminology or have better French localization suggestions, open an Issue or Pull Request.
-
+**贡献说明:**如发现术语不一致或有更好的法语本地化建议,欢迎提交 Issue 或 Pull Request。

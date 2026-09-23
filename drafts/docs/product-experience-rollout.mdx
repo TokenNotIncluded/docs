@@ -1,6 +1,8 @@
 ---
 title: "用户体验与来源分析实施清单"
-description: "LMM API documentation: 用户体验与来源分析实施清单"
+sidebarTitle: "体验实施清单"
+description: "用户体验与来源分析的实施清单与发布顺序。"
+icon: "list-checks"
 ---
 
 当前未完成事项统一跟踪：[GitHub #380](https://github.com/TokenNotIncluded/api.lmm.best/issues/380)。下方批次为历史实施记录，早期待办状态已被后续实现部分替代；以 issue 中的剩余实现与验收清单为准。
@@ -146,4 +148,3 @@ description: "LMM API documentation: 用户体验与来源分析实施清单"
 - 新手单个手动 Key 创建只返回一次完整 Key，后续单条／批量读取均由服务端阻止。旧 Key、自动 OAuth 及高级批量创建保持原有兼容行为；新建结果可复制、配置、只读检测与撤销。
 - 模型运行状态来自当前可用路由及有到期时间的管理员声明，并区分账号权限。它不保证下一次上游请求成功。控制台新增最近请求概览；普通用量日志不自动标作成功响应。
 - 上述功能已本地验证并补齐七语，尚未生产部署；整份原始清单的全流程验收和剩余细节仍未全部完成。
-

@@ -1,6 +1,8 @@
 ---
-title: "Signal path and WebMCP"
-description: "LMM API documentation: Signal path and WebMCP"
+title: "Signal Path 与 WebMCP"
+sidebarTitle: "Signal Path"
+description: "Signal Path 与 WebMCP 的交互路径与实现约定。"
+icon: "route"
 ---
 
 The game is available at `/games/signal`, including after sign-in. The sign-in and registration panels also offer the game. It is optional and never an authentication or anti-bot gate.
@@ -40,4 +42,3 @@ The game adds no AI provider calls and spends no platform credits. The participa
 ## Validation
 
 `contracts/signal-game/v2-golden.json` checks deterministic JavaScript/Go generation across all sizes. Model and controller tests cover countdown enforcement, no hints in challenge mode, replay validation, private email, account ownership, idempotency, and ranking filters. The browser tests cover local persistence, guest upload rejection and bounded WebMCP actions. No production account or score is created by these tests.
-

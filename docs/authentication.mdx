@@ -1,51 +1,52 @@
 ---
-title: "User Authentication and Login Sessions"
-description: "LMM API documentation: User Authentication and Login Sessions"
+title: "用户认证与登录会话"
+sidebarTitle: "认证与会话"
+description: "面板访问令牌、刷新 Cookie、PAT 与会话限制。"
 ---
 
-Panel authentication now uses a combination of short-lived access tokens, `HttpOnly` refresh cookies, and server-side session control. Panel requests no longer rely on Gin session middleware, and the `New-Api-User` request header is no longer required.
+面板认证现在由三部分组成:短期访问令牌、`HttpOnly` 刷新 Cookie 和服务端会话控制。面板请求不再依赖 Gin session 中间件,也不再要求 `New-Api-User` 请求头。
 
-## Authentication Model
+## 认证模型
 
-- Access token is a 15-minute JWT kept only in browser memory and sent via `Authorization: Bearer <token>`.
-- Refresh token is a random opaque value with a maximum lifetime of 30 days. The browser stores it only in an `HttpOnly`, `SameSite=Strict` cookie; the server stores only an HMAC digest and rotates it at each refresh.
-- `user_sessions` is the session control plane. It stores device, IP, login method, last active time, expiry, and revoked state. Session state in the database is the source of truth. Revocation propagation depends on Redis topology described below.
-- When security-related fields like password, status, role, or security factors change, `auth_version` increments and invalidates prior sessions. Plan changes that only alter grouping may refresh authorization cache and do not force logout.
-- Redis caches both authentication and session snapshots. Version fences and revoke tombstones prevent stale cache reauthorization. Session snapshots use TTL tied to `SYNC_FREQUENCY`. On cache miss or without Redis, authentication falls back to database checks.
+- 访问令牌是 15 分钟的 JWT,只保存在浏览器内存中,通过 `Authorization: Bearer <token>` 发送。
+- 刷新令牌是随机不可读值,最长有效期 30 天。浏览器只把它放在 `HttpOnly`、`SameSite=Strict` 的 Cookie 中;服务端只保存 HMAC 摘要,并在每次刷新时轮换。
+- `user_sessions` 是会话控制面,记录设备、IP、登录方式、最后活跃时间、过期时间和吊销状态。数据库中的会话状态是唯一事实来源,吊销的传播范围取决于下面的 Redis 拓扑。
+- 密码、状态、角色等安全相关字段变更时 `auth_version` 递增,旧会话随之失效。只调整分组的变更可以只刷新授权缓存,不强制登出。
+- Redis 同时缓存认证与会话快照。版本栅栏和吊销墓碑防止过期缓存被重新授权;会话快照的 TTL 与 `SYNC_FREQUENCY` 绑定。缓存未命中或未启用 Redis 时,认证回落到数据库校验。
 
-`SESSION_SECRET` derives separate signing keys for access tokens, security proof, refresh hash, and AuthFlow digest.
+`SESSION_SECRET` 会派生出访问令牌、安全证明、刷新哈希和 AuthFlow 摘要各自的签名密钥。
 
-In production and multi-node deployments, all nodes must share the same high-entropy secret value; rotating it invalidates existing sessions, temporary auth flows, and security proofs.
+在生产环境和多节点部署中,所有节点必须共享同一个高熵密钥;轮换该密钥会使现有会话、临时认证流程和安全证明失效。
 
-## Multi-Node Redis Topology
+## 多节点 Redis 拓扑
 
-Multi-node setups must share the same primary database.
+多节点部署必须共享同一个主数据库。
 
-- Session count, account-level active-session limit, and issuance window counts are enforced in the database, so limits apply globally across nodes.
-- Redis session hashes (`revoking`/`revoked` tombstones) are cache only; TTL is the minimum of remaining session lifetime and `SYNC_FREQUENCY`.
-- `SYNC_FREQUENCY` defaults to 60 seconds, including invalid values.
-- Cache reads never extend TTL. On expiration, fallback to database by SID.
-- Completed active cache writes can only continue when DB observation window remains; they cannot revive a full cache cycle after revoke tombstone expiration.
+- 会话数量、账户级活跃会话上限和签发窗口计数都在数据库中校验,因此限制是全局生效的。
+- Redis 中的会话哈希(`revoking` / `revoked` 墓碑)只是缓存,TTL 取会话剩余有效期与 `SYNC_FREQUENCY` 的较小值。
+- `SYNC_FREQUENCY` 默认 60 秒,配置为非法值时同样按默认值处理。
+- 读取缓存不会延长 TTL;过期后按 SID 回落数据库。
+- 已完成的活跃缓存写入只能在数据库观察窗口内继续,无法在吊销墓碑过期后复活完整缓存周期。
 
-| Redis Topology | Session State Propagation | Rate-Limit Semantics |
+| Redis 拓扑 | 会话状态传播 | 限流语义 |
 | --- | --- | --- |
-| Shared Redis across all nodes | Revoke and version updates propagate through one shared cache | Rate-limit quota is shared across all nodes |
-| Independent Redis per node | Convergence after cache TTL expiry, at most within `SYNC_FREQUENCY`; old cache may return 401 briefly during version rotation on a node | Limits are independent per node, so worst-case combined quota can scale to node count × single-node cap |
-| No Redis | Every check queries database directly | Node-local in-memory limiters, limits are independent |
+| 所有节点共享 Redis | 吊销与版本更新通过同一份缓存立即传播 | 限流额度在所有节点间共享 |
+| 每个节点独立 Redis | 最迟在缓存 TTL 到期后收敛,即 `SYNC_FREQUENCY` 以内;版本轮换期间该节点可能出现短暂的 401 | 各节点独立计数,最坏情况下总额度可达节点数 × 单节点上限 |
+| 不使用 Redis | 每次校验都直接查询数据库 | 节点本地内存限流,额度相互独立 |
 
-A larger `SYNC_FREQUENCY` widens stale cache windows for independent Redis. A smaller value increases per-node database checks for active sessions.
+`SYNC_FREQUENCY` 越大,独立 Redis 部署下的陈旧缓存窗口越长;取值越小,活跃会话的数据库查询次数越多。
 
-With default settings, active sessions can add one rate check approximately every 60 seconds per node.
+按默认配置,活跃会话大约每 60 秒在每个节点增加一次限流校验。
 
-When shared Redis is used, revocation tombstones and version changes still propagate immediately.
+使用共享 Redis 时,吊销墓碑和版本变更仍然立即传播。
 
-All nodes must also share the same `CRYPTO_SECRET` when using the same Redis, otherwise cache key digests differ and caches cannot be shared.
+共享同一 Redis 的所有节点还必须共享 `CRYPTO_SECRET`,否则缓存键摘要不一致,缓存无法共用。
 
-This scoped guarantee applies to login authentication only. Rate limiting and other caches can still be affected by topology.
+这一保证只覆盖登录认证;限流和其他缓存仍可能受拓扑影响。
 
-## Browser Interfaces
+## 浏览器接口
 
-After login, password, 2FA, passkey, OAuth, WeChat, and Telegram flows return a unified payload:
+登录、密码、两步验证、Passkey、OAuth、微信和 Telegram 流程登录后返回统一结构:
 
 ```json
 {
@@ -69,94 +70,94 @@ After login, password, 2FA, passkey, OAuth, WeChat, and Telegram flows return a 
 }
 ```
 
-Session endpoints:
+会话相关端点:
 
-| Endpoint | Auth | Purpose |
+| 端点 | 认证方式 | 用途 |
 | --- | --- | --- |
-| `POST /api/user/auth/refresh` | Refresh cookie; Origin check added in secure mode | Rotate refresh token and issue a new access token |
-| `POST /api/user/auth/logout` | Refresh cookie; Origin check added in secure mode; Bearer optional | Revoke current login session and clear cookie |
-| `GET /api/user/sessions` | Bearer | List valid sessions for current auth version, current session first, max 100 |
-| `PUT /api/user/sessions/settings` | Browser-session Bearer | Save the current user's automatic session sign-out preference |
-| `DELETE /api/user/sessions/:sid` | Bearer | Revoke selected session, including current one |
-| `POST /api/user/sessions/revoke-others` | Bearer | Keep current session and revoke all others |
+| `POST /api/user/auth/refresh` | 刷新 Cookie;安全模式下额外校验 Origin | 轮换刷新令牌并签发新的访问令牌 |
+| `POST /api/user/auth/logout` | 刷新 Cookie;安全模式下额外校验 Origin;Bearer 可选 | 吊销当前登录会话并清除 Cookie |
+| `GET /api/user/sessions` | Bearer | 列出当前认证版本下的有效会话,当前会话排在前面,最多 100 条 |
+| `PUT /api/user/sessions/settings` | 浏览器会话 Bearer | 保存当前用户的自动登出偏好 |
+| `DELETE /api/user/sessions/:sid` | Bearer | 吊销指定会话,包括当前会话 |
+| `POST /api/user/sessions/revoke-others` | Bearer | 保留当前会话并吊销其他所有会话 |
 
-When an in-memory session exists, include `X-Auth-Session: <sid>` on refresh/logout calls.
+浏览器内存中存在会话时,刷新和登出请求要带上 `X-Auth-Session: <sid>`。
 
-If refresh cookie SID and header SID mismatch, both endpoints return `409 AUTH_SESSION_MISMATCH` and do not rotate/revoke/clear any session.
+如果刷新 Cookie 的 SID 与请求头 SID 不一致,两个接口都会返回 `409 AUTH_SESSION_MISMATCH`,并且不会执行轮换、吊销或清除。
 
-The client should first call refresh to clear stale session SID in this tab, align cookie to current session, then retry logout.
+此时客户端应先调用刷新接口清理该标签页中的过期会话 SID,让 Cookie 对齐当前会话,再重试登出。
 
-When no active memory session exists at cold start, this header may be omitted.
+冷启动时没有活跃内存会话,可以不带该请求头。
 
-Concurrent use of the same refresh token is supported. The server deterministically rotates to one successor token so other tabs are not forced to log out due to missing “winner” response.
+同一个刷新令牌支持并发使用。服务端会确定性地轮换到一个后继令牌,其他标签页不会因为没拿到“获胜”响应而被强制登出。
 
-If the latest refresh token reappears after a short tolerance window, it will revoke the corresponding session. Unknown earlier or random tokens are rejected and cannot be used to kick sessions by guessing.
+如果最近的刷新令牌在容忍窗口之后再次出现,对应会话会被吊销。无法识别的更早令牌或随机令牌会被拒,不能通过猜测踢掉会话。
 
-The frontend serializes refresh calls per profile using Web Locks and shares session identifiers and login/logout events via BroadcastChannel (fallback to `storage` events).
+前端按配置文件用 Web Locks 串行化刷新调用,并通过 BroadcastChannel(回退到 `storage` 事件)共享会话标识与登录登出事件。
 
-Access token and refresh token are never shared across tabs via Web Storage.
+访问令牌和刷新令牌都不会通过 Web Storage 在标签页之间共享。
 
-## Session Issuance Limits and Retention
+## 会话签发限制与保留
 
-The **Automatically sign out sessions older than one week** switch is enabled by default for new and existing accounts. The user preference is stored as `session_auto_logout` in `users.setting`; a missing value means enabled. `GET /api/user/sessions` keeps its `data` array and includes the effective `session_auto_logout` boolean at the top level. Save it with `PUT /api/user/sessions/settings` and a JSON body such as `{"session_auto_logout": false}`. A boolean is required; PATs cannot change this browser-session setting.
+新建账户和已有账户默认开启 **自动登出一周前的会话** 开关。用户偏好保存在 `users.setting` 的 `session_auto_logout` 字段,缺少该值表示开启。`GET /api/user/sessions` 保留原有的 `data` 数组,并在顶层返回生效的 `session_auto_logout` 布尔值。通过 `PUT /api/user/sessions/settings` 保存,请求体形如 `{"session_auto_logout": false}`。该字段必须是布尔值;PAT 不能修改这个浏览器会话设置。
 
-When enabled, a session is signed out when its login time (`created_at`) is strictly earlier than `now - 7 × 24 hours`. Exactly seven days is still within the boundary. Refreshing a token or using a device updates activity without resetting this login age. The rule also applies to the current session. Turning the switch off preserves sessions still valid under the original 30-day lifetime; it cannot restore a session already revoked.
+开启后,登录时间(`created_at`)严格早于 `now - 7 × 24 小时` 的会话会被登出,正好七天仍在边界内。刷新令牌或使用设备会更新活跃时间,但不会重置登录时长。该规则同样适用于当前会话。关闭开关会保留在原有 30 天有效期内仍然有效的会话,无法恢复已被吊销的会话。
 
-The Go backend checks the age during access-token validation and refresh, and cleans up old sessions before login issuance, before listing sessions, and when enabling the switch. The master node also performs cleanup at startup and every hour, including accounts that no longer visit the site. Automatic sign-out uses the existing revocation and cache tombstone path; revoked records remain subject to audit retention below. This preference currently applies to the default Go backend; the Rust preview has not implemented it.
+Go 后端在访问令牌校验和刷新时检查会话年龄,并在登录签发前、列出会话前以及开启开关时清理旧会话。主节点还会在启动时和每小时执行清理,覆盖不再访问站点的账户。自动登出复用既有的吊销和缓存墓碑路径,被吊销的记录仍受下面的审计保留策略约束。该偏好当前仅适用于默认的 Go 后端,Rust 预览版尚未实现。
 
-Login issuance enforces two-tier account-level checks for all login methods:
+登录签发对所有登录方式执行两级账户级检查:
 
-- `USER_SESSION_ACTIVE_LIMIT` (default `50`): max number of unexpired active sessions. Exceeded returns `409 AUTH_SESSION_LIMIT`.
-- `USER_SESSION_ISSUANCE_LIMIT` (default `100`) and `USER_SESSION_ISSUANCE_WINDOW_SECONDS` (default `86400`): total sessions created in window, including revoked sessions and old auth versions. Exceeded returns `429 AUTH_SESSION_ISSUANCE_LIMIT`.
+- `USER_SESSION_ACTIVE_LIMIT`(默认 `50`):未过期的活跃会话数量上限,超限返回 `409 AUTH_SESSION_LIMIT`。
+- `USER_SESSION_ISSUANCE_LIMIT`(默认 `100`)与 `USER_SESSION_ISSUANCE_WINDOW_SECONDS`(默认 `86400`):窗口内创建的会话总数,包含已吊销会话和旧认证版本,超限返回 `429 AUTH_SESSION_ISSUANCE_LIMIT`。
 
-These counters and inserts are not wrapped with cross-node DB locks, so rare over-allocation can occur under extreme concurrent logins, but issuance is denied when counters fail.
+这些计数和写入没有加跨节点数据库锁,极端并发登录下可能出现少量超额,但计数失败时会拒绝签发。
 
-Accounts already above active limits are not forcibly logged out during upgrade; limits apply only to subsequent token issuance.
+升级前已超出活跃上限的账户不会被强制登出,限制只作用于之后的令牌签发。
 
-`USER_SESSION_REVOKED_RETENTION_DAYS` (default `7`) controls audit retention for revoked rows.
+`USER_SESSION_REVOKED_RETENTION_DAYS`(默认 `7`)控制被吊销行的审计保留时长。
 
-Issuance window must not exceed revoked retention; otherwise startup logs warnings and clamps the effective window to retention to avoid undercounting throttling from early revoked-row cleanup.
+签发窗口不得超过吊销保留时长,否则启动时会记录告警并把有效窗口收窄到保留时长,避免提前清理吊销行导致限流计数偏低。
 
-Cleanup does not delete expired sessions if `created_at` remains inside issuance window. Unexpired revoked rows are retained through retention window.
+只要 `created_at` 仍处于签发窗口内,清理就不会删除过期会话。未过期的吊销行会保留整个保留窗口。
 
-Expired entries are preserved to avoid silently reducing issuance counters or audit records.
+已过期记录会被保留,以免静默降低签发计数或丢失审计记录。
 
-Active count includes active rows with stale `user_auth_version`; because device list shows only current version, users may need to use “revoke other sessions” on an active device to clear hidden stale rows. Password reset revokes all sessions but does not reset issuance counters.
+活跃计数包含 `user_auth_version` 陈旧的活跃行;由于设备列表只展示当前版本,用户可能需要在活跃设备上执行“吊销其他会话”来清除隐藏的陈旧行。重置密码会吊销所有会话,但不会重置签发计数。
 
-Only master nodes run periodic cleanup every hour for expired sessions and revoked sessions beyond retention.
+只有主节点会每小时执行一次周期清理,处理过期会话和超出保留时长的已吊销会话。
 
-`USER_SESSION_HOURLY_ALERT_THRESHOLD` (default `5000`) only creates alerts during unusual hourly issuance spikes and is not a global circuit breaker.
+`USER_SESSION_HOURLY_ALERT_THRESHOLD`(默认 `5000`)只在每小时签发量异常飙升时产生告警,不是全局熔断。
 
-## Refresh/Logout Origin Checks
+## 刷新与登出的 Origin 校验
 
-Refresh and logout origin controls are tied to cookie security mode:
+刷新和登出的 Origin 控制与 Cookie 安全模式绑定:
 
-- If `SESSION_COOKIE_SECURE` is unset or `false`, refresh cookie works on local HTTP. Refresh/logout OriginGuard is disabled and `SESSION_COOKIE_TRUSTED_URL` should not be configured. This enables `http://localhost` with different ports for local dev proxies.
-- If `SESSION_COOKIE_SECURE=true`, refresh cookie is HTTPS-only and strict OriginGuard is enabled. `POST /api/user/auth/refresh` and `POST /api/user/auth/logout` validate browser `Origin`. If `Origin` is absent, a valid single `Referer` is accepted as fallback.
+- 未设置 `SESSION_COOKIE_SECURE` 或设置为 `false` 时,刷新 Cookie 可用于本地 HTTP。刷新与登出的 OriginGuard 关闭,此时不应配置 `SESSION_COOKIE_TRUSTED_URL`,从而支持本地开发代理使用不同端口的 `http://localhost`。
+- `SESSION_COOKIE_SECURE=true` 时,刷新 Cookie 仅限 HTTPS,并启用严格的 OriginGuard。`POST /api/user/auth/refresh` 和 `POST /api/user/auth/logout` 会校验浏览器的 `Origin`;缺少 `Origin` 时接受唯一的有效 `Referer` 作为回退。
 
-Allowed origins include request origin and exact entries in `SESSION_COOKIE_TRUSTED_URL`.
+允许的来源包括请求自身的 Origin 以及 `SESSION_COOKIE_TRUSTED_URL` 中精确列出的条目。
 
-Secure Origin checks ignore client-provided `X-Forwarded-Proto`.
+安全模式下忽略客户端提供的 `X-Forwarded-Proto`。
 
-When TLS terminates at reverse proxy, include public HTTPS panel origin in `SESSION_COOKIE_TRUSTED_URL`.
+TLS 在反向代理终止时,要把面板的公网 HTTPS 来源写进 `SESSION_COOKIE_TRUSTED_URL`。
 
-`SESSION_COOKIE_TRUSTED_URL` now explicitly lists trusted origins for refresh/logout cookies only; it is not a CORS whitelist.
+`SESSION_COOKIE_TRUSTED_URL` 只用于刷新和登出 Cookie 的可信来源,不是 CORS 白名单。
 
-Rules:
+规则:
 
-- Configure only when `SESSION_COOKIE_SECURE=true`.
-- Use comma-separated exact HTTPS origins, for example `https://panel.example.com` or `https://panel.example.com:8443`.
-- No wildcards, paths, query strings, user info, or domain suffix matching.
-- Does not modify relay behavior or CORS for legacy billing dashboard, `/api/usage/token`, or `/api/log/token`.
+- 仅在 `SESSION_COOKIE_SECURE=true` 时配置。
+- 使用逗号分隔的精确 HTTPS 来源,例如 `https://panel.example.com` 或 `https://panel.example.com:8443`。
+- 不支持通配符、路径、查询串、用户信息和域名后缀匹配。
+- 不改变中继行为,也不影响旧计费面板、`/api/usage/token` 和 `/api/log/token` 的 CORS。
 
-Local development example (OriginGuard disabled):
+本地开发示例(OriginGuard 关闭):
 
 ```env
 SESSION_SECRET=<local-random-value>
 SESSION_COOKIE_SECURE=false
 ```
 
-Production example (OriginGuard enabled):
+生产示例(OriginGuard 开启):
 
 ```env
 SESSION_SECRET=<high-entropy-random-value>
@@ -164,83 +165,81 @@ SESSION_COOKIE_SECURE=true
 SESSION_COOKIE_TRUSTED_URL=https://panel.example.com,https://admin.example.com
 ```
 
-This switch only controls refresh/logout origin behavior.
+该开关只控制刷新与登出的来源行为。
 
-## Trusted Proxies and IP Rate Limits
+## 可信代理与 IP 限流
 
-Gin now defaults to trusting all proxy-supplied client-IP headers. This project moves to a three-state control:
+Gin 默认信任所有代理提供的客户端 IP 请求头。本项目改为三态控制:
 
-- If unset/empty/whitespace, trust loopback and private CIDRs by default: `127.0.0.0/8`, `::1`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, and `fc00::/7`, with startup warning.
-- This protects localhost/Nginx/Docker setups but may not be sufficient for public internet direct access.
-- `TRUSTED_PROXIES=none` (case-insensitive, exact only) enables strict direct mode and ignores all proxy headers.
-- Any non-empty value is parsed as comma-separated IP/CIDR and fully replaces defaults.
-- Invalid CIDR, empty list, or mixing `none` with values prevents startup.
+- 未设置、为空或只有空白时,默认信任回环和私有网段:`127.0.0.0/8`、`::1`、`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16` 和 `fc00::/7`,并在启动时告警。
+- 这能保护 localhost、Nginx 和 Docker 场景,但可能不足以应对公网直连。
+- `TRUSTED_PROXIES=none`(不区分大小写,必须完全匹配)启用严格直连模式,忽略所有代理请求头。
+- 任何非空值都会按逗号分隔的 IP/CIDR 解析,并完全替换默认值。
+- CIDR 非法、列表为空或把 `none` 与具体值混用都会导致启动失败。
 
-When request source is trusted proxy, Gin reads header chain from right to left and takes the first non-trusted hop as client IP.
+请求来源是可信代理时,Gin 从右向左读取请求头链,取第一个不可信跳作为客户端 IP。
 
-Default trust of private network implies residual risk: other hosts in the same private network that can directly reach the app may forge those headers. Use `none` or precise proxy addresses for stronger enforcement.
+默认信任私有网络意味着残留风险:同网段内能直连应用的其它主机可以伪造这些请求头。需要更强约束时使用 `none` 或精确的代理地址。
 
-Redis rate limiting uses atomic Lua fixed window instead of prior approximate list-based sliding window.
+Redis 限流从原先的近似链表滑动窗口改为原子 Lua 固定窗口。
 
-This intentionally changes behavior: both sides of a boundary window can pass, allowing up to about twice configured rate in very short bursts (for example, `20/20min` may briefly pass ~40).
+这会刻意改变行为:边界窗口两侧都可能通过,短时间内允许接近配置值两倍的突发(例如 `20/20min` 可能短暂通过约 40 次)。
 
-User-level model success limiting still uses existing Redis List sliding window, with timestamps written in UTC.
+用户级模型调用成功限流仍使用现有的 Redis List 滑动窗口,时间戳统一写为 UTC。
 
-During rolling migration, mixed local-time and UTC entries may cause temporary over/under-limit within a single window. Consistency is restored after one full window across all nodes.
+滚动迁移期间,本地时间与 UTC 条目混合可能在同一窗口内造成临时超限或低于限制。所有节点经过一个完整窗口后恢复一致。
 
-This migration keeps keyspace unchanged.
+本次迁移不改变键空间。
 
-Public registration remains protected by critical IP limiting; distributed multi-account attacks cannot be fully prevented by IP limits alone.
-For public deployments, enable Turnstile and email verification. Additional device/feature risk controls should be separate security projects.
+公开注册仍由关键 IP 限流保护,但分布式多账号攻击无法只靠 IP 限流完全阻止。面向公网部署时请启用 Turnstile 和邮箱验证,设备与功能级风险控制应作为独立的安全项目推进。
 
-## PAT Access Contract
+## PAT 访问契约
 
-Panel PAT (`User.AccessToken`) remains `Authorization: Bearer <pat>`, and still accepts `Authorization: <pat>`.
+面板 PAT(`User.AccessToken`)仍使用 `Authorization: Bearer <pat>`,同时继续接受 `Authorization: <pat>`。
 
-`New-Api-User` is no longer required for auth; external scripts no longer need duplicate Bearer+user-id headers.
+认证不再要求 `New-Api-User`,外部脚本也不需要同时发送 Bearer 和用户 ID 请求头。
 
-PAT is not a panel login session. It cannot call session management APIs and cannot produce session-bound security proofs.
+PAT 不是面板登录会话,不能调用会话管理接口,也无法生成绑定会话的安全证明。
 
-## Temporary Auth Flow and Re-Verification
+## 临时认证流程与二次验证
 
-OAuth state, 2FA pending, passkey ceremony, and Telegram bind state live in `auth_flows`. Client stores random `flow_token`; database stores only HMAC digest.
+OAuth state、待完成的 2FA、Passkey 流程和 Telegram 绑定状态都存放在 `auth_flows` 中。客户端保存随机 `flow_token`,数据库只保存 HMAC 摘要。
 
-Flow records bind purpose, provider, intent, user, and login session and are atomic single-use.
+流程记录绑定用途、提供方、意图、用户和登录会话,并且是原子的一次性凭据。
 
-OAuth affiliate code is persisted through the login auth flow as well.
+OAuth 推广码同样通过登录认证流程持久化。
 
-Standard OAuth bind callback sends result via same-origin `postMessage` to popup opener. Only opener calls backend bind APIs with its own in-memory Bearer token.
+标准 OAuth 绑定回调通过同源 `postMessage` 把结果发给弹出窗口的打开者。只有打开者才用自己内存中的 Bearer 令牌调用后端绑定接口。
 
-Telegram binding creates binding AuthFlow while user is logged in; Telegram widget callback returns with `flow_token` in URL path. Callback verifies source login session is still valid.
+Telegram 绑定在用户已登录时创建绑定的 AuthFlow,Telegram 组件回调通过 URL 路径带回 `flow_token`。回调会校验来源登录会话是否仍然有效。
 
-Telegram signed widget assertion is a one-time credential and replay is rejected.
+Telegram 组件签名断言是一次性凭据,重放会被拒绝。
 
-Sensitive operations use 5-minute `X-Security-Proof`:
+敏感操作需要 5 分钟有效的 `X-Security-Proof`:
 
-- `channel.key.read`: read channel key
-- `passkey.register`: register passkey
-- `passkey.delete`: delete passkey
+- `channel.key.read`:读取渠道密钥
+- `passkey.register`:注册 Passkey
+- `passkey.delete`:删除 Passkey
 
-Proof binds user, login session, user auth version, session version, and scope. It cannot be reused across user/session/purpose.
+安全证明绑定用户、登录会话、用户认证版本、会话版本和 scope,不能跨用户、会话或用途复用。
 
-For users with 2FA enabled, both passkey register begin and finish must include valid `passkey.register` proof. Finish re-validates proof before consuming AuthFlow token.
+启用了两步验证的用户,Passkey 注册的开始和完成都必须携带有效的 `passkey.register` 证明;完成环节会在消费 AuthFlow 令牌前重新校验证明。
 
-Passkey registration for users without 2FA does not require this header.
+未启用两步验证的用户注册 Passkey 不需要该请求头。
 
-## Upgrade Notes
+## 升级说明
 
-- Legacy `session` cookies are no longer used; existing panel logins become invalid after upgrade.
-- Database migration adds `user_sessions`, `auth_flows`, `external_identity_claims`, and `users.auth_version`, and initializes auth versions and Telegram ownership.
-- Migration rejects startup if historical data has one Telegram ID linked to multiple users.
-- Migration adds indexes for session issuance counts and batched cleanup.
-- For large existing `user_sessions`, allocate maintenance window on first startup.
-- `user_sessions.previous_refresh_hash` migrates from fixed `char(64)` to `varchar(64)`. Application reads both.
-- Migration is idempotent and should not repeatedly alter column type.
-- Only master nodes run periodic cleanup of expired sessions, revoked sessions beyond retention, and old AuthFlows.
-- Without explicit `TRUSTED_PROXIES`, default private proxy trust applies; deployments with public LBs, `100.64.0.0/10`, link-local, or custom CNI ranges should configure explicitly.
-- Set `none` to ignore all forwarded headers.
-- Redis limiter now uses fixed window with explicit boundary burst semantics (up to ~2x burst).
-- User-model success limiting has transient mixed-timestamp window during rolling migration.
-- Self-built clients should adopt new AuthBundle, `flow_token`, and Security Proof contract.
-- PAT clients can remove `New-Api-User` usage.
-
+- 旧版 `session` Cookie 不再使用,升级后已有的面板登录全部失效。
+- 数据库迁移新增 `user_sessions`、`auth_flows`、`external_identity_claims` 和 `users.auth_version`,并初始化认证版本与 Telegram 归属。
+- 历史数据中同一个 Telegram ID 关联多个用户时,迁移会拒绝启动。
+- 迁移为会话签发计数和批量清理添加索引。
+- `user_sessions` 数据量较大时,首次启动需要预留维护窗口。
+- `user_sessions.previous_refresh_hash` 从固定 `char(64)` 迁移为 `varchar(64)`,应用同时兼容两者。
+- 迁移是幂等的,不应重复修改列类型。
+- 只有主节点会周期清理过期会话、超出保留时长的吊销会话和旧的 AuthFlow。
+- 未显式配置 `TRUSTED_PROXIES` 时使用默认私有代理信任;使用公网负载均衡、`100.64.0.0/10`、链路本地地址或自定义 CNI 网段的部署必须显式配置。
+- 设置为 `none` 会忽略所有转发请求头。
+- Redis 限流改用固定窗口,边界突发可达约两倍。
+- 用户模型成功限流在滚动迁移期间存在时间戳混合的临时窗口。
+- 自建客户端应改用新的 AuthBundle、`flow_token` 和安全证明契约。
+- PAT 客户端可以移除对 `New-Api-User` 的依赖。

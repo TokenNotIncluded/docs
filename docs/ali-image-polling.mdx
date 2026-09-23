@@ -1,27 +1,13 @@
 ---
-title: "Ali asynchronous image polling"
-description: "LMM API documentation: Ali asynchronous image polling"
+title: "Ali 图像异步轮询"
+sidebarTitle: "图像异步轮询"
+description: "阿里图像生成任务的异步轮询接口与状态查询流程。"
 ---
 
-Ali asynchronous image requests wait 5 seconds before the first task query,
-then wait 10 seconds between queries, with at most 20 attempts. Transport and
-response-reading errors consume attempts too. There is no wait after the final
-attempt. Twenty immediate nonterminal or failed queries therefore finish after
-195 seconds.
+阿里异步图像请求在首次查询任务前等待 5 秒,之后每次查询间隔 10 秒,最多尝试 20 次。传输错误与响应读取错误同样消耗尝试次数。最后一次尝试后不再等待。因此 20 次立刻返回未完成或失败的查询会在 195 秒后结束。
 
-Polling has a **205-second overall deadline**, starting when polling begins and
-covering delays, HTTP response headers and response body reads. This is a new
-wall-clock bound, not a guarantee previously provided by the attempt counter.
-An earlier incoming request deadline or cancellation wins. Slow queries may use
-the budget before all 20 attempts run. Cancellation releases the HTTP response;
-it does not cancel the provider's image-generation job.
+轮询有**205 秒的总截止时间**,从开始轮询时计时,覆盖等待、HTTP 响应头和响应体读取。这是新增的挂钟时间上界,而不是尝试计数此前提供的保证。更早到达的入站请求截止时间或取消优先。慢查询可能在 20 次尝试用完之前就耗尽预算。取消会释放 HTTP 响应,但不会取消供应方的图像生成任务。
 
-Task queries reuse the shared HTTP client with the channel's proxy and transport
-settings. Existing `RELAY_TIMEOUT` and response-header timeout settings still
-apply; the shared client's timeout is not mutated. Even with `RELAY_TIMEOUT=0`,
-the polling context provides a finite remaining budget.
+任务查询复用共享 HTTP 客户端以及渠道的代理和传输设置。既有的 `RELAY_TIMEOUT` 与响应头超时设置仍然生效,共享客户端的超时不会被修改。即使 `RELAY_TIMEOUT=0`,轮询上下文也会提供有限的剩余预算。
 
-Terminal provider statuses and raw responses retain their existing handling.
-Synchronous image generation, response conversion and image-count pricing are
-unchanged.
-
+供应方的终态状态与原始响应保留既有处理方式。同步图像生成、响应转换和图像数量计价保持不变。
