@@ -99,7 +99,6 @@
             "groups": [
               {
                 "group": "开始使用",
-                "icon": "rocket",
                 "pages": [
                   "/introduction",
                   "/quickstart",
@@ -108,7 +107,6 @@
               },
               {
                 "group": "接入指南",
-                "icon": "plug-zap",
                 "pages": [
                   "/docs/api-keys",
                   "/docs/api-reference",
@@ -128,7 +126,6 @@
               },
               {
                 "group": "账户与计费",
-                "icon": "credit-card",
                 "pages": [
                   "/docs/billing",
                   "/docs/account",
@@ -137,7 +134,6 @@
               },
               {
                 "group": "帮助",
-                "icon": "circle-question-mark",
                 "pages": [
                   "/docs/faq",
                   "/docs/troubleshooting"
@@ -145,7 +141,6 @@
               },
               {
                 "group": "政策与法律",
-                "icon": "scale",
                 "pages": [
                   "/docs/legal/user-agreement",
                   "/docs/legal/privacy-policy",
