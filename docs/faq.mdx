@@ -4,65 +4,75 @@ sidebarTitle: "常见问题"
 icon: "circle-question-mark"
 ---
 
-<AccordionGroup>
-  <Accordion title="支持哪些客户端？">
-    支持自定义 Base URL 的 OpenAI、Anthropic 和 Gemini 客户端。
+<ResponseField name="支持哪些客户端" type="客户端">
+  支持自定义 Base URL 的 OpenAI、Anthropic 和 Gemini 客户端。
 
-    常用工具的填法在侧边栏 **工具** 里：Claude Code、Codex、Cursor、Grok Build。入口见[快速开始](/quickstart)。
-  </Accordion>
-  <Accordion title="和官方订阅有什么区别？">
-    LMM API 提供模型接口，并按实际用量扣费。一枚 API Key 可以调用多家供应商的模型。你在客户端中更换地址和 API Key 后即可使用。
-  </Accordion>
-  <Accordion title="如何计费？">
-    服务按用量扣费。文本按 token，图像按张，视频按次，音频按秒或字符。计算公式见[模型与价格](/docs/models)。
+  常用工具的填法在侧边栏 **工具** 里：Claude Code、Codex、Cursor、Grok Build。入口见[快速开始](/quickstart)。
+</ResponseField>
 
-    额度换算为 **$1 = 500,000 额度**。控制台以美元显示。
-  </Accordion>
-  <Accordion title="余额会过期吗？">
-    充值得到的额度长期有效，并保留在账户中。
-  </Accordion>
-  <Accordion title="一枚 API Key 可以在几台设备上使用？">
-    设备数量没有限制。建议一台设备使用一枚 API Key，以便定位异常用量。泄露时也只影响这一台设备。
-  </Accordion>
-  <Accordion title="可以调用哪些模型？">
-    服务覆盖多家供应商的文本、图像、视频、音频、嵌入和审核模型。列表以控制台 **模型与价格** 页为准，也可以调用 `GET /v1/models`。
+<ResponseField name="和官方订阅有什么区别" type="计费">
+  LMM API 提供模型接口，并按实际用量扣费。一枚 API Key 可以调用多家供应商的模型。你在客户端中更换地址和 API Key 后即可使用。
+</ResponseField>
 
-    创建 API Key 时选择的分组，决定这枚 API Key 可以调用哪些模型。
-  </Accordion>
-  <Accordion title="为什么同一模型的价格会变化？">
-    模型单价和分组倍率会随上游成本与运营策略调整。以控制台为准。需要当前价格时，调用 `GET /v1/pricing?model=<模型ID>`。
-  </Accordion>
-  <Accordion title="在国内网络下如何访问？">
-    直接访问 `https://api.lmm.best`。
-  </Accordion>
-  <Accordion title="API Key 泄露后如何处理？">
-    1. 登录控制台，删除泄露的 API Key。
-    2. 创建一枚新的 API Key，并更新全部客户端。
-    3. 检查调用日志，确认是否有异常消费。
+<ResponseField name="如何计费" type="计费">
+  服务按用量扣费。文本按 token，图像按张，视频按次，音频按秒或字符。计算公式见[模型与价格](/docs/models)。
 
-    如果 API Key 进入了公开仓库，同时清理历史提交。
-  </Accordion>
-  <Accordion title="调用内容会如何记录？">
-    控制台默认显示调用时间、模型、状态码、token 数和扣费金额。这些记录用于用量展示和路由。
+  额度换算为 **$1 = 500,000 额度**。控制台以美元显示。
+</ResponseField>
 
-    排障、风控和计费争议需要时，系统会保留技术日志。访问受权限控制。规则见[隐私政策](/docs/legal/privacy-policy)。
-  </Accordion>
-  <Accordion title="如何申请发票或退款？">
-    登录控制台后，通过工单提交订单、发票和退款申请。
-  </Accordion>
-  <Accordion title="为什么返回 404？">
-    常见原因有两个：
+<ResponseField name="余额会过期吗" type="额度">
+  充值得到的额度长期有效，并保留在账户中。
+</ResponseField>
 
-    1. API Key 无效或已过期。在控制台重新创建一枚。
-    2. 地址不正确。多数客户端填写 `https://api.lmm.best/v1`。Claude Code 和 Anthropic SDK 填写 `https://api.lmm.best`。
-  </Accordion>
-  <Accordion title="如何联系支持？">
-    登录控制台后提交工单。控制台中的助手可以回答常见的接入问题。
+<ResponseField name="一枚 API Key 可以在几台设备上使用" type="安全">
+  设备数量没有限制。建议一台设备使用一枚 API Key，以便定位异常用量。泄露时也只影响这一台设备。
+</ResponseField>
 
-    <Warning>
-      支持请求通过站内工单处理。向你索要密码或 API Key 的消息不是官方支持。
-    </Warning>
-  </Accordion>
-</AccordionGroup>
+<ResponseField name="可以调用哪些模型" type="模型">
+  服务覆盖多家供应商的文本、图像、视频、音频、嵌入和审核模型。列表以控制台 **模型与价格** 页为准，也可以调用 `GET /v1/models`。
+
+  创建 API Key 时选择的分组，决定这枚 API Key 可以调用哪些模型。
+</ResponseField>
+
+<ResponseField name="为什么同一模型的价格会变化" type="价格">
+  模型单价和分组倍率会随上游成本与运营策略调整。以控制台为准。需要当前价格时，调用 `GET /v1/pricing?model=<模型ID>`。
+</ResponseField>
+
+<ResponseField name="在国内网络下如何访问" type="访问">
+  直接访问 `https://api.lmm.best`。
+</ResponseField>
+
+<ResponseField name="API Key 泄露后如何处理" type="安全">
+  1. 登录控制台，删除泄露的 API Key。
+  2. 创建一枚新的 API Key，并更新全部客户端。
+  3. 检查调用日志，确认是否有异常消费。
+
+  如果 API Key 进入了公开仓库，同时清理历史提交。
+</ResponseField>
+
+<ResponseField name="调用内容会如何记录" type="隐私">
+  控制台默认显示调用时间、模型、状态码、token 数和扣费金额。这些记录用于用量展示和路由。
+
+  排障、风控和计费争议需要时，系统会保留技术日志。访问受权限控制。规则见[隐私政策](/docs/legal/privacy-policy)。
+</ResponseField>
+
+<ResponseField name="如何申请发票或退款" type="账单">
+  登录控制台后，通过工单提交订单、发票和退款申请。
+</ResponseField>
+
+<ResponseField name="为什么返回 404" type="错误">
+  常见原因有两个：
+
+  1. API Key 无效或已过期。在控制台重新创建一枚。
+  2. 地址不正确。多数客户端填写 `https://api.lmm.best/v1`。Claude Code 和 Anthropic SDK 填写 `https://api.lmm.best`。
+</ResponseField>
+
+<ResponseField name="如何联系支持" type="支持">
+  登录控制台后提交工单。控制台中的助手可以回答常见的接入问题。
+
+  <Warning>
+    支持请求通过站内工单处理。向你索要密码或 API Key 的消息不是官方支持。
+  </Warning>
+</ResponseField>
 
 更多状态码见[错误与排查](/docs/troubleshooting)。
