@@ -1,0 +1,30 @@
+---
+title: "Cursor"
+sidebarTitle: "Cursor"
+---
+
+Cursor 通过 OpenAI 兼容接口使用 LMM API。Base URL 保留 `/v1`。
+
+| 配置项 | 值 |
+| --- | --- |
+| Base URL | `https://api.lmm.best/v1` |
+| API Key | OpenAI API Key |
+
+<Steps>
+  <Step title="打开模型设置">
+    打开 **Cursor Settings → Models**。
+  </Step>
+  <Step title="填写 API Key">
+    打开 **OpenAI API Key**，粘贴控制台创建的 `sk-xxxxxxxx`，然后保存。
+  </Step>
+  <Step title="覆盖 Base URL">
+    打开 **Override OpenAI Base URL**，填入 `https://api.lmm.best/v1`。
+  </Step>
+  <Step title="添加模型">
+    点击 **Add model**，填入控制台 **模型与价格** 里的模型 ID，并打开对应开关。
+  </Step>
+</Steps>
+
+<Note>
+  覆盖 Base URL 后，OpenAI 系列请求会发到 LMM API。改回 Cursor 自带模型时，关闭这项覆盖。Tab 补全仍使用 Cursor 自己的模型。
+</Note>

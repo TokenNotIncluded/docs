@@ -1,0 +1,39 @@
+---
+title: "Codex"
+sidebarTitle: "Codex"
+---
+
+Codex CLI 使用 OpenAI Responses。Base URL 保留 `/v1`，API Key 放在 `LMM_API_KEY`。
+
+| 配置项 | 值 |
+| --- | --- |
+| Base URL | `https://api.lmm.best/v1` |
+| API Key | `LMM_API_KEY` |
+| 协议 | `wire_api = "responses"` |
+
+编辑 `~/.codex/config.toml`：
+
+```toml
+model = "gpt-5.6-sol"
+model_provider = "lmm"
+
+[model_providers.lmm]
+name = "LMM API"
+base_url = "https://api.lmm.best/v1"
+wire_api = "responses"
+env_key = "LMM_API_KEY"
+```
+
+<CodeGroup>
+```bash macOS / Linux
+export LMM_API_KEY=sk-xxxxxxxx
+codex
+```
+
+```powershell Windows PowerShell
+$env:LMM_API_KEY="sk-xxxxxxxx"
+codex
+```
+</CodeGroup>
+
+`model` 换成控制台 **模型与价格** 里可用的模型 ID。

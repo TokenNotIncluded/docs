@@ -1,0 +1,53 @@
+---
+title: "快速开始"
+sidebarTitle: "快速开始"
+---
+
+注册账户、创建 API Key，然后按你使用的工具填入 Base URL 和 API Key。
+
+<Steps>
+  <Step title="注册并登录">
+    打开 [api.lmm.best](https://api.lmm.best)。可以用用户名和密码（需要邮箱验证码）、Google、GitHub、Discord、LinuxDO 或 Telegram 注册。Passkey 需要先在已登录的账户里绑定设备。
+
+    登录后进入控制台。
+  </Step>
+  <Step title="创建 API Key">
+    打开 **密钥 / 令牌**，点击新建。名称用来区分用途，例如 `claude-code`。分组第一次选择默认分组。额度可以留空，此时这枚 API Key 使用账户余额。
+
+    保存后复制 API Key。它以 `sk-` 开头。控制台把 API Key 显示为「令牌」。
+
+    <Warning>
+      API Key 具有账户的调用权限。不要把它提交到公开仓库，也不要放进截图或聊天记录。如果泄露，在控制台删除它并新建一枚。
+    </Warning>
+  </Step>
+  <Step title="选择工具">
+    打开侧边栏的 **工具**，按你正在用的客户端查看配置。
+
+    <CardGroup cols={2}>
+      <Card title="Claude Code" icon="terminal" href="/docs/tools/claude">
+        Base URL 为 `https://api.lmm.best`，Key 写入 `ANTHROPIC_AUTH_TOKEN`。
+      </Card>
+      <Card title="Codex" icon="square-terminal" href="/docs/tools/codex">
+        Base URL 为 `https://api.lmm.best/v1`，协议使用 Responses。
+      </Card>
+      <Card title="Cursor" icon="mouse-pointer-2" href="/docs/tools/cursor">
+        在 Models 里覆盖 OpenAI Base URL，并填入 API Key。
+      </Card>
+      <Card title="Grok Build" icon="sparkles" href="/docs/tools/grok">
+        在 `~/.grok/config.toml` 里添加自定义模型。
+      </Card>
+    </CardGroup>
+  </Step>
+  <Step title="按协议核对 Base URL">
+    | 协议 | Base URL | 用于 |
+    | --- | --- | --- |
+    | Anthropic Messages | `https://api.lmm.best` | Claude Code |
+    | OpenAI Chat Completions | `https://api.lmm.best/v1` | Cursor、Grok Build |
+    | OpenAI Responses | `https://api.lmm.best/v1` | Codex |
+    | Anthropic Messages（Grok） | `https://api.lmm.best/v1` | Grok Build 的 `messages` 后端 |
+
+    Claude Code 的地址到主机名为止。其余工具保留 `/v1`。
+  </Step>
+</Steps>
+
+配置完成后，在对应工具里发起一次对话。请求失败时，按[错误与排查](/docs/troubleshooting)中的状态码处理。

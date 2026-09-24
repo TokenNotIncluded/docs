@@ -1,0 +1,39 @@
+---
+title: "Claude Code"
+sidebarTitle: "Claude Code"
+---
+
+Claude Code 使用 Anthropic Messages。Base URL 到主机名为止，API Key 写入 `ANTHROPIC_AUTH_TOKEN`。
+
+| 配置项 | 值 |
+| --- | --- |
+| Base URL | `https://api.lmm.best` |
+| API Key | `ANTHROPIC_AUTH_TOKEN` |
+
+<CodeGroup>
+```bash macOS / Linux
+export ANTHROPIC_BASE_URL=https://api.lmm.best
+export ANTHROPIC_AUTH_TOKEN=sk-xxxxxxxx
+claude
+```
+
+```powershell Windows PowerShell
+$env:ANTHROPIC_BASE_URL="https://api.lmm.best"
+$env:ANTHROPIC_AUTH_TOKEN="sk-xxxxxxxx"
+claude
+```
+</CodeGroup>
+
+要在新的终端里保留配置，写入 `~/.claude/settings.json` 的 `env`：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.lmm.best",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxx",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6"
+  }
+}
+```
+
+`ANTHROPIC_MODEL` 可选。填写控制台 **模型与价格** 里可用的 Claude 模型 ID。API Key 在控制台 **密钥 / 令牌** 中创建。

@@ -1,0 +1,122 @@
+---
+title: "充值与计费"
+sidebarTitle: "充值与计费"
+---
+
+打开控制台的 **钱包**，可以充值、兑换额度，并查看扣费记录。
+
+## 理解额度
+
+账户金额以 quota 存储，并按固定系数换算成美元：
+
+```text
+$1 = 500,000 额度
+```
+
+控制台显示美元。人民币金额按站点配置的汇率折算，扣费仍使用美元额度。额度没有有效期。
+
+## 完成充值
+
+支付方式以钱包页当时列出的方式为准。到账后，额度可以立即使用。
+
+支付成功但额度未到账时：
+
+<Steps>
+  <Step title="刷新钱包">
+    刷新页面，并查看订单状态。
+  </Step>
+  <Step title="等待回调">
+    支付通道通常在几分钟内同步结果。
+  </Step>
+  <Step title="提交工单">
+    仍未到账时，在控制台提交工单，并附上订单号。
+  </Step>
+</Steps>
+
+## 使用优惠码、红包和兑换码
+
+<AccordionGroup>
+  <Accordion title="使用优惠码">
+    带有折扣的优惠码通过钱包链接生效：
+
+    ```text
+    https://api.lmm.best/wallet?discount_code=XXXX
+    ```
+
+    使用次数和有效期以钱包页显示的为准。
+  </Accordion>
+  <Accordion title="领取红包">
+    红包每个账户只能领取一次。链接格式如下：
+
+    ```text
+    https://api.lmm.best/red-packet/<红包ID>
+    ```
+
+    打开链接并登录后即可领取。已经领取过的账户不能再次领取。
+  </Accordion>
+  <Accordion title="兑换额度">
+    在钱包页的兑换入口输入兑换码。兑换成功后，对应额度记入账户。
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  优惠码和红包通过站内公告、控制台和本页中的链接发放。
+</Note>
+
+## 领取签到奖励
+
+控制台可以每日签到并领取额度。账户等级越高，签到奖励越多。等级和奖励数量以签到页为准。
+
+<Warning>
+  只签到而不使用服务，或用随机用户名批量注册，会被判定为滥用并封禁账户。
+</Warning>
+
+## 查看一次调用如何扣费
+
+每次调用按实际用量扣费。文本请求的计算方式见[模型与价格](/docs/models)。
+
+```text
+扣费额度 = 用量 × 模型倍率 × 分组倍率
+金额(USD) = 扣费额度 ÷ 500,000
+```
+
+额度不足时，请求会被拒绝。同一账户下的多枚 API Key 共享账户余额，每枚 API Key 还可以单独设置上限。
+
+## 查询用量
+
+查询某一枚 API Key：
+
+```bash
+curl https://api.lmm.best/v1/usage \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+```
+
+| 字段 | 含义 |
+| --- | --- |
+| `remaining` | 这枚 API Key 的剩余美元额度 |
+| `used_today` | UTC 当日已用金额 |
+| `used_total` | 这枚 API Key 的累计用量 |
+| `total_quota` | `remaining` 与 `used_total` 之和 |
+| `unlimited` | 为 `true` 时，这枚 API Key 本身没有上限 |
+| `updated_at` | 快照时间，单位是 Unix 秒 |
+
+查询账户钱包：
+
+```bash
+curl https://api.lmm.best/v1/balance \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+```
+
+先在控制台为这枚 API Key 打开 **允许读取账户余额**。返回的 `remaining` 是账户钱包余额，单位是美元。
+
+控制台的调用日志包含时间、模型、token 数、状态码和扣费金额。你可以按时间范围筛选并导出。
+
+## 遵守查询限流
+
+`/v1/usage`、`/v1/balance` 和 `/v1/pricing` 按账户限流，每分钟 30 次。这个限制覆盖该账户的全部 API Key。收到 `429` 时，遵守 `Retry-After` 并退避。
+
+## 申请退款或处理异常订单
+
+充值异常和退款通过控制台登录后的工单提交。身份核验在工单中完成。
+
+邀请好友后的额度奖励见[邀请奖励](/docs/referral)。

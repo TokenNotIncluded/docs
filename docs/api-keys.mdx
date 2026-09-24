@@ -1,0 +1,104 @@
+---
+title: "API Key"
+sidebarTitle: "API Key"
+---
+
+API Key 是调用接口的凭据。控制台把它显示为「令牌」。一个账户可以创建多枚 API Key，分别给不同的应用或设备使用。
+
+打开控制台的 **密钥 / 令牌**。
+
+## 创建 API Key
+
+<Steps>
+  <Step title="打开新建表单">
+    登录控制台，进入 **密钥 / 令牌**，点击新建。
+  </Step>
+  <Step title="设置限制">
+    | 字段 | 作用 |
+    | --- | --- |
+    | **名称** | 用来区分用途，例如 `claude-code-笔记本`。 |
+    | **分组** | 决定可用模型和计费倍率。选择「自动」时，网关在可用分组中选择。 |
+    | **额度** | 这枚 API Key 的金额上限。留空或设为无限时，它跟随账户余额。 |
+    | **有效期** | 可选。到期后 API Key 失效。 |
+    | **模型限制** | 可选。只允许调用列出的模型。 |
+    | **IP 白名单** | 可选。只接受来自这些 IP 的请求。 |
+  </Step>
+  <Step title="保存 API Key">
+    保存后复制完整值。它以 `sk-` 开头。
+
+    <Warning>
+      完整的 API Key 只在创建时显示一次。请立刻保存。如果怀疑泄露，删除这枚 API Key 并新建一枚。
+    </Warning>
+  </Step>
+</Steps>
+
+## 理解两层额度
+
+账户余额和 API Key 额度同时生效。
+
+- 账户余额是这个账户还能使用的总金额。
+- API Key 额度是这一枚凭据最多能使用的金额。
+
+实际可用金额取两者中较小的值。给临时设备或第三方应用单独设置较低的额度，可以把单次泄露的影响限制在这一枚 API Key 上。
+
+`GET /v1/usage` 返回的是这一枚 API Key 的剩余额度和累计用量。
+
+## 允许读取账户余额
+
+默认情况下，API Key 只能查询自己的额度。客户端需要显示账户钱包余额时，打开读取权限：
+
+<Steps>
+  <Step title="编辑 API Key">
+    进入 **密钥 / 令牌**，打开目标 API Key 的编辑框。
+  </Step>
+  <Step title="打开余额权限">
+    勾选 **允许此密钥读取账户余额**。之后这枚 API Key 可以调用 `GET /v1/balance`。
+  </Step>
+</Steps>
+
+<Warning>
+  打开后，持有这枚 API Key 的人可以读取账户余额。共享出去的 API Key 保持关闭。关闭开关后，权限立即撤销。
+</Warning>
+
+```bash
+curl https://api.lmm.best/v1/balance \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+```
+
+## 导入到 cc-switch
+
+<Steps>
+  <Step title="选择统一供应商">
+    在 cc-switch 右上角点击加号，选择 **统一供应商**。
+  </Step>
+  <Step title="填写接入信息">
+    | 字段 | 值 |
+    | --- | --- |
+    | Base URL | `https://api.lmm.best` |
+    | API Key | 控制台创建的 API Key |
+    | 模型 ID | 分组中可用的模型 ID，例如 `gpt-6-astra` |
+  </Step>
+  <Step title="显示余额">
+    先为这枚 API Key 打开 **允许读取账户余额**，导入时再勾选用量查询。导入后，余额每 5 分钟刷新一次。
+  </Step>
+</Steps>
+
+## 保护 API Key
+
+- 一台设备使用一枚 API Key。这样可以定位异常用量，泄露时也只影响这一台设备。
+- 只授予需要的模型和分组。能设置额度时就设置额度。
+- 怀疑泄露时，删除旧的 API Key，创建新的，并更新客户端配置。
+- 把 API Key 放在你的服务端。浏览器和移动端代码中的 API Key 等于公开。前端需要调用时，经你自己的后端转发。
+
+## 用管理 API 操作
+
+登录控制台后，可以用管理 API 操作用户的 API Key。这些端点使用控制台登录后的 Bearer 会话令牌。
+
+| 端点 | 作用 |
+| --- | --- |
+| `GET /api/token/` | 列出 API Key |
+| `POST /api/token/` | 创建 API Key |
+| `PUT /api/token/` | 更新 API Key |
+| `DELETE /api/token/{id}` | 删除 API Key |
+
+端点说明见[接入地址与端点](/docs/api-reference)。

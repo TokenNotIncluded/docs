@@ -1,60 +1,41 @@
 ---
-title: "LMM API 文档"
-sidebarTitle: "总览"
-description: "使用 LMM API 构建应用，安全运行平台，并接入兼容 OpenAI 的模型端点。"
+title: "简介"
+sidebarTitle: "简介"
 ---
 
-LMM API 提供兼容 OpenAI 的文本、图像、视频、音频、嵌入和内容审核模型访问能力。本站把接入指南、端点参考、部署运维、计费支付、产品功能与政策条款放在同一个侧边栏里,用标题分组。
+LMM API 是模型聚合网关。你在[控制台](https://api.lmm.best)注册并创建 API Key 之后，可以用同一套接口调用多家供应商的文本、图像、视频、音频、嵌入和审核模型。
 
-<CardGroup cols={2}>
-  <Card title="先完成认证" icon="key-round" href="/docs/authentication">
-    了解面板访问令牌、刷新 Cookie、PAT 与会话限制,再发出第一个请求。
-  </Card>
-  <Card title="查阅端点" icon="brackets" href="/docs/api-reference">
-    中继 API 与管理 API 的 OpenAPI 总览、基础地址和鉴权方式。
-  </Card>
-  <Card title="部署与运维" icon="server-cog" href="/docs/backend-cli-deployment-contract">
-    按受支持的部署、数据库、诊断和回滚流程操作。
-  </Card>
-  <Card title="计费与支付" icon="credit-card" href="/docs/payment-money-contract">
-    价格锁、支付金额、推荐奖励和赏金规则的契约说明。
-  </Card>
-</CardGroup>
+控制台把 API Key 显示为「令牌」。
 
-## 侧边栏分组
+## 支持哪些协议
 
-侧边栏从上到下按六个标题分组,覆盖接入到政策的完整链路:
+同一枚 API Key 可以按客户端原来的协议发送请求。
 
-- **开始使用**:总览、认证与会话、API 总览。
-- **API 端点**:中继 API 与管理 API 的自动生成端点页面,以及响应兼容、只读查询、图像轮询和远程控制专题。
-- **部署与运维**:部署与环境、数据与缓存、运行时与诊断。
-- **计费与支付**:模型价格锁、支付金额契约、CC Switch 余额、推荐奖励和开源赏金。
-- **产品与功能**:产品术语、内置助手、渠道设置、OAuth 设置、前端设计与等待体验。
-- **政策与法律**:用户协议、隐私政策、服务条款以及中法俄三份术语词汇表。
+| 协议 | 入口 | 适用客户端 |
+| --- | --- | --- |
+| OpenAI | `/v1/chat/completions`、`/v1/responses` | OpenAI SDK、Codex、多数聊天应用 |
+| Anthropic | `/v1/messages` | Claude Code、Anthropic SDK |
+| Gemini | `/v1beta/models/{model}:generateContent` | Gemini 客户端 |
 
-<Note>
-  两份 OpenAPI 规范保存在 `docs/openapi/`,站内所有端点页面由它们自动生成,不需要手写。
-</Note>
+图像、音频、嵌入、重排序和审核也走 OpenAI 兼容入口。完整列表见[接入地址与端点](/docs/api-reference)。
 
-## 推荐阅读路径
+## 什么时候使用
 
-先完成认证和端点选择,再进入部署运维。只有需要改动线上状态时,才阅读部署与运维中的发布事务页面。
+- 你要用一个账户调用多个模型供应商。
+- 你要在现有客户端里更换地址和 API Key 后继续使用。
+- 你要按实际用量付费。
 
-<Steps>
-  <Step title="认证并发出第一个请求">
-    阅读[认证与会话](/docs/authentication),了解面板访问令牌和中继 API Bearer 契约。令牌必须保留在服务端,并在会话或部署发生变化时轮换。
-  </Step>
-  <Step title="选择兼容端点">
-    进入 [API 总览](/docs/api-reference),再根据客户端选择 Chat Completions、Responses、Messages、Gemini、嵌入或媒体端点。端点页面可交互,能直接填入令牌发送请求。
-  </Step>
-  <Step title="在安全环境中验证">
-    修改生产状态前,先完成[启动设置](/docs/setup-startup)中的检查,再阅读[CLI 部署契约](/docs/backend-cli-deployment-contract)中的验证契约。
-  </Step>
-  <Step title="依据证据运维">
-    按需查看[服务器运维](/docs/server-ops)、数据库、诊断和部署事务页面,让每次变更都可回滚、可审计。
-  </Step>
-</Steps>
+## 理解核心概念
 
-<Warning>
-  生产变更必须遵循文档中的验证和审批步骤。演练结果、历史日志或一次成功的健康检查都不能替代当前的发布契约。
-</Warning>
+| 概念 | 含义 |
+| --- | --- |
+| **API Key** | 调用凭据，以 `sk-` 开头。你可以为它设置额度、有效期、模型范围和 IP 白名单。 |
+| **额度** | 账户的计费单位。站点按 $1 = 500,000 额度换算，控制台以美元显示。 |
+| **分组** | 决定这枚 API Key 可以调用哪些模型，以及使用哪一档计费倍率。 |
+| **倍率** | 计费系数。扣费等于用量乘以模型倍率和分组倍率。见[模型与价格](/docs/models)。 |
+
+可用模型、分组名称和倍率会调整。调用前以控制台的 **模型与价格** 页为准。
+
+## 下一步
+
+打开[快速开始](/quickstart)，完成注册、创建 API Key，并发送第一次请求。

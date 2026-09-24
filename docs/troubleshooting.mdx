@@ -1,0 +1,73 @@
+---
+title: "错误与排查"
+sidebarTitle: "错误与排查"
+---
+
+先用这三条请求确认 API Key、额度和价格都可以读取。
+
+```bash
+curl https://api.lmm.best/v1/models \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+
+curl https://api.lmm.best/v1/usage \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+
+curl "https://api.lmm.best/v1/pricing?model=gpt-5.6-sol" \
+  -H "Authorization: Bearer sk-xxxxxxxx"
+```
+
+三条都成功时，继续检查客户端的 Base URL、鉴权头和模型 ID。任何一条失败时，按下表处理。
+
+## 根据状态码处理
+
+| 状态码 | 含义 | 处理方式 |
+| --- | --- | --- |
+| `400` | 请求格式不正确 | 检查 JSON、必填字段和参数类型。 |
+| `401` | 鉴权失败 | 检查 API Key，以及鉴权头是否符合目标协议。 |
+| `403` | 无权访问 | 检查 API Key 是否被禁用、额度是否耗尽，以及 IP 是否在白名单内。 |
+| `404` | API Key 无效，或路径不存在 | 在控制台重新创建 API Key。同时核对 Base URL 是否多写或少写了 `/v1`。 |
+| `429` | 触发限流 | 降低请求频率。只读查询按账户每分钟 30 次。遵守 `Retry-After` 并退避。 |
+| `500`、`502`、`503` | 服务端或上游异常 | 稍后重试。持续失败时提交工单，并附上请求时间和模型 ID。 |
+
+错误体：
+
+```json
+{
+  "error": {
+    "message": "invalid api key",
+    "type": "invalid_request_error"
+  }
+}
+```
+
+## 处理客户端报错
+
+| 症状 | 处理方式 |
+| --- | --- |
+| 客户端和 `/v1/models` 都返回 `404` | API Key 无效或已过期。在控制台创建新的 API Key。 |
+| `/v1/models` 成功，客户端仍返回 `404` | 地址不正确。OpenAI 兼容应用、Codex 和 Cherry Studio 使用 `https://api.lmm.best/v1`。Claude Code 和 Anthropic SDK 使用 `https://api.lmm.best`。 |
+| `401 Unauthorized` | 鉴权头不正确，或 Base URL 多写、少写了 `/v1`。 |
+| 模型不存在，或无权使用该模型 | 模型不在当前分组中，或被 API Key 的模型限制排除。到控制台核对分组和限制。 |
+| 流式响应中途断开 | 上游长时间没有新输出。更换分组或模型，在客户端开启重试，或缩短单次上下文。 |
+| Claude Code 压缩失败，或停在 95% | 长上下文压缩超时。升级 Claude Code，更换响应更快的分组，并用 `/clear` 缩短上下文。 |
+| 请求耗时很长 | 低价分组的延迟更高。推理模型的思考时间也更长。更换模型和分组后再比较一次。 |
+
+## 处理额度和登录问题
+
+| 症状 | 处理方式 |
+| --- | --- |
+| 额度不足 | 充值后重试。你也可以给单枚 API Key 设置较低上限。 |
+| `GET /v1/balance` 返回 `403` | 这枚 API Key 没有打开 **允许读取账户余额**。到 **密钥 / 令牌** 打开后再试。 |
+| 登录提示会话数量超限 | 到账户设置执行 **吊销其他会话**，然后重新登录。 |
+
+## 提交工单时附上这些信息
+
+- 请求时间，精确到分钟，并注明时区
+- 模型 ID 和分组
+- 请求 ID 或响应头
+- 错误响应原文
+- 复现步骤
+
+<Warning>
+  工单中不要附上完整的 API Key。需要核验时，提供名称或前几位。
+</Warning>

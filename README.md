@@ -1,8 +1,8 @@
-# LMM API documentation
+# LMM API 文档
 
 This repository contains the Mintlify documentation site for [LMM API](https://api.lmm.best).
 
-The site includes the complete upstream documentation set from `TokenNotIncluded/api.lmm.best/docs`, converted to MDX with Mintlify frontmatter and organized into navigation groups. The two OpenAPI contracts are stored in `docs/openapi/` and registered in `docs.json` for generated endpoint reference pages.
+The site is written for end users: how to sign up, create an API key, call the API, connect common clients, and understand model groups, ratios, and billing. Internal engineering and operations notes are kept under `drafts/` and are excluded from the build.
 
 ## Local preview
 
@@ -17,6 +17,8 @@ The preview runs at `http://localhost:3000`.
 
 ## Structure
 
-- `introduction.mdx` is the site overview.
-- `docs/` contains the migrated MDX pages and OpenAPI specifications.
-- `docs.json` defines branding, OpenAPI sources, navigation, and footer links.
+- `introduction.mdx`, `quickstart.mdx`, `how-it-works.mdx` — getting started.
+- `docs/` — user-facing guides (`api-keys`, `api-reference`, `clients`, `models`, `billing`, `account`, `referral`, `faq`, `troubleshooting`) plus `docs/legal/` and the OpenAPI specs.
+- `docs/openapi/` — the two OpenAPI contracts registered in `docs.json` for generated API reference pages.
+- `docs.json` — branding, colors, OpenAPI sources, navigation, and footer links.
+- `drafts/` — internal notes and operations documentation, ignored by Mintlify.

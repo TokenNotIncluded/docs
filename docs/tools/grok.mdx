@@ -1,0 +1,44 @@
+---
+title: "Grok Build"
+sidebarTitle: "Grok Build"
+---
+
+在 `~/.grok/config.toml` 里增加一个自定义模型。对话模型使用 OpenAI Chat Completions，Base URL 保留 `/v1`。
+
+| 配置项 | 值 |
+| --- | --- |
+| Base URL | `https://api.lmm.best/v1` |
+| API Key | 环境变量 `LMM_API_KEY` |
+| 协议 | `api_backend = "chat_completions"` |
+
+```toml
+[model.lmm]
+model = "gpt-5.6-sol"
+name = "LMM"
+base_url = "https://api.lmm.best/v1"
+env_key = "LMM_API_KEY"
+```
+
+<CodeGroup>
+```bash macOS / Linux
+export LMM_API_KEY=sk-xxxxxxxx
+```
+
+```powershell Windows PowerShell
+$env:LMM_API_KEY="sk-xxxxxxxx"
+```
+</CodeGroup>
+
+启动 Grok 后，在模型列表里选择 **LMM**。`model` 换成控制台 **模型与价格** 里可用的模型 ID。
+
+调用 Claude 时把协议改成 Messages，并带上 Anthropic 版本头：
+
+```toml
+[model.lmm-claude]
+model = "claude-sonnet-4-6"
+name = "LMM Claude"
+base_url = "https://api.lmm.best/v1"
+api_backend = "messages"
+env_key = "LMM_API_KEY"
+extra_headers = { "anthropic-version" = "2023-06-01" }
+```
